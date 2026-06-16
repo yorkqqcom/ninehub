@@ -1,0 +1,378 @@
+{
+  "provider": "tushare",
+  "version": "2025-06-bundled",
+  "source": "bundled",
+  "apis": [
+    {
+      "api": "daily",
+      "doc_id": 27,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120
+    },
+    {
+      "api": "weekly",
+      "doc_id": 144,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 2000
+    },
+    {
+      "api": "monthly",
+      "doc_id": 29,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120
+    },
+    {
+      "api": "pro_bar",
+      "doc_id": 30,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120
+    },
+    {
+      "api": "adj_factor",
+      "doc_id": 28,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 2000
+    },
+    {
+      "api": "suspend_d",
+      "doc_id": 214,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120
+    },
+    {
+      "api": "daily_basic",
+      "doc_id": 32,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 2000
+    },
+    {
+      "api": "stock_basic",
+      "doc_id": 25,
+      "category": "基础",
+      "probe_category": "list_basic",
+      "min_points": 120
+    },
+    {
+      "api": "trade_cal",
+      "doc_id": 26,
+      "category": "基础",
+      "probe_category": "exchange_date_range",
+      "min_points": 2000
+    },
+    {
+      "api": "namechange",
+      "doc_id": 34,
+      "category": "基础",
+      "probe_category": "list_limit",
+      "min_points": 120
+    },
+    {
+      "api": "stock_company",
+      "doc_id": 36,
+      "category": "基础",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "new_share",
+      "doc_id": 37,
+      "category": "基础",
+      "probe_category": "list_limit",
+      "min_points": 120
+    },
+    {
+      "api": "income",
+      "doc_id": 33,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600
+    },
+    {
+      "api": "balancesheet",
+      "doc_id": 36,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600
+    },
+    {
+      "api": "cashflow",
+      "doc_id": 44,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600
+    },
+    {
+      "api": "forecast",
+      "doc_id": 45,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600
+    },
+    {
+      "api": "express",
+      "doc_id": 46,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600
+    },
+    {
+      "api": "dividend",
+      "doc_id": 47,
+      "category": "财务",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "fina_indicator",
+      "doc_id": 48,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600
+    },
+    {
+      "api": "fina_mainbz",
+      "doc_id": 49,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600
+    },
+    {
+      "api": "top10_holders",
+      "doc_id": 50,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "top10_floatholders",
+      "doc_id": 51,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "pledge_stat",
+      "doc_id": 52,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "share_float",
+      "doc_id": 160,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "block_trade",
+      "doc_id": 53,
+      "category": "参考",
+      "probe_category": "trade_date",
+      "min_points": 120
+    },
+    {
+      "api": "stk_holdernumber",
+      "doc_id": 54,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "moneyflow",
+      "doc_id": 55,
+      "category": "特色",
+      "probe_category": "ts_code_date_range",
+      "min_points": 2000
+    },
+    {
+      "api": "margin",
+      "doc_id": 56,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 2000
+    },
+    {
+      "api": "margin_detail",
+      "doc_id": 57,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 2000
+    },
+    {
+      "api": "top_list",
+      "doc_id": 58,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 2000
+    },
+    {
+      "api": "top_inst",
+      "doc_id": 107,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 5000
+    },
+    {
+      "api": "index_basic",
+      "doc_id": 59,
+      "category": "指数",
+      "probe_category": "list_limit",
+      "min_points": 120
+    },
+    {
+      "api": "index_daily",
+      "doc_id": 60,
+      "category": "指数",
+      "probe_category": "index_daily",
+      "min_points": 120
+    },
+    {
+      "api": "index_weight",
+      "doc_id": 61,
+      "category": "指数",
+      "probe_category": "trade_date",
+      "min_points": 120
+    },
+    {
+      "api": "fund_basic",
+      "doc_id": 62,
+      "category": "基金",
+      "probe_category": "list_limit",
+      "min_points": 120
+    },
+    {
+      "api": "fund_nav",
+      "doc_id": 63,
+      "category": "基金",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120
+    },
+    {
+      "api": "fund_div",
+      "doc_id": 64,
+      "category": "基金",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "fut_basic",
+      "doc_id": 65,
+      "category": "期货",
+      "probe_category": "list_limit",
+      "min_points": 120
+    },
+    {
+      "api": "fut_daily",
+      "doc_id": 66,
+      "category": "期货",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120
+    },
+    {
+      "api": "opt_basic",
+      "doc_id": 67,
+      "category": "期权",
+      "probe_category": "list_limit",
+      "min_points": 120
+    },
+    {
+      "api": "opt_daily",
+      "doc_id": 68,
+      "category": "期权",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120
+    },
+    {
+      "api": "cb_basic",
+      "doc_id": 69,
+      "category": "债券",
+      "probe_category": "list_limit",
+      "min_points": 120
+    },
+    {
+      "api": "cb_daily",
+      "doc_id": 70,
+      "category": "债券",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120
+    },
+    {
+      "api": "concept",
+      "doc_id": 71,
+      "category": "概念",
+      "probe_category": "list_limit",
+      "min_points": 120
+    },
+    {
+      "api": "concept_detail",
+      "doc_id": 72,
+      "category": "概念",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "ggt_top10",
+      "doc_id": 73,
+      "category": "港股通",
+      "probe_category": "trade_date",
+      "min_points": 2000
+    },
+    {
+      "api": "hsgt_top10",
+      "doc_id": 74,
+      "category": "港股通",
+      "probe_category": "trade_date",
+      "min_points": 2000
+    },
+    {
+      "api": "cn_gdp",
+      "doc_id": 75,
+      "category": "宏观",
+      "probe_category": "none",
+      "min_points": 120
+    },
+    {
+      "api": "cn_cpi",
+      "doc_id": 76,
+      "category": "宏观",
+      "probe_category": "none",
+      "min_points": 120
+    },
+    {
+      "api": "broker_recommend",
+      "doc_id": 77,
+      "category": "研报",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "report_rc",
+      "doc_id": 78,
+      "category": "研报",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "stk_managers",
+      "doc_id": 79,
+      "category": "基础",
+      "probe_category": "ts_code",
+      "min_points": 120
+    },
+    {
+      "api": "repurchase",
+      "doc_id": 80,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+/* 工作流页 — Cockpit 式布局（对标 xtqmt bottom-band） */
+.wf-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-height: 0;
+  height: 100%;
+}
+
+.wf-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: var(--space-lg);
+  min-height: 320px;
+  flex: 1;
+}
+
+.wf-canvas-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wf-canvas-panel .panel__body {
+  flex: 1;
+  min-height: 280px;
+  padding: var(--space-md);
+}
+
+.wf-side-panel .panel__body {
+  padding: var(--space-md);
+}
+
+.wf-node-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.wf-node-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.wf-node-item:hover {
+  background: var(--color-row-hover);
+}
+
+.wf-node-item.active {
+  background: var(--color-row-active);
+  border-color: var(--color-border);
+}
+
+.wf-node-item__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wf-node-item__type {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.wf-bottom-band {
+  flex-shrink: 0;
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.wf-bottom-band .panel__body {
+  padding: 0;
+  overflow: auto;
+  max-height: 180px;
+}
+
+.wf-bottom-band .data-table tbody tr {
+  cursor: pointer;
+}
+
+.wf-bottom-band .data-table tbody tr.row-active {
+  background: var(--color-row-active);
+}
+
+.wf-validate-panel .panel__body {
+  padding: var(--space-sm) var(--space-md);
+}
+
+.wf-validate-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: var(--font-size-sm);
+}
+
+.wf-validate-list--err {
+  color: var(--color-rise);
+}
+
+.wf-validate-list--warn {
+  color: var(--color-warn-text);
+}
+
+.wf-async-toggle {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.wf-btn-danger:not(:disabled) {
+  color: var(--color-rise);
+}
+
+@media (max-width: 900px) {
+  .wf-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .wf-side-panel {
+    order: 2;
+  }
+}

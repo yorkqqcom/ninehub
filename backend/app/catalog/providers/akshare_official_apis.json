@@ -1,0 +1,9 @@
+{
+  "provider": "akshare",
+  "version": "2025-06-stub",
+  "source": "bundled",
+  "apis": [
+    {"api": "stock_zh_a_hist", "category": "行情", "probe_category": "none", "label": "A股历史行情"},
+    {"api": "stock_info_a_code_name", "category": "基础", "probe_category": "none", "label": "A股代码名称"}
+  ]
+}

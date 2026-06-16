@@ -1,0 +1,534 @@
+{
+  "cases": [
+    {
+      "id": "weekly-144",
+      "doc_id": 144,
+      "api": "weekly",
+      "text": "接口：weekly 描述：获取A股周线行情 积分：需2000积分以上才可以调取本接口，5000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "top_list-106",
+      "doc_id": 106,
+      "api": "top_list",
+      "text": "接口：top_list 描述：龙虎榜每日统计单 积分：需2000积分以上才可以调取本接口，5000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "top_inst-107",
+      "doc_id": 107,
+      "api": "top_inst",
+      "text": "接口：top_inst 积分：5000积分以上才可以调取，具体请参阅积分获取办法",
+      "min_points": 5000
+    },
+    {
+      "id": "top10_holders-61",
+      "doc_id": 61,
+      "api": "top10_holders",
+      "text": "接口：top10_holders 积分：需2000积分才可以调取，每分钟可以请求200次",
+      "min_points": 2000
+    },
+    {
+      "id": "top10_floatholders-62",
+      "doc_id": 62,
+      "api": "top10_floatholders",
+      "text": "接口：top10_floatholders 积分：需2000积分才可以调取，每分钟可以请求200次",
+      "min_points": 2000
+    },
+    {
+      "id": "stock_basic-25",
+      "doc_id": 25,
+      "api": "stock_basic",
+      "text": "接口：stock_basic 积分：120积分可以试用，每天10次请求 用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000
+    },
+    {
+      "id": "stock_company-329",
+      "doc_id": 329,
+      "api": "stock_company",
+      "text": "接口：stock_company 积分：用户需要至少120积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 120
+    },
+    {
+      "id": "income-33",
+      "doc_id": 33,
+      "api": "income",
+      "text": "接口：income 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000
+    },
+    {
+      "id": "namechange-100",
+      "doc_id": 100,
+      "api": "namechange",
+      "text": "接口：namechange 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000
+    },
+    {
+      "id": "pledge_stat-110",
+      "doc_id": 110,
+      "api": "pledge_stat",
+      "text": "接口：pledge_stat 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000
+    },
+    {
+      "id": "pro_bar-146",
+      "doc_id": 146,
+      "api": "pro_bar",
+      "text": "接口：pro_bar 积分：用户需要至少6000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 6000
+    },
+    {
+      "id": "stk_holdernumber-166",
+      "doc_id": 166,
+      "api": "stk_holdernumber",
+      "text": "接口：stk_holdernumber 积分：需2000积分才可以调取，每分钟可以请求200次",
+      "min_points": 2000
+    },
+    {
+      "id": "report_rc-292",
+      "doc_id": 292,
+      "api": "report_rc",
+      "text": "接口：report_rc 积分：用户需要至少1000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 1000
+    },
+    {
+      "id": "trade_cal-26",
+      "doc_id": 26,
+      "api": "trade_cal",
+      "text": "接口：trade_cal 积分：需2000积分",
+      "min_points": 2000
+    },
+    {
+      "id": "daily_basic-32",
+      "doc_id": 32,
+      "api": "daily_basic",
+      "text": "接口：daily_basic 积分：至少2000积分才可以调取，5000积分无总量限制",
+      "min_points": 2000
+    },
+    {
+      "id": "suspend_d-214",
+      "doc_id": 214,
+      "api": "suspend_d",
+      "text": "接口：suspend_d 描述：按日期获取股票每日停复牌信息 输入参数",
+      "min_points": null
+    },
+    {
+      "id": "ths_hot-259",
+      "doc_id": 259,
+      "api": "ths_hot",
+      "text": "接口：ths_hot 描述：获取同花顺App热榜数据 输入参数",
+      "min_points": null
+    },
+    {
+      "id": "stk_managers-112",
+      "doc_id": 112,
+      "api": "stk_managers",
+      "text": "接口：stk_managers 描述：获取上市公司管理层 输入参数",
+      "min_points": null
+    },
+    {
+      "id": "new_share-123",
+      "doc_id": 123,
+      "api": "new_share",
+      "text": "接口：new_share 描述：获取新股上市列表数据 输入参数",
+      "min_points": null
+    },
+    {
+      "id": "stk_factor_pro-328",
+      "doc_id": 328,
+      "api": "stk_factor_pro",
+      "text": "接口：stk_factor_pro 描述：获取股票每日技术面因子数据 输入参数",
+      "min_points": null
+    },
+    {
+      "id": "gen-1",
+      "text": "积分：需120积分以上才可以调取本接口，2000积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "gen-2",
+      "text": "积分：需2000积分以上才可以调取本接口，5000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "gen-3",
+      "text": "积分：需600积分以上才可以调取本接口，2000积分以上频次会更高",
+      "min_points": 600
+    },
+    {
+      "id": "gen-4",
+      "text": "积分：需1000积分以上才可以调取本接口，5000积分以上频次会更高",
+      "min_points": 1000
+    },
+    {
+      "id": "gen-5",
+      "text": "积分：需5000积分以上才可以调取本接口，10000积分以上频次会更高",
+      "min_points": 5000
+    },
+    {
+      "id": "gen-6",
+      "text": "积分：需120积分以上才可以调取本接口，600积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "gen-7",
+      "text": "积分：120积分以上才可以调取，具体请参阅积分获取办法",
+      "min_points": 120
+    },
+    {
+      "id": "gen-8",
+      "text": "积分：2000积分以上才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000
+    },
+    {
+      "id": "gen-9",
+      "text": "积分：600积分以上才可以调取，具体请参阅积分获取办法",
+      "min_points": 600
+    },
+    {
+      "id": "gen-10",
+      "text": "积分：1000积分以上才可以调取，具体请参阅积分获取办法",
+      "min_points": 1000
+    },
+    {
+      "id": "gen-11",
+      "text": "积分：5000积分以上才可以调取，具体请参阅积分获取办法",
+      "min_points": 5000
+    },
+    {
+      "id": "gen-12",
+      "text": "积分：120积分以上才可以调取，具体请参阅积分获取办法",
+      "min_points": 120
+    },
+    {
+      "id": "gen-13",
+      "text": "积分：用户需要至少120积分才可以调取，2000积分无总量限制",
+      "min_points": 120
+    },
+    {
+      "id": "gen-14",
+      "text": "积分：用户需要至少2000积分才可以调取，5000积分无总量限制",
+      "min_points": 2000
+    },
+    {
+      "id": "gen-15",
+      "text": "积分：用户需要至少600积分才可以调取，2000积分无总量限制",
+      "min_points": 600
+    },
+    {
+      "id": "gen-16",
+      "text": "积分：用户需要至少1000积分才可以调取，5000积分无总量限制",
+      "min_points": 1000
+    },
+    {
+      "id": "gen-17",
+      "text": "积分：用户需要至少5000积分才可以调取，10000积分无总量限制",
+      "min_points": 5000
+    },
+    {
+      "id": "gen-18",
+      "text": "积分：用户需要至少120积分才可以调取，600积分无总量限制",
+      "min_points": 120
+    },
+    {
+      "id": "gen-19",
+      "text": "用户需要至少120积分才可以调取 频次限制 每分钟 2000积分",
+      "min_points": 120
+    },
+    {
+      "id": "gen-20",
+      "text": "用户需要至少2000积分才可以调取 频次限制 每分钟 5000积分",
+      "min_points": 2000
+    },
+    {
+      "id": "gen-21",
+      "text": "用户需要至少600积分才可以调取 频次限制 每分钟 2000积分",
+      "min_points": 600
+    },
+    {
+      "id": "gen-22",
+      "text": "用户需要至少1000积分才可以调取 频次限制 每分钟 5000积分",
+      "min_points": 1000
+    },
+    {
+      "id": "gen-23",
+      "text": "用户需要至少5000积分才可以调取 频次限制 每分钟 10000积分",
+      "min_points": 5000
+    },
+    {
+      "id": "gen-24",
+      "text": "用户需要至少120积分才可以调取 频次限制 每分钟 600积分",
+      "min_points": 120
+    },
+    {
+      "id": "gen-25",
+      "text": "积分：需120积分才可以调取，2000积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "gen-26",
+      "text": "积分：需2000积分才可以调取，5000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "gen-27",
+      "text": "积分：需600积分才可以调取，2000积分以上频次会更高",
+      "min_points": 600
+    },
+    {
+      "id": "gen-28",
+      "text": "积分：需1000积分才可以调取，5000积分以上频次会更高",
+      "min_points": 1000
+    },
+    {
+      "id": "gen-29",
+      "text": "积分：需5000积分才可以调取，10000积分以上频次会更高",
+      "min_points": 5000
+    },
+    {
+      "id": "gen-30",
+      "text": "积分：需120积分才可以调取，600积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "gen-31",
+      "text": "积分要求：120积分起，2000以上可高频调取",
+      "min_points": 120
+    },
+    {
+      "id": "gen-32",
+      "text": "积分要求：2000积分起，5000以上可高频调取",
+      "min_points": 2000
+    },
+    {
+      "id": "gen-33",
+      "text": "积分要求：600积分起，2000以上可高频调取",
+      "min_points": 600
+    },
+    {
+      "id": "gen-34",
+      "text": "积分要求：1000积分起，5000以上可高频调取",
+      "min_points": 1000
+    },
+    {
+      "id": "gen-35",
+      "text": "积分要求：5000积分起，10000以上可高频调取",
+      "min_points": 5000
+    },
+    {
+      "id": "gen-36",
+      "text": "积分要求：120积分起，600以上可高频调取",
+      "min_points": 120
+    },
+    {
+      "id": "gen-37",
+      "text": "接口：foo 积分：需120积分以上才可以调取本接口，2000积分以上频次会更高 输入参数",
+      "min_points": 120
+    },
+    {
+      "id": "gen-38",
+      "text": "接口：foo 积分：需2000积分以上才可以调取本接口，5000积分以上频次会更高 输入参数",
+      "min_points": 2000
+    },
+    {
+      "id": "gen-39",
+      "text": "接口：foo 积分：需600积分以上才可以调取本接口，2000积分以上频次会更高 输入参数",
+      "min_points": 600
+    },
+    {
+      "id": "gen-40",
+      "text": "接口：foo 积分：需1000积分以上才可以调取本接口，5000积分以上频次会更高 输入参数",
+      "min_points": 1000
+    },
+    {
+      "id": "gen-41",
+      "text": "接口：foo 积分：需5000积分以上才可以调取本接口，10000积分以上频次会更高 输入参数",
+      "min_points": 5000
+    },
+    {
+      "id": "gen-42",
+      "text": "接口：foo 积分：需120积分以上才可以调取本接口，600积分以上频次会更高 输入参数",
+      "min_points": 120
+    },
+    {
+      "id": "api-daily-120",
+      "text": "接口：daily 描述：test 积分：需120积分以上才可以调取本接口，240积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "api-daily-600",
+      "text": "接口：daily 描述：test 积分：需600积分以上才可以调取本接口，1200积分以上频次会更高",
+      "min_points": 600
+    },
+    {
+      "id": "api-daily-1000",
+      "text": "接口：daily 描述：test 积分：需1000积分以上才可以调取本接口，2000积分以上频次会更高",
+      "min_points": 1000
+    },
+    {
+      "id": "api-daily-2000",
+      "text": "接口：daily 描述：test 积分：需2000积分以上才可以调取本接口，4000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "api-daily-5000",
+      "text": "接口：daily 描述：test 积分：需5000积分以上才可以调取本接口，10000积分以上频次会更高",
+      "min_points": 5000
+    },
+    {
+      "id": "api-daily-6000",
+      "text": "接口：daily 描述：test 积分：需6000积分以上才可以调取本接口，11000积分以上频次会更高",
+      "min_points": 6000
+    },
+    {
+      "id": "api-weekly-120",
+      "text": "接口：weekly 描述：test 积分：需120积分以上才可以调取本接口，240积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "api-weekly-600",
+      "text": "接口：weekly 描述：test 积分：需600积分以上才可以调取本接口，1200积分以上频次会更高",
+      "min_points": 600
+    },
+    {
+      "id": "api-weekly-1000",
+      "text": "接口：weekly 描述：test 积分：需1000积分以上才可以调取本接口，2000积分以上频次会更高",
+      "min_points": 1000
+    },
+    {
+      "id": "api-weekly-2000",
+      "text": "接口：weekly 描述：test 积分：需2000积分以上才可以调取本接口，4000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "api-weekly-5000",
+      "text": "接口：weekly 描述：test 积分：需5000积分以上才可以调取本接口，10000积分以上频次会更高",
+      "min_points": 5000
+    },
+    {
+      "id": "api-weekly-6000",
+      "text": "接口：weekly 描述：test 积分：需6000积分以上才可以调取本接口，11000积分以上频次会更高",
+      "min_points": 6000
+    },
+    {
+      "id": "api-margin-120",
+      "text": "接口：margin 描述：test 积分：需120积分以上才可以调取本接口，240积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "api-margin-600",
+      "text": "接口：margin 描述：test 积分：需600积分以上才可以调取本接口，1200积分以上频次会更高",
+      "min_points": 600
+    },
+    {
+      "id": "api-margin-1000",
+      "text": "接口：margin 描述：test 积分：需1000积分以上才可以调取本接口，2000积分以上频次会更高",
+      "min_points": 1000
+    },
+    {
+      "id": "api-margin-2000",
+      "text": "接口：margin 描述：test 积分：需2000积分以上才可以调取本接口，4000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "api-margin-5000",
+      "text": "接口：margin 描述：test 积分：需5000积分以上才可以调取本接口，10000积分以上频次会更高",
+      "min_points": 5000
+    },
+    {
+      "id": "api-margin-6000",
+      "text": "接口：margin 描述：test 积分：需6000积分以上才可以调取本接口，11000积分以上频次会更高",
+      "min_points": 6000
+    },
+    {
+      "id": "api-limit_list_d-120",
+      "text": "接口：limit_list_d 描述：test 积分：需120积分以上才可以调取本接口，240积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "api-limit_list_d-600",
+      "text": "接口：limit_list_d 描述：test 积分：需600积分以上才可以调取本接口，1200积分以上频次会更高",
+      "min_points": 600
+    },
+    {
+      "id": "api-limit_list_d-1000",
+      "text": "接口：limit_list_d 描述：test 积分：需1000积分以上才可以调取本接口，2000积分以上频次会更高",
+      "min_points": 1000
+    },
+    {
+      "id": "api-limit_list_d-2000",
+      "text": "接口：limit_list_d 描述：test 积分：需2000积分以上才可以调取本接口，4000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "api-limit_list_d-5000",
+      "text": "接口：limit_list_d 描述：test 积分：需5000积分以上才可以调取本接口，10000积分以上频次会更高",
+      "min_points": 5000
+    },
+    {
+      "id": "api-limit_list_d-6000",
+      "text": "接口：limit_list_d 描述：test 积分：需6000积分以上才可以调取本接口，11000积分以上频次会更高",
+      "min_points": 6000
+    },
+    {
+      "id": "api-share_float-120",
+      "text": "接口：share_float 描述：test 积分：需120积分以上才可以调取本接口，240积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "api-share_float-600",
+      "text": "接口：share_float 描述：test 积分：需600积分以上才可以调取本接口，1200积分以上频次会更高",
+      "min_points": 600
+    },
+    {
+      "id": "api-share_float-1000",
+      "text": "接口：share_float 描述：test 积分：需1000积分以上才可以调取本接口，2000积分以上频次会更高",
+      "min_points": 1000
+    },
+    {
+      "id": "api-share_float-2000",
+      "text": "接口：share_float 描述：test 积分：需2000积分以上才可以调取本接口，4000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "api-share_float-5000",
+      "text": "接口：share_float 描述：test 积分：需5000积分以上才可以调取本接口，10000积分以上频次会更高",
+      "min_points": 5000
+    },
+    {
+      "id": "api-share_float-6000",
+      "text": "接口：share_float 描述：test 积分：需6000积分以上才可以调取本接口，11000积分以上频次会更高",
+      "min_points": 6000
+    },
+    {
+      "id": "api-repurchase-120",
+      "text": "接口：repurchase 描述：test 积分：需120积分以上才可以调取本接口，240积分以上频次会更高",
+      "min_points": 120
+    },
+    {
+      "id": "api-repurchase-600",
+      "text": "接口：repurchase 描述：test 积分：需600积分以上才可以调取本接口，1200积分以上频次会更高",
+      "min_points": 600
+    },
+    {
+      "id": "api-repurchase-1000",
+      "text": "接口：repurchase 描述：test 积分：需1000积分以上才可以调取本接口，2000积分以上频次会更高",
+      "min_points": 1000
+    },
+    {
+      "id": "api-repurchase-2000",
+      "text": "接口：repurchase 描述：test 积分：需2000积分以上才可以调取本接口，4000积分以上频次会更高",
+      "min_points": 2000
+    },
+    {
+      "id": "api-repurchase-5000",
+      "text": "接口：repurchase 描述：test 积分：需5000积分以上才可以调取本接口，10000积分以上频次会更高",
+      "min_points": 5000
+    },
+    {
+      "id": "api-repurchase-6000",
+      "text": "接口：repurchase 描述：test 积分：需6000积分以上才可以调取本接口，11000积分以上频次会更高",
+      "min_points": 6000
+    }
+  ]
+}

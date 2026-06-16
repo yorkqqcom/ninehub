@@ -1,0 +1,474 @@
+{
+  "provider": "tushare",
+  "fetched_at": "2026-06-16T00:22:35.983692+00:00",
+  "doc_count": 81,
+  "with_points_preview": 61,
+  "pages": {
+    "25": {
+      "plain_text": "接口：stock_basic 描述：获取基础信息数据 积分：120积分可以试用，每天10次请求 用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=25",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "26": {
+      "plain_text": "接口：trade_cal 描述：获取各大交易所交易日历数据 积分：需2000积分",
+      "url": "https://tushare.pro/document/2?doc_id=26",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "27": {
+      "plain_text": "接口：daily 描述：获取股票行情数据，或通过通用行情接口获取数据，可以获取历史行情 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=27",
+      "fetcher": "mcp_live_compile"
+    },
+    "28": {
+      "plain_text": "接口：adj_factor 积分要求：2000积分起，5000以上可高频调取",
+      "url": "https://tushare.pro/document/2?doc_id=28",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "29": {
+      "plain_text": "接口：monthly 描述：获取A股月线数据 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=29",
+      "fetcher": "mcp_live_compile"
+    },
+    "32": {
+      "plain_text": "接口：daily_basic 描述：获取全部股票每日重要的基本面指标 积分：至少2000积分才可以调取，5000积分无总量限制",
+      "url": "https://tushare.pro/document/2?doc_id=32",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "33": {
+      "plain_text": "接口：income 描述：获取上市公司财务利润表数据 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=33",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "35": {
+      "plain_text": "接口：hs_const 描述：获取沪深港股通成分股数据 积分：120积分可以试用。本接口是VIP数据，需单独开通权限，请参考权限说明",
+      "url": "https://tushare.pro/document/2?doc_id=35",
+      "fetcher": "mcp_live_compile"
+    },
+    "36": {
+      "plain_text": "接口：balancesheet 描述：获取上市公司资产负债表 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=36",
+      "fetcher": "mcp_live_compile"
+    },
+    "44": {
+      "plain_text": "接口：cashflow 描述：获取上市公司现金流 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=44",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "45": {
+      "plain_text": "接口：forecast 描述：获取业绩预告数据 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=45",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "46": {
+      "plain_text": "接口：express 描述：获取上市公司业绩快报 调取要求大于120积分，且Finance接口勾选要求超过5000",
+      "url": "https://tushare.pro/document/2?doc_id=46",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 120
+    },
+    "48": {
+      "plain_text": "接口：fina_indicator 描述：获取上市公司财务指标数据 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=48",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "55": {
+      "plain_text": "接口：moneyflow 描述：获取沪深A股票资金流向数据 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=55",
+      "fetcher": "mcp_live_compile"
+    },
+    "56": {
+      "plain_text": "接口：margin 描述：获取融资融券每日交易汇总数据 积分：2000积分起",
+      "url": "https://tushare.pro/document/2?doc_id=56",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "57": {
+      "plain_text": "接口：margin_detail 描述：获取沪深两市每日融资融券明细 积分：2000积分起",
+      "url": "https://tushare.pro/document/2?doc_id=57",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "58": {
+      "plain_text": "接口：pro 描述：通用行情接口，支持股票、指数、基金、期货、期权、港股、外汇等 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=58",
+      "fetcher": "mcp_live_compile"
+    },
+    "59": {
+      "plain_text": "接口：index_basic 描述：获取指数基础信息 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=59",
+      "fetcher": "mcp_live_compile"
+    },
+    "60": {
+      "plain_text": "接口：index_daily 描述：获取指数每日行情 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=60",
+      "fetcher": "mcp_live_compile"
+    },
+    "61": {
+      "plain_text": "接口：top10_holders 积分：需2000积分才可以调取，每分钟可以请求200次",
+      "url": "https://tushare.pro/document/2?doc_id=61",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "62": {
+      "plain_text": "接口：top10_floatholders 积分：需2000积分才可以调取，每分钟可以请求200次",
+      "url": "https://tushare.pro/document/2?doc_id=62",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "63": {
+      "plain_text": "接口：fund_nav 描述：获取公募基金净值 积分消耗：单次3000条，需要消耗用户积分",
+      "url": "https://tushare.pro/document/2?doc_id=63",
+      "fetcher": "mcp_live_compile"
+    },
+    "64": {
+      "plain_text": "接口：fund_div 描述：公募基金分红 积分消耗：单次4000条，需要消耗用户积分",
+      "url": "https://tushare.pro/document/2?doc_id=64",
+      "fetcher": "mcp_live_compile"
+    },
+    "65": {
+      "plain_text": "接口：fut_basic 描述：获取期货合约列表 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=65",
+      "fetcher": "mcp_live_compile"
+    },
+    "66": {
+      "plain_text": "接口：index_weight 描述：获取各类指数成分和权重 积分：需2000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=66",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "67": {
+      "plain_text": "接口：index_dailybasic 描述：获取大盘指数每日指标 积分：需2000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=67",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "68": {
+      "plain_text": "接口：index_daily 描述：获取指数每日行情 积分：需2000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=68",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "69": {
+      "plain_text": "接口：fund_daily 描述：获取场内基金日线行情 积分：需2000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=69",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "70": {
+      "plain_text": "接口：fund_company 描述：获取公募基金管理人列表 积分：120积分可以试用 用户需要至少2000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=70",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "71": {
+      "plain_text": "接口：fund_div 描述：公募基金分红 积分：用户需要至少2000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=71",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "72": {
+      "plain_text": "接口：index_member 描述：按三级分类提取指数成分 权限：1500积分可调取",
+      "url": "https://tushare.pro/document/2?doc_id=72",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 1500
+    },
+    "73": {
+      "plain_text": "接口：hsgt_top10 描述：获取沪股通、深股通每日前十大成交 权限：需2000积分才可以多次调取",
+      "url": "https://tushare.pro/document/2?doc_id=73",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "74": {
+      "plain_text": "接口：ggt_top10 描述：获取港股通每日成交 权限：需2000积分才可以多次调取",
+      "url": "https://tushare.pro/document/2?doc_id=74",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "75": {
+      "plain_text": "接口：cn_gdp 描述：获取国民经济之GDP数据 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=75",
+      "fetcher": "mcp_live_compile"
+    },
+    "76": {
+      "plain_text": "接口：cn_cpi 描述：获取CPI数据 积分：1000积分可重复调取",
+      "url": "https://tushare.pro/document/2?doc_id=76",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 1000
+    },
+    "81": {
+      "plain_text": "接口：fina_mainbz 描述：获得上市公司主营业务构成 积分：前10万名用户积分有600分",
+      "url": "https://tushare.pro/document/2?doc_id=81",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 600
+    },
+    "100": {
+      "plain_text": "接口：namechange 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=100",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "103": {
+      "plain_text": "接口：dividend 描述：分红送股 积分：用户积1000积分后可用",
+      "url": "https://tushare.pro/document/2?doc_id=103",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 1000
+    },
+    "106": {
+      "plain_text": "接口：top_list 描述：龙虎榜每日统计单 积分：需2000积分以上才可以调取本接口，5000积分以上频次会更高",
+      "url": "https://tushare.pro/document/2?doc_id=106",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "107": {
+      "plain_text": "接口：top_inst 积分：5000积分以上才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=107",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "110": {
+      "plain_text": "接口：pledge_stat 积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=110",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "111": {
+      "plain_text": "接口：pledge_detail 描述：获取股权质押明细 积分：2000积分每分钟可以请求2000次",
+      "url": "https://tushare.pro/document/2?doc_id=111",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "112": {
+      "plain_text": "接口：stk_managers 描述：上市公司管理层 积分：2000积分以上",
+      "url": "https://tushare.pro/document/2?doc_id=112",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "123": {
+      "plain_text": "接口：new_share 描述：获取新股上市列表数据 积分：1000积分可以使用",
+      "url": "https://tushare.pro/document/2?doc_id=123",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 1000
+    },
+    "124": {
+      "plain_text": "接口：repurchase 描述：获取上市公司回购股票数据 积分：需5000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=124",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "144": {
+      "plain_text": "接口：weekly 描述：获取A股周线行情 积分：需2000积分以上才可以调取本接口，5000积分以上频次会更高",
+      "url": "https://tushare.pro/document/2?doc_id=144",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "146": {
+      "plain_text": "接口：stk_factor_pro 描述：获取股票每日技术面因子专业版 积分：至少6000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=146",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 6000
+    },
+    "160": {
+      "plain_text": "接口：share_float 描述：获取限售股解禁 积分：用户需要至少3000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=160",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 3000
+    },
+    "161": {
+      "plain_text": "接口：block_trade 描述：大宗交易 积分：用户需要至少3000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=161",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 3000
+    },
+    "162": {
+      "plain_text": "接口：disclosure_date 描述：财报披露计划 权限：2000积分以上",
+      "url": "https://tushare.pro/document/2?doc_id=162",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "166": {
+      "plain_text": "接口：stk_holdernumber 积分：需2000积分才可以调取，每分钟可以请求200次",
+      "url": "https://tushare.pro/document/2?doc_id=166",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "175": {
+      "plain_text": "接口：stk_holdertrade 描述：获取上市公司增减持数据 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=175",
+      "fetcher": "mcp_live_compile"
+    },
+    "214": {
+      "plain_text": "接口：suspend_d 描述：按日期获取股票每日停复牌信息 权限：5000积分每分钟5000次",
+      "url": "https://tushare.pro/document/2?doc_id=214",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "244": {
+      "plain_text": "接口：stk_rewards 描述：管理层薪酬和持股 积分：需5000积分",
+      "url": "https://tushare.pro/document/2?doc_id=244",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "259": {
+      "plain_text": "接口：ths_hot 描述：获取同花顺App热榜数据 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=259",
+      "fetcher": "mcp_live_compile"
+    },
+    "267": {
+      "plain_text": "接口：broker_recommend 描述：券商月度金股 积分：5000积分可多次调取",
+      "url": "https://tushare.pro/document/2?doc_id=267",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "274": {
+      "plain_text": "接口：hk_hold 描述：获取沪深港股通持股明细 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=274",
+      "fetcher": "mcp_live_compile"
+    },
+    "275": {
+      "plain_text": "接口：stk_surv 描述：机构调研 积分：120积分正常使用",
+      "url": "https://tushare.pro/document/2?doc_id=275",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 120
+    },
+    "292": {
+      "plain_text": "接口：report_rc 积分：用户需要至少1000积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=292",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 1000
+    },
+    "293": {
+      "plain_text": "接口：broker_rec 描述：券商月度金股 积分：5000积分可多次调取",
+      "url": "https://tushare.pro/document/2?doc_id=293",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "294": {
+      "plain_text": "接口：cyq_chips 描述：获取A股每日筹码分布 积分：5000积分无每天总量限制",
+      "url": "https://tushare.pro/document/2?doc_id=294",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "296": {
+      "plain_text": "接口：stk_factor 描述：获取股票技术因子 积分：5000积分每分钟可以请求500次",
+      "url": "https://tushare.pro/document/2?doc_id=296",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "311": {
+      "plain_text": "接口：hm_list 描述：获取游资名录 积分：10000积分以上可调取",
+      "url": "https://tushare.pro/document/2?doc_id=311",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 10000
+    },
+    "312": {
+      "plain_text": "接口：hm_detail 描述：获取游资交易每日明细 积分：10000积分可一次获取全部数据",
+      "url": "https://tushare.pro/document/2?doc_id=312",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 10000
+    },
+    "321": {
+      "plain_text": "接口：dc_hot 描述：获取东方财富App热榜 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=321",
+      "fetcher": "mcp_live_compile"
+    },
+    "326": {
+      "plain_text": "接口：margin_target 描述：融资融券标的（盘前） 输入参数",
+      "url": "https://tushare.pro/document/2?doc_id=326",
+      "fetcher": "mcp_live_compile"
+    },
+    "328": {
+      "plain_text": "接口：stk_factor_pro 描述：获取股票每日技术面因子数据 积分：5000积分每分钟可以请求1000次",
+      "url": "https://tushare.pro/document/2?doc_id=328",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 5000
+    },
+    "329": {
+      "plain_text": "接口：stock_company 积分：用户需要至少120积分才可以调取，具体请参阅积分获取办法",
+      "url": "https://tushare.pro/document/2?doc_id=329",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 120
+    },
+    "353": {
+      "plain_text": "接口：stk_auction_o 描述：开盘集合竞价 积分：本接口是VIP接口",
+      "url": "https://tushare.pro/document/2?doc_id=353",
+      "fetcher": "mcp_live_compile"
+    },
+    "354": {
+      "plain_text": "接口：stk_auction_c 描述：收盘集合竞价 积分：本接口是VIP接口",
+      "url": "https://tushare.pro/document/2?doc_id=354",
+      "fetcher": "mcp_live_compile"
+    },
+    "356": {
+      "plain_text": "接口：fund_portfolio 描述：公募基金持仓 积分：需2000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=356",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "357": {
+      "plain_text": "接口：limit_list_d 描述：涨停股票连板天梯 积分：本接口是VIP接口",
+      "url": "https://tushare.pro/document/2?doc_id=357",
+      "fetcher": "mcp_live_compile"
+    },
+    "366": {
+      "plain_text": "接口：stk_limit 描述：获取全市场每日涨跌停价格 积分：2000积分",
+      "url": "https://tushare.pro/document/2?doc_id=366",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "370": {
+      "plain_text": "接口：dc_index 描述：获取东方财富概念板块 积分：8000积分/次",
+      "url": "https://tushare.pro/document/2?doc_id=370",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 8000
+    },
+    "371": {
+      "plain_text": "接口：dc_daily 描述：获取东财概念板块、行业指数板块行情 积分：8000积分/分钟",
+      "url": "https://tushare.pro/document/2?doc_id=371",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 8000
+    },
+    "372": {
+      "plain_text": "接口：dc_member 描述：获取东方财富板块每日成分 积分：8000积分/天",
+      "url": "https://tushare.pro/document/2?doc_id=372",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 8000
+    },
+    "374": {
+      "plain_text": "接口：stk_mins 描述：获取股票分钟行情 积分：8000积分/分钟",
+      "url": "https://tushare.pro/document/2?doc_id=374",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 8000
+    },
+    "375": {
+      "plain_text": "接口：bse_mapping 描述：北交所新旧代码对照 积分：2000积分起",
+      "url": "https://tushare.pro/document/2?doc_id=375",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 2000
+    },
+    "382": {
+      "plain_text": "接口：barrelated 描述：获取A股复权行情 积分：8000积分/天",
+      "url": "https://tushare.pro/document/2?doc_id=382",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 8000
+    },
+    "397": {
+      "plain_text": "接口：st_list 描述：ST股票列表 积分：需3000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=397",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 3000
+    },
+    "398": {
+      "plain_text": "接口：stock_hsgt 描述：沪深港通股票列表 积分：需6000积分才可以调取",
+      "url": "https://tushare.pro/document/2?doc_id=398",
+      "fetcher": "mcp_live_compile",
+      "min_points_preview": 6000
+    }
+  }
+}

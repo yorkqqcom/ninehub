@@ -1,0 +1,5502 @@
+{
+  "version": "1",
+  "source_project": "D:\\PycharmProjects\\tusharestockForPostgreSQL",
+  "api_to_table_name": {
+    "daily": "daily_quotes",
+    "weekly": "weekly",
+    "monthly": "monthly",
+    "pro_bar": "adjusted_quotes",
+    "adj_factor": "adj_factors",
+    "income": "fina_income",
+    "balancesheet": "fina_balancesheet",
+    "cashflow": "fina_cashflow",
+    "forecast": "fina_forecast",
+    "express": "fina_express",
+    "dividend": "fina_dividend",
+    "disclosure_date": "fina_disclosure_date",
+    "anns_d": "announcements",
+    "announcement_pdf_text_cache": "announcement_pdf_text_cache",
+    "business_tags_snapshot": "business_tags_snapshot",
+    "cninfo_announcement_sync_state": "cninfo_announcement_sync_state",
+    "daily_auction_open": "daily_auction_open",
+    "daily_basic": "daily_basic",
+    "fina_audit": "fina_audit",
+    "fina_indicator": "fina_indicator",
+    "fina_mainbz": "fina_mainbz",
+    "fund_basic": "fund_basic",
+    "fund_company": "fund_company",
+    "fund_holdings_diff_industry": "fund_holdings_diff_industry",
+    "fund_holdings_diff_segment": "fund_holdings_diff_segment",
+    "fund_holdings_diff_stock": "fund_holdings_diff_stock",
+    "fund_portfolio": "fund_portfolio",
+    "fund_share": "fund_share",
+    "fund_share_change": "fund_share_change",
+    "fund_share_change_daily_summary": "fund_share_change_daily_summary",
+    "fund_sw_exposure": "fund_sw_exposure",
+    "index_basic": "index_basic",
+    "index_classify": "index_classify",
+    "index_daily": "index_daily",
+    "index_member_all": "index_member_all",
+    "mainbiz_relations_snapshot": "mainbiz_relations_snapshot",
+    "mainbiz_run_metrics": "mainbiz_run_metrics",
+    "minute_kline_bars": "minute_kline_bars",
+    "minute_sync_universe": "minute_sync_universe",
+    "minute_time_bars": "minute_time_bars",
+    "moneyflow": "moneyflow",
+    "realtime_quotes": "realtime_quotes",
+    "realtime_quote_hist": "realtime_quote_hist",
+    "stock_basic": "stock_basic",
+    "stock_risk_scan_cache": "stock_risk_scan_cache",
+    "trade_cal": "trade_cal",
+    "wx_message_queue": "wx_message_queue",
+    "namechange": "namechange",
+    "hs_const": "hs_const",
+    "stock_company": "stock_company",
+    "stk_managers": "stk_managers",
+    "stk_rewards": "stk_rewards",
+    "new_share": "new_share",
+    "bse_mapping": "bse_mapping",
+    "st_list": "st_list",
+    "stock_hsgt": "stock_hsgt",
+    "suspend_d": "suspend_d",
+    "stk_limit": "stk_limit",
+    "stk_auction_o": "stk_auction_o",
+    "stk_auction_c": "stk_auction_c",
+    "stk_factor": "stk_factor",
+    "stk_factor_pro": "stk_factor_pro",
+    "top10_holders": "top10_holders",
+    "top10_floatholders": "top10_floatholders",
+    "pledge_stat": "pledge_stat",
+    "pledge_detail": "pledge_detail",
+    "repurchase": "repurchase",
+    "share_float": "share_float",
+    "block_trade": "block_trade",
+    "stk_holdernumber": "stk_holdernumber",
+    "stk_holdertrade": "stk_holdertrade",
+    "moneyflow_hsgt": "moneyflow_hsgt",
+    "margin": "margin",
+    "margin_detail": "margin_detail",
+    "margin_target": "margin_target",
+    "top_list": "top_list",
+    "top_inst": "top_inst",
+    "limit_list": "limit_list",
+    "limit_list_d": "limit_list_d",
+    "hm_list": "hm_list",
+    "hm_detail": "hm_detail",
+    "cyq_perf": "cyq_perf",
+    "cyq_chips": "cyq_chips",
+    "ggt_top10": "ggt_top10",
+    "hsgt_top10": "hsgt_top10",
+    "ggt_daily": "ggt_daily",
+    "hk_hold": "hk_hold",
+    "concept": "concept",
+    "concept_detail": "concept_detail",
+    "ths_hot": "ths_hot",
+    "dc_hot": "dc_hot",
+    "broker_recommend": "broker_recommend",
+    "report_rc": "report_rc",
+    "stk_surv": "stk_surv",
+    "index_member": "index_member",
+    "index_weight": "index_weight"
+  },
+  "field_overrides": {
+    "daily": {
+      "change": "change_amount"
+    },
+    "weekly": {
+      "change": "change_amount"
+    },
+    "monthly": {
+      "change": "change_amount"
+    },
+    "pro_bar": {
+      "change": "change_amount"
+    },
+    "forecast": {
+      "type": "fcst_type"
+    },
+    "fund_basic": {
+      "type": "category_type"
+    }
+  },
+  "platform_columns": {
+    "pro_bar": [
+      {
+        "key": "adj_type",
+        "type": "string"
+      }
+    ]
+  },
+  "apis": {
+    "adj_factor": {
+      "api_name": "adj_factor",
+      "table_name": "adj_factors",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "adj_factor",
+          "type": "number"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_adj_factors_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_adj_factors_trade_date",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_adj_factors_ts_code_trade_date",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_adj_factors_trade_date_ts_code",
+          "columns": [
+            "trade_date",
+            "ts_code"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "adj_factor.py"
+    },
+    "pro_bar": {
+      "api_name": "pro_bar",
+      "table_name": "adjusted_quotes",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "adj_type",
+          "type": "string"
+        },
+        {
+          "key": "open",
+          "type": "number"
+        },
+        {
+          "key": "high",
+          "type": "number"
+        },
+        {
+          "key": "low",
+          "type": "number"
+        },
+        {
+          "key": "close",
+          "type": "number"
+        },
+        {
+          "key": "pre_close",
+          "type": "number"
+        },
+        {
+          "key": "change_amount",
+          "type": "number"
+        },
+        {
+          "key": "pct_chg",
+          "type": "number"
+        },
+        {
+          "key": "vol",
+          "type": "bigint"
+        },
+        {
+          "key": "amount",
+          "type": "number"
+        },
+        {
+          "key": "adj_factor",
+          "type": "number"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_adjusted_quotes_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_adjusted_quotes_trade_date",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_adjusted_quotes_adj_type",
+          "columns": [
+            "adj_type"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_adjusted_quotes_ts_code_trade_date_adj",
+          "columns": [
+            "ts_code",
+            "trade_date",
+            "adj_type"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_adjusted_quotes_trade_date_ts_code_adj",
+          "columns": [
+            "trade_date",
+            "ts_code",
+            "adj_type"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "adjusted_quote.py"
+    },
+    "anns_d": {
+      "api_name": "anns_d",
+      "table_name": "announcements",
+      "columns": [
+        {
+          "key": "unique_key",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "title",
+          "type": "text"
+        },
+        {
+          "key": "url",
+          "type": "text"
+        },
+        {
+          "key": "rec_time",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_announcements_ann_date",
+          "columns": [
+            "ann_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_announcements_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_announcements_ts_code_ann_date",
+          "columns": [
+            "ts_code",
+            "ann_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_announcements_rec_time",
+          "columns": [
+            "rec_time"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "announcement.py"
+    },
+    "announcement_pdf_text_cache": {
+      "api_name": "announcement_pdf_text_cache",
+      "table_name": "announcement_pdf_text_cache",
+      "columns": [
+        {
+          "key": "unique_key",
+          "type": "string"
+        },
+        {
+          "key": "extracted_text",
+          "type": "text"
+        },
+        {
+          "key": "page_count",
+          "type": "string"
+        },
+        {
+          "key": "char_count",
+          "type": "string"
+        },
+        {
+          "key": "fetch_error",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "announcement_pdf_text_cache.py"
+    },
+    "business_tags_snapshot": {
+      "api_name": "business_tags_snapshot",
+      "table_name": "business_tags_snapshot",
+      "columns": [
+        {
+          "key": "run_id",
+          "type": "string"
+        },
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "stock_name",
+          "type": "string"
+        },
+        {
+          "key": "report_period",
+          "type": "date"
+        },
+        {
+          "key": "model_version",
+          "type": "string"
+        },
+        {
+          "key": "prompt_version",
+          "type": "string"
+        },
+        {
+          "key": "profile_fingerprint",
+          "type": "string"
+        },
+        {
+          "key": "tags_json",
+          "type": "text"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_biz_tag_ts_period",
+          "columns": [
+            "ts_code",
+            "report_period"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_biz_tag_model_prompt",
+          "columns": [
+            "model_version",
+            "prompt_version"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_biz_tag_fingerprint",
+          "columns": [
+            "profile_fingerprint"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "business_tags_snapshot.py"
+    },
+    "cninfo_announcement_sync_state": {
+      "api_name": "cninfo_announcement_sync_state",
+      "table_name": "cninfo_announcement_sync_state",
+      "columns": [
+        {
+          "key": "state_key",
+          "type": "string"
+        },
+        {
+          "key": "payload",
+          "type": "text"
+        },
+        {
+          "key": "announcement_id",
+          "type": "string"
+        },
+        {
+          "key": "sec_code",
+          "type": "string"
+        },
+        {
+          "key": "sec_name",
+          "type": "string"
+        },
+        {
+          "key": "announcement_time",
+          "type": "string"
+        },
+        {
+          "key": "title",
+          "type": "text"
+        },
+        {
+          "key": "adjunct_url",
+          "type": "text"
+        },
+        {
+          "key": "file_url",
+          "type": "text"
+        },
+        {
+          "key": "org_id",
+          "type": "string"
+        },
+        {
+          "key": "page_column",
+          "type": "string"
+        },
+        {
+          "key": "source_plate",
+          "type": "string"
+        },
+        {
+          "key": "raw_json",
+          "type": "text"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_cninfo_ann_time",
+          "columns": [
+            "announcement_time"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_cninfo_ann_sec",
+          "columns": [
+            "sec_code"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "cninfo_announcement.py"
+    },
+    "daily_auction_open": {
+      "api_name": "daily_auction_open",
+      "table_name": "daily_auction_open",
+      "columns": [
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "auction_open",
+          "type": "number"
+        },
+        {
+          "key": "pre_close",
+          "type": "number"
+        },
+        {
+          "key": "auction_pct_chg",
+          "type": "number"
+        },
+        {
+          "key": "vol",
+          "type": "bigint"
+        },
+        {
+          "key": "amount",
+          "type": "number"
+        },
+        {
+          "key": "captured_at",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "trade_date",
+        "ts_code"
+      ],
+      "indexes": [
+        {
+          "name": "idx_daily_auction_open_date",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_daily_auction_open_code_date",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "daily_auction_open.py"
+    },
+    "daily_basic": {
+      "api_name": "daily_basic",
+      "table_name": "daily_basic",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "close",
+          "type": "number"
+        },
+        {
+          "key": "turnover_rate",
+          "type": "number"
+        },
+        {
+          "key": "turnover_rate_f",
+          "type": "number"
+        },
+        {
+          "key": "volume_ratio",
+          "type": "number"
+        },
+        {
+          "key": "pe",
+          "type": "number"
+        },
+        {
+          "key": "pe_ttm",
+          "type": "number"
+        },
+        {
+          "key": "pb",
+          "type": "number"
+        },
+        {
+          "key": "ps",
+          "type": "number"
+        },
+        {
+          "key": "ps_ttm",
+          "type": "number"
+        },
+        {
+          "key": "dv_ratio",
+          "type": "number"
+        },
+        {
+          "key": "dv_ttm",
+          "type": "number"
+        },
+        {
+          "key": "total_share",
+          "type": "number"
+        },
+        {
+          "key": "float_share",
+          "type": "number"
+        },
+        {
+          "key": "free_share",
+          "type": "number"
+        },
+        {
+          "key": "total_mv",
+          "type": "number"
+        },
+        {
+          "key": "circ_mv",
+          "type": "number"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_daily_basic_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_daily_basic_trade_date",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_daily_basic_ts_code_trade_date",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_daily_basic_trade_date_ts_code",
+          "columns": [
+            "trade_date",
+            "ts_code"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "daily_basic.py"
+    },
+    "daily": {
+      "api_name": "daily",
+      "table_name": "daily_quotes",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "open",
+          "type": "number"
+        },
+        {
+          "key": "high",
+          "type": "number"
+        },
+        {
+          "key": "low",
+          "type": "number"
+        },
+        {
+          "key": "close",
+          "type": "number"
+        },
+        {
+          "key": "pre_close",
+          "type": "number"
+        },
+        {
+          "key": "change_amount",
+          "type": "number"
+        },
+        {
+          "key": "pct_chg",
+          "type": "number"
+        },
+        {
+          "key": "vol",
+          "type": "bigint"
+        },
+        {
+          "key": "amount",
+          "type": "number"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_daily_quotes_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_daily_quotes_trade_date",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_daily_quotes_ts_code_trade_date",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_daily_quotes_trade_date_ts_code",
+          "columns": [
+            "trade_date",
+            "ts_code"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "daily_quote.py"
+    },
+    "fina_audit": {
+      "api_name": "fina_audit",
+      "table_name": "fina_audit",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "audit_result",
+          "type": "string"
+        },
+        {
+          "key": "audit_fees",
+          "type": "number"
+        },
+        {
+          "key": "audit_agency",
+          "type": "string"
+        },
+        {
+          "key": "audit_sign",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_audit_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_audit_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_audit.py"
+    },
+    "balancesheet": {
+      "api_name": "balancesheet",
+      "table_name": "fina_balancesheet",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "f_ann_date",
+          "type": "date"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "report_type",
+          "type": "string"
+        },
+        {
+          "key": "comp_type",
+          "type": "string"
+        },
+        {
+          "key": "end_type",
+          "type": "string"
+        },
+        {
+          "key": "total_share",
+          "type": "number"
+        },
+        {
+          "key": "cap_rese",
+          "type": "number"
+        },
+        {
+          "key": "undistr_porfit",
+          "type": "number"
+        },
+        {
+          "key": "surplus_rese",
+          "type": "number"
+        },
+        {
+          "key": "special_rese",
+          "type": "number"
+        },
+        {
+          "key": "money_cap",
+          "type": "number"
+        },
+        {
+          "key": "trad_asset",
+          "type": "number"
+        },
+        {
+          "key": "notes_receiv",
+          "type": "number"
+        },
+        {
+          "key": "accounts_receiv",
+          "type": "number"
+        },
+        {
+          "key": "oth_receiv",
+          "type": "number"
+        },
+        {
+          "key": "prepayment",
+          "type": "number"
+        },
+        {
+          "key": "div_receiv",
+          "type": "number"
+        },
+        {
+          "key": "int_receiv",
+          "type": "number"
+        },
+        {
+          "key": "inventories",
+          "type": "number"
+        },
+        {
+          "key": "amor_exp",
+          "type": "number"
+        },
+        {
+          "key": "nca_within_1y",
+          "type": "number"
+        },
+        {
+          "key": "sett_rsrv",
+          "type": "number"
+        },
+        {
+          "key": "loanto_oth_bank_fi",
+          "type": "number"
+        },
+        {
+          "key": "premium_receiv",
+          "type": "number"
+        },
+        {
+          "key": "reinsur_receiv",
+          "type": "number"
+        },
+        {
+          "key": "reinsur_res_receiv",
+          "type": "number"
+        },
+        {
+          "key": "pur_resale_fa",
+          "type": "number"
+        },
+        {
+          "key": "oth_cur_assets",
+          "type": "number"
+        },
+        {
+          "key": "total_cur_assets",
+          "type": "number"
+        },
+        {
+          "key": "fa_avail_for_sale",
+          "type": "number"
+        },
+        {
+          "key": "htm_invest",
+          "type": "number"
+        },
+        {
+          "key": "lt_eqt_invest",
+          "type": "number"
+        },
+        {
+          "key": "invest_real_estate",
+          "type": "number"
+        },
+        {
+          "key": "time_deposits",
+          "type": "number"
+        },
+        {
+          "key": "oth_assets",
+          "type": "number"
+        },
+        {
+          "key": "lt_rec",
+          "type": "number"
+        },
+        {
+          "key": "fix_assets",
+          "type": "number"
+        },
+        {
+          "key": "cip",
+          "type": "number"
+        },
+        {
+          "key": "const_materials",
+          "type": "number"
+        },
+        {
+          "key": "fixed_assets_disp",
+          "type": "number"
+        },
+        {
+          "key": "produc_bio_assets",
+          "type": "number"
+        },
+        {
+          "key": "oil_and_gas_assets",
+          "type": "number"
+        },
+        {
+          "key": "intan_assets",
+          "type": "number"
+        },
+        {
+          "key": "r_and_d",
+          "type": "number"
+        },
+        {
+          "key": "goodwill",
+          "type": "number"
+        },
+        {
+          "key": "lt_amor_exp",
+          "type": "number"
+        },
+        {
+          "key": "defer_tax_assets",
+          "type": "number"
+        },
+        {
+          "key": "decr_in_disbur",
+          "type": "number"
+        },
+        {
+          "key": "oth_nca",
+          "type": "number"
+        },
+        {
+          "key": "total_nca",
+          "type": "number"
+        },
+        {
+          "key": "cash_reser_cb",
+          "type": "number"
+        },
+        {
+          "key": "depos_in_oth_bfi",
+          "type": "number"
+        },
+        {
+          "key": "prec_metals",
+          "type": "number"
+        },
+        {
+          "key": "deriv_assets",
+          "type": "number"
+        },
+        {
+          "key": "rr_reins_une_prem",
+          "type": "number"
+        },
+        {
+          "key": "rr_reins_outstd_cla",
+          "type": "number"
+        },
+        {
+          "key": "rr_reins_lins_liab",
+          "type": "number"
+        },
+        {
+          "key": "rr_reins_lthins_liab",
+          "type": "number"
+        },
+        {
+          "key": "refund_depos",
+          "type": "number"
+        },
+        {
+          "key": "ph_pledge_loans",
+          "type": "number"
+        },
+        {
+          "key": "refund_cap_depos",
+          "type": "number"
+        },
+        {
+          "key": "indep_acct_assets",
+          "type": "number"
+        },
+        {
+          "key": "client_depos",
+          "type": "number"
+        },
+        {
+          "key": "client_prov",
+          "type": "number"
+        },
+        {
+          "key": "transac_seat_fee",
+          "type": "number"
+        },
+        {
+          "key": "invest_as_receiv",
+          "type": "number"
+        },
+        {
+          "key": "total_assets",
+          "type": "number"
+        },
+        {
+          "key": "lt_borr",
+          "type": "number"
+        },
+        {
+          "key": "st_borr",
+          "type": "number"
+        },
+        {
+          "key": "cb_borr",
+          "type": "number"
+        },
+        {
+          "key": "depos_ib_deposits",
+          "type": "number"
+        },
+        {
+          "key": "loan_oth_bank",
+          "type": "number"
+        },
+        {
+          "key": "trading_fl",
+          "type": "number"
+        },
+        {
+          "key": "notes_payable",
+          "type": "number"
+        },
+        {
+          "key": "acct_payable",
+          "type": "number"
+        },
+        {
+          "key": "adv_receipts",
+          "type": "number"
+        },
+        {
+          "key": "sold_for_repur_fa",
+          "type": "number"
+        },
+        {
+          "key": "comm_payable",
+          "type": "number"
+        },
+        {
+          "key": "payroll_payable",
+          "type": "number"
+        },
+        {
+          "key": "taxes_payable",
+          "type": "number"
+        },
+        {
+          "key": "int_payable",
+          "type": "number"
+        },
+        {
+          "key": "div_payable",
+          "type": "number"
+        },
+        {
+          "key": "oth_payable",
+          "type": "number"
+        },
+        {
+          "key": "acc_exp",
+          "type": "number"
+        },
+        {
+          "key": "deferred_inc",
+          "type": "number"
+        },
+        {
+          "key": "st_bonds_payable",
+          "type": "number"
+        },
+        {
+          "key": "payable_to_reinsurer",
+          "type": "number"
+        },
+        {
+          "key": "rsrv_insur_cont",
+          "type": "number"
+        },
+        {
+          "key": "acting_trading_sec",
+          "type": "number"
+        },
+        {
+          "key": "acting_uw_sec",
+          "type": "number"
+        },
+        {
+          "key": "non_cur_liab_due_1y",
+          "type": "number"
+        },
+        {
+          "key": "oth_cur_liab",
+          "type": "number"
+        },
+        {
+          "key": "total_cur_liab",
+          "type": "number"
+        },
+        {
+          "key": "bond_payable",
+          "type": "number"
+        },
+        {
+          "key": "lt_payable",
+          "type": "number"
+        },
+        {
+          "key": "specific_payables",
+          "type": "number"
+        },
+        {
+          "key": "estimated_liab",
+          "type": "number"
+        },
+        {
+          "key": "defer_tax_liab",
+          "type": "number"
+        },
+        {
+          "key": "defer_inc_non_cur_liab",
+          "type": "number"
+        },
+        {
+          "key": "oth_ncl",
+          "type": "number"
+        },
+        {
+          "key": "total_ncl",
+          "type": "number"
+        },
+        {
+          "key": "depos_oth_bfi",
+          "type": "number"
+        },
+        {
+          "key": "deriv_liab",
+          "type": "number"
+        },
+        {
+          "key": "depos",
+          "type": "number"
+        },
+        {
+          "key": "agency_bus_liab",
+          "type": "number"
+        },
+        {
+          "key": "oth_liab",
+          "type": "number"
+        },
+        {
+          "key": "prem_receiv_adva",
+          "type": "number"
+        },
+        {
+          "key": "depos_received",
+          "type": "number"
+        },
+        {
+          "key": "ph_invest",
+          "type": "number"
+        },
+        {
+          "key": "reser_une_prem",
+          "type": "number"
+        },
+        {
+          "key": "reser_outstd_claims",
+          "type": "number"
+        },
+        {
+          "key": "reser_lins_liab",
+          "type": "number"
+        },
+        {
+          "key": "reser_lthins_liab",
+          "type": "number"
+        },
+        {
+          "key": "indept_acc_liab",
+          "type": "number"
+        },
+        {
+          "key": "pledge_borr",
+          "type": "number"
+        },
+        {
+          "key": "indem_payable",
+          "type": "number"
+        },
+        {
+          "key": "policy_div_payable",
+          "type": "number"
+        },
+        {
+          "key": "total_liab",
+          "type": "number"
+        },
+        {
+          "key": "treasury_share",
+          "type": "number"
+        },
+        {
+          "key": "ordin_risk_reser",
+          "type": "number"
+        },
+        {
+          "key": "forex_differ",
+          "type": "number"
+        },
+        {
+          "key": "invest_loss_unconf",
+          "type": "number"
+        },
+        {
+          "key": "minority_int",
+          "type": "number"
+        },
+        {
+          "key": "total_hldr_eqy_exc_min_int",
+          "type": "number"
+        },
+        {
+          "key": "total_hldr_eqy_inc_min_int",
+          "type": "number"
+        },
+        {
+          "key": "total_liab_hldr_eqy",
+          "type": "number"
+        },
+        {
+          "key": "lt_payroll_payable",
+          "type": "number"
+        },
+        {
+          "key": "oth_comp_income",
+          "type": "number"
+        },
+        {
+          "key": "oth_eqt_tools",
+          "type": "number"
+        },
+        {
+          "key": "oth_eqt_tools_p_shr",
+          "type": "number"
+        },
+        {
+          "key": "lending_funds",
+          "type": "number"
+        },
+        {
+          "key": "acc_receivable",
+          "type": "number"
+        },
+        {
+          "key": "st_fin_payable",
+          "type": "number"
+        },
+        {
+          "key": "payables",
+          "type": "number"
+        },
+        {
+          "key": "hfs_assets",
+          "type": "number"
+        },
+        {
+          "key": "hfs_sales",
+          "type": "number"
+        },
+        {
+          "key": "cost_fin_assets",
+          "type": "number"
+        },
+        {
+          "key": "fair_value_fin_assets",
+          "type": "number"
+        },
+        {
+          "key": "contract_assets",
+          "type": "number"
+        },
+        {
+          "key": "contract_liab",
+          "type": "number"
+        },
+        {
+          "key": "accounts_receiv_bill",
+          "type": "number"
+        },
+        {
+          "key": "accounts_pay",
+          "type": "number"
+        },
+        {
+          "key": "oth_rcv_total",
+          "type": "number"
+        },
+        {
+          "key": "fix_assets_total",
+          "type": "number"
+        },
+        {
+          "key": "cip_total",
+          "type": "number"
+        },
+        {
+          "key": "oth_pay_total",
+          "type": "number"
+        },
+        {
+          "key": "long_pay_total",
+          "type": "number"
+        },
+        {
+          "key": "debt_invest",
+          "type": "number"
+        },
+        {
+          "key": "oth_debt_invest",
+          "type": "number"
+        },
+        {
+          "key": "update_flag",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date",
+        "report_type"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_balancesheet_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_balancesheet_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_balancesheet.py"
+    },
+    "cashflow": {
+      "api_name": "cashflow",
+      "table_name": "fina_cashflow",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "f_ann_date",
+          "type": "date"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "comp_type",
+          "type": "string"
+        },
+        {
+          "key": "report_type",
+          "type": "string"
+        },
+        {
+          "key": "end_type",
+          "type": "string"
+        },
+        {
+          "key": "net_profit",
+          "type": "number"
+        },
+        {
+          "key": "finan_exp",
+          "type": "number"
+        },
+        {
+          "key": "c_fr_sale_sg",
+          "type": "number"
+        },
+        {
+          "key": "recp_tax_rends",
+          "type": "number"
+        },
+        {
+          "key": "n_depos_incr_fi",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_loans_cb",
+          "type": "number"
+        },
+        {
+          "key": "n_inc_borr_oth_fi",
+          "type": "number"
+        },
+        {
+          "key": "prem_fr_orig_contr",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_insured_dep",
+          "type": "number"
+        },
+        {
+          "key": "n_reinsur_prem",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_disp_tfa",
+          "type": "number"
+        },
+        {
+          "key": "ifc_cash_incr",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_disp_faas",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_loans_oth_bank",
+          "type": "number"
+        },
+        {
+          "key": "n_cap_incr_repur",
+          "type": "number"
+        },
+        {
+          "key": "c_fr_oth_operate_a",
+          "type": "number"
+        },
+        {
+          "key": "c_inf_fr_operate_a",
+          "type": "number"
+        },
+        {
+          "key": "c_paid_goods_s",
+          "type": "number"
+        },
+        {
+          "key": "c_paid_to_for_empl",
+          "type": "number"
+        },
+        {
+          "key": "c_paid_for_taxes",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_clt_loan_adv",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_dep_cbob",
+          "type": "number"
+        },
+        {
+          "key": "c_pay_claims_orig_inco",
+          "type": "number"
+        },
+        {
+          "key": "pay_handling_chrg",
+          "type": "number"
+        },
+        {
+          "key": "pay_comm_insur_plcy",
+          "type": "number"
+        },
+        {
+          "key": "oth_cash_pay_oper_act",
+          "type": "number"
+        },
+        {
+          "key": "st_cash_out_act",
+          "type": "number"
+        },
+        {
+          "key": "n_cashflow_act",
+          "type": "number"
+        },
+        {
+          "key": "oth_recp_ral_inv_act",
+          "type": "number"
+        },
+        {
+          "key": "c_disp_withdrwl_invest",
+          "type": "number"
+        },
+        {
+          "key": "c_recp_return_invest",
+          "type": "number"
+        },
+        {
+          "key": "n_recp_disp_fiolta",
+          "type": "number"
+        },
+        {
+          "key": "n_recp_disp_sobu",
+          "type": "number"
+        },
+        {
+          "key": "stot_inflows_inv_act",
+          "type": "number"
+        },
+        {
+          "key": "c_pay_acq_const_fiolta",
+          "type": "number"
+        },
+        {
+          "key": "c_paid_invest",
+          "type": "number"
+        },
+        {
+          "key": "n_disp_subs_oth_biz",
+          "type": "number"
+        },
+        {
+          "key": "oth_pay_ral_inv_act",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_pledge_loan",
+          "type": "number"
+        },
+        {
+          "key": "stot_out_inv_act",
+          "type": "number"
+        },
+        {
+          "key": "n_cashflow_inv_act",
+          "type": "number"
+        },
+        {
+          "key": "c_recp_borrow",
+          "type": "number"
+        },
+        {
+          "key": "proc_issue_bonds",
+          "type": "number"
+        },
+        {
+          "key": "oth_cash_recp_ral_fnc_act",
+          "type": "number"
+        },
+        {
+          "key": "stot_cash_in_fnc_act",
+          "type": "number"
+        },
+        {
+          "key": "free_cashflow",
+          "type": "number"
+        },
+        {
+          "key": "c_prepay_amt_borr",
+          "type": "number"
+        },
+        {
+          "key": "c_pay_dist_dpcp_int_exp",
+          "type": "number"
+        },
+        {
+          "key": "incl_dvd_profit_paid_sc_ms",
+          "type": "number"
+        },
+        {
+          "key": "oth_cashpay_ral_fnc_act",
+          "type": "number"
+        },
+        {
+          "key": "stot_cashout_fnc_act",
+          "type": "number"
+        },
+        {
+          "key": "n_cash_flows_fnc_act",
+          "type": "number"
+        },
+        {
+          "key": "eff_fx_flu_cash",
+          "type": "number"
+        },
+        {
+          "key": "n_incr_cash_cash_equ",
+          "type": "number"
+        },
+        {
+          "key": "c_cash_equ_beg_period",
+          "type": "number"
+        },
+        {
+          "key": "c_cash_equ_end_period",
+          "type": "number"
+        },
+        {
+          "key": "c_recp_cap_contrib",
+          "type": "number"
+        },
+        {
+          "key": "incl_cash_rec_saims",
+          "type": "number"
+        },
+        {
+          "key": "uncon_invest_loss",
+          "type": "number"
+        },
+        {
+          "key": "prov_depr_assets",
+          "type": "number"
+        },
+        {
+          "key": "depr_fa_coga_dpba",
+          "type": "number"
+        },
+        {
+          "key": "amort_intang_assets",
+          "type": "number"
+        },
+        {
+          "key": "lt_amort_deferred_exp",
+          "type": "number"
+        },
+        {
+          "key": "decr_deferred_exp",
+          "type": "number"
+        },
+        {
+          "key": "incr_acc_exp",
+          "type": "number"
+        },
+        {
+          "key": "loss_disp_fiolta",
+          "type": "number"
+        },
+        {
+          "key": "loss_scr_fa",
+          "type": "number"
+        },
+        {
+          "key": "loss_fv_chg",
+          "type": "number"
+        },
+        {
+          "key": "invest_loss",
+          "type": "number"
+        },
+        {
+          "key": "decr_def_inc_tax_assets",
+          "type": "number"
+        },
+        {
+          "key": "incr_def_inc_tax_liab",
+          "type": "number"
+        },
+        {
+          "key": "decr_inventories",
+          "type": "number"
+        },
+        {
+          "key": "decr_oper_payable",
+          "type": "number"
+        },
+        {
+          "key": "incr_oper_payable",
+          "type": "number"
+        },
+        {
+          "key": "others",
+          "type": "number"
+        },
+        {
+          "key": "im_net_cashflow_oper_act",
+          "type": "number"
+        },
+        {
+          "key": "conv_debt_into_cap",
+          "type": "number"
+        },
+        {
+          "key": "conv_copbonds_due_within_1y",
+          "type": "number"
+        },
+        {
+          "key": "fa_fnc_leases",
+          "type": "number"
+        },
+        {
+          "key": "im_n_incr_cash_equ",
+          "type": "number"
+        },
+        {
+          "key": "net_dism_capital_add",
+          "type": "number"
+        },
+        {
+          "key": "net_cash_rece_sec",
+          "type": "number"
+        },
+        {
+          "key": "credit_impa_loss",
+          "type": "number"
+        },
+        {
+          "key": "use_right_asset_dep",
+          "type": "number"
+        },
+        {
+          "key": "oth_loss_asset",
+          "type": "number"
+        },
+        {
+          "key": "end_bal_cash",
+          "type": "number"
+        },
+        {
+          "key": "beg_bal_cash",
+          "type": "number"
+        },
+        {
+          "key": "end_bal_cash_equ",
+          "type": "number"
+        },
+        {
+          "key": "beg_bal_cash_equ",
+          "type": "number"
+        },
+        {
+          "key": "update_flag",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date",
+        "report_type"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_cashflow_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_cashflow_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_cashflow.py"
+    },
+    "disclosure_date": {
+      "api_name": "disclosure_date",
+      "table_name": "fina_disclosure_date",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "pre_date",
+          "type": "date"
+        },
+        {
+          "key": "actual_date",
+          "type": "date"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_disclosure_date_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_disclosure_date_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_disclosure_date.py"
+    },
+    "dividend": {
+      "api_name": "dividend",
+      "table_name": "fina_dividend",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "div_proc",
+          "type": "string"
+        },
+        {
+          "key": "stk_div",
+          "type": "number"
+        },
+        {
+          "key": "stk_bo_rate",
+          "type": "number"
+        },
+        {
+          "key": "stk_co_rate",
+          "type": "number"
+        },
+        {
+          "key": "cash_div",
+          "type": "number"
+        },
+        {
+          "key": "cash_div_tax",
+          "type": "number"
+        },
+        {
+          "key": "record_date",
+          "type": "date"
+        },
+        {
+          "key": "ex_date",
+          "type": "date"
+        },
+        {
+          "key": "pay_date",
+          "type": "date"
+        },
+        {
+          "key": "div_listdate",
+          "type": "date"
+        },
+        {
+          "key": "imp_ann_date",
+          "type": "date"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date",
+        "div_proc",
+        "ann_date"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_dividend_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_dividend_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_dividend.py"
+    },
+    "express": {
+      "api_name": "express",
+      "table_name": "fina_express",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "revenue",
+          "type": "number"
+        },
+        {
+          "key": "operate_profit",
+          "type": "number"
+        },
+        {
+          "key": "total_profit",
+          "type": "number"
+        },
+        {
+          "key": "n_income",
+          "type": "number"
+        },
+        {
+          "key": "total_assets",
+          "type": "number"
+        },
+        {
+          "key": "total_hldr_eqy_exc_min_int",
+          "type": "number"
+        },
+        {
+          "key": "diluted_eps",
+          "type": "number"
+        },
+        {
+          "key": "diluted_roe",
+          "type": "number"
+        },
+        {
+          "key": "yoy_net_profit",
+          "type": "number"
+        },
+        {
+          "key": "bps",
+          "type": "number"
+        },
+        {
+          "key": "perf_summary",
+          "type": "text"
+        },
+        {
+          "key": "update_flag",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_express_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_express_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_express.py"
+    },
+    "forecast": {
+      "api_name": "forecast",
+      "table_name": "fina_forecast",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "fcst_type",
+          "type": "string"
+        },
+        {
+          "key": "p_change_min",
+          "type": "number"
+        },
+        {
+          "key": "p_change_max",
+          "type": "number"
+        },
+        {
+          "key": "net_profit_min",
+          "type": "number"
+        },
+        {
+          "key": "net_profit_max",
+          "type": "number"
+        },
+        {
+          "key": "last_parent_net",
+          "type": "number"
+        },
+        {
+          "key": "first_ann_date",
+          "type": "date"
+        },
+        {
+          "key": "summary",
+          "type": "text"
+        },
+        {
+          "key": "change_reason",
+          "type": "text"
+        },
+        {
+          "key": "update_flag",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date",
+        "ann_date"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_forecast_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_forecast_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_forecast.py"
+    },
+    "income": {
+      "api_name": "income",
+      "table_name": "fina_income",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "f_ann_date",
+          "type": "date"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "report_type",
+          "type": "string"
+        },
+        {
+          "key": "comp_type",
+          "type": "string"
+        },
+        {
+          "key": "end_type",
+          "type": "string"
+        },
+        {
+          "key": "basic_eps",
+          "type": "number"
+        },
+        {
+          "key": "diluted_eps",
+          "type": "number"
+        },
+        {
+          "key": "total_revenue",
+          "type": "number"
+        },
+        {
+          "key": "revenue",
+          "type": "number"
+        },
+        {
+          "key": "int_income",
+          "type": "number"
+        },
+        {
+          "key": "prem_earned",
+          "type": "number"
+        },
+        {
+          "key": "comm_income",
+          "type": "number"
+        },
+        {
+          "key": "n_commis_income",
+          "type": "number"
+        },
+        {
+          "key": "n_oth_income",
+          "type": "number"
+        },
+        {
+          "key": "n_oth_b_income",
+          "type": "number"
+        },
+        {
+          "key": "prem_income",
+          "type": "number"
+        },
+        {
+          "key": "out_prem",
+          "type": "number"
+        },
+        {
+          "key": "une_prem_reser",
+          "type": "number"
+        },
+        {
+          "key": "reins_income",
+          "type": "number"
+        },
+        {
+          "key": "n_sec_tb_income",
+          "type": "number"
+        },
+        {
+          "key": "n_sec_uw_income",
+          "type": "number"
+        },
+        {
+          "key": "n_asset_mg_income",
+          "type": "number"
+        },
+        {
+          "key": "oth_b_income",
+          "type": "number"
+        },
+        {
+          "key": "fv_value_chg_gain",
+          "type": "number"
+        },
+        {
+          "key": "invest_income",
+          "type": "number"
+        },
+        {
+          "key": "ass_invest_income",
+          "type": "number"
+        },
+        {
+          "key": "forex_gain",
+          "type": "number"
+        },
+        {
+          "key": "total_cogs",
+          "type": "number"
+        },
+        {
+          "key": "oper_cost",
+          "type": "number"
+        },
+        {
+          "key": "int_exp",
+          "type": "number"
+        },
+        {
+          "key": "comm_exp",
+          "type": "number"
+        },
+        {
+          "key": "biz_tax_surchg",
+          "type": "number"
+        },
+        {
+          "key": "sell_exp",
+          "type": "number"
+        },
+        {
+          "key": "admin_exp",
+          "type": "number"
+        },
+        {
+          "key": "fin_exp",
+          "type": "number"
+        },
+        {
+          "key": "assets_impair_loss",
+          "type": "number"
+        },
+        {
+          "key": "prem_refund",
+          "type": "number"
+        },
+        {
+          "key": "compens_payout",
+          "type": "number"
+        },
+        {
+          "key": "reser_insur_liab",
+          "type": "number"
+        },
+        {
+          "key": "div_payt",
+          "type": "number"
+        },
+        {
+          "key": "reins_exp",
+          "type": "number"
+        },
+        {
+          "key": "oper_exp",
+          "type": "number"
+        },
+        {
+          "key": "compens_payout_refu",
+          "type": "number"
+        },
+        {
+          "key": "insur_reser_refu",
+          "type": "number"
+        },
+        {
+          "key": "reins_cost_refund",
+          "type": "number"
+        },
+        {
+          "key": "other_bus_cost",
+          "type": "number"
+        },
+        {
+          "key": "operate_profit",
+          "type": "number"
+        },
+        {
+          "key": "non_oper_income",
+          "type": "number"
+        },
+        {
+          "key": "non_oper_exp",
+          "type": "number"
+        },
+        {
+          "key": "nca_disploss",
+          "type": "number"
+        },
+        {
+          "key": "total_profit",
+          "type": "number"
+        },
+        {
+          "key": "income_tax",
+          "type": "number"
+        },
+        {
+          "key": "n_income",
+          "type": "number"
+        },
+        {
+          "key": "n_income_attr_p",
+          "type": "number"
+        },
+        {
+          "key": "minority_gain",
+          "type": "number"
+        },
+        {
+          "key": "oth_compr_income",
+          "type": "number"
+        },
+        {
+          "key": "t_compr_income",
+          "type": "number"
+        },
+        {
+          "key": "compr_inc_attr_p",
+          "type": "number"
+        },
+        {
+          "key": "compr_inc_attr_m_s",
+          "type": "number"
+        },
+        {
+          "key": "ebit",
+          "type": "number"
+        },
+        {
+          "key": "ebitda",
+          "type": "number"
+        },
+        {
+          "key": "insurance_exp",
+          "type": "number"
+        },
+        {
+          "key": "undist_profit",
+          "type": "number"
+        },
+        {
+          "key": "distable_profit",
+          "type": "number"
+        },
+        {
+          "key": "rd_exp",
+          "type": "number"
+        },
+        {
+          "key": "fin_exp_int_exp",
+          "type": "number"
+        },
+        {
+          "key": "fin_exp_int_inc",
+          "type": "number"
+        },
+        {
+          "key": "transfer_surplus_rese",
+          "type": "number"
+        },
+        {
+          "key": "transfer_housing_imprest",
+          "type": "number"
+        },
+        {
+          "key": "transfer_oth",
+          "type": "number"
+        },
+        {
+          "key": "adj_lossgain",
+          "type": "number"
+        },
+        {
+          "key": "withdra_legal_surplus",
+          "type": "number"
+        },
+        {
+          "key": "withdra_legal_pubfund",
+          "type": "number"
+        },
+        {
+          "key": "withdra_biz_devfund",
+          "type": "number"
+        },
+        {
+          "key": "withdra_rese_fund",
+          "type": "number"
+        },
+        {
+          "key": "withdra_oth_ersu",
+          "type": "number"
+        },
+        {
+          "key": "workers_welfare",
+          "type": "number"
+        },
+        {
+          "key": "distr_profit_shrhder",
+          "type": "number"
+        },
+        {
+          "key": "prfshare_payable_dvd",
+          "type": "number"
+        },
+        {
+          "key": "comshare_payable_dvd",
+          "type": "number"
+        },
+        {
+          "key": "capit_comstock_div",
+          "type": "number"
+        },
+        {
+          "key": "continued_net_profit",
+          "type": "number"
+        },
+        {
+          "key": "update_flag",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date",
+        "report_type"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_income_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_income_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_income.py"
+    },
+    "fina_indicator": {
+      "api_name": "fina_indicator",
+      "table_name": "fina_indicator",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "date"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "eps",
+          "type": "number"
+        },
+        {
+          "key": "dt_eps",
+          "type": "number"
+        },
+        {
+          "key": "total_revenue_ps",
+          "type": "number"
+        },
+        {
+          "key": "revenue_ps",
+          "type": "number"
+        },
+        {
+          "key": "capital_rese_ps",
+          "type": "number"
+        },
+        {
+          "key": "surplus_rese_ps",
+          "type": "number"
+        },
+        {
+          "key": "undist_profit_ps",
+          "type": "number"
+        },
+        {
+          "key": "extra_item",
+          "type": "number"
+        },
+        {
+          "key": "profit_dedt",
+          "type": "number"
+        },
+        {
+          "key": "gross_margin",
+          "type": "number"
+        },
+        {
+          "key": "current_ratio",
+          "type": "number"
+        },
+        {
+          "key": "quick_ratio",
+          "type": "number"
+        },
+        {
+          "key": "cash_ratio",
+          "type": "number"
+        },
+        {
+          "key": "ar_turn",
+          "type": "number"
+        },
+        {
+          "key": "ca_turn",
+          "type": "number"
+        },
+        {
+          "key": "fa_turn",
+          "type": "number"
+        },
+        {
+          "key": "assets_turn",
+          "type": "number"
+        },
+        {
+          "key": "op_income",
+          "type": "number"
+        },
+        {
+          "key": "ebit",
+          "type": "number"
+        },
+        {
+          "key": "ebitda",
+          "type": "number"
+        },
+        {
+          "key": "fcff",
+          "type": "number"
+        },
+        {
+          "key": "fcfe",
+          "type": "number"
+        },
+        {
+          "key": "current_exint",
+          "type": "number"
+        },
+        {
+          "key": "noncurrent_exint",
+          "type": "number"
+        },
+        {
+          "key": "interestdebt",
+          "type": "number"
+        },
+        {
+          "key": "netdebt",
+          "type": "number"
+        },
+        {
+          "key": "tangible_asset",
+          "type": "number"
+        },
+        {
+          "key": "working_capital",
+          "type": "number"
+        },
+        {
+          "key": "networking_capital",
+          "type": "number"
+        },
+        {
+          "key": "invest_capital",
+          "type": "number"
+        },
+        {
+          "key": "retained_earnings",
+          "type": "number"
+        },
+        {
+          "key": "diluted2_eps",
+          "type": "number"
+        },
+        {
+          "key": "bps",
+          "type": "number"
+        },
+        {
+          "key": "ocfps",
+          "type": "number"
+        },
+        {
+          "key": "retainedps",
+          "type": "number"
+        },
+        {
+          "key": "cfps",
+          "type": "number"
+        },
+        {
+          "key": "ebit_ps",
+          "type": "number"
+        },
+        {
+          "key": "fcff_ps",
+          "type": "number"
+        },
+        {
+          "key": "fcfe_ps",
+          "type": "number"
+        },
+        {
+          "key": "netprofit_margin",
+          "type": "number"
+        },
+        {
+          "key": "grossprofit_margin",
+          "type": "number"
+        },
+        {
+          "key": "cogs_of_sales",
+          "type": "number"
+        },
+        {
+          "key": "expense_of_sales",
+          "type": "number"
+        },
+        {
+          "key": "profit_to_gr",
+          "type": "number"
+        },
+        {
+          "key": "saleexp_to_gr",
+          "type": "number"
+        },
+        {
+          "key": "adminexp_of_gr",
+          "type": "number"
+        },
+        {
+          "key": "finaexp_of_gr",
+          "type": "number"
+        },
+        {
+          "key": "impai_ttm",
+          "type": "number"
+        },
+        {
+          "key": "gc_of_gr",
+          "type": "number"
+        },
+        {
+          "key": "op_of_gr",
+          "type": "number"
+        },
+        {
+          "key": "ebit_of_gr",
+          "type": "number"
+        },
+        {
+          "key": "roe",
+          "type": "number"
+        },
+        {
+          "key": "roe_waa",
+          "type": "number"
+        },
+        {
+          "key": "roe_dt",
+          "type": "number"
+        },
+        {
+          "key": "roa",
+          "type": "number"
+        },
+        {
+          "key": "npta",
+          "type": "number"
+        },
+        {
+          "key": "roic",
+          "type": "number"
+        },
+        {
+          "key": "roe_yearly",
+          "type": "number"
+        },
+        {
+          "key": "roa2_yearly",
+          "type": "number"
+        },
+        {
+          "key": "debt_to_assets",
+          "type": "number"
+        },
+        {
+          "key": "assets_to_eqt",
+          "type": "number"
+        },
+        {
+          "key": "dp_assets_to_eqt",
+          "type": "number"
+        },
+        {
+          "key": "ca_to_assets",
+          "type": "number"
+        },
+        {
+          "key": "nca_to_assets",
+          "type": "number"
+        },
+        {
+          "key": "tbassets_to_totalassets",
+          "type": "number"
+        },
+        {
+          "key": "int_to_talcap",
+          "type": "number"
+        },
+        {
+          "key": "eqt_to_talcapital",
+          "type": "number"
+        },
+        {
+          "key": "currentdebt_to_debt",
+          "type": "number"
+        },
+        {
+          "key": "longdeb_to_debt",
+          "type": "number"
+        },
+        {
+          "key": "ocf_to_shortdebt",
+          "type": "number"
+        },
+        {
+          "key": "debt_to_eqt",
+          "type": "number"
+        },
+        {
+          "key": "eqt_to_debt",
+          "type": "number"
+        },
+        {
+          "key": "eqt_to_interestdebt",
+          "type": "number"
+        },
+        {
+          "key": "tangibleasset_to_debt",
+          "type": "number"
+        },
+        {
+          "key": "tangasset_to_intdebt",
+          "type": "number"
+        },
+        {
+          "key": "tangibleasset_to_netdebt",
+          "type": "number"
+        },
+        {
+          "key": "ocf_to_debt",
+          "type": "number"
+        },
+        {
+          "key": "turn_days",
+          "type": "number"
+        },
+        {
+          "key": "roa_yearly",
+          "type": "number"
+        },
+        {
+          "key": "roa_dp",
+          "type": "number"
+        },
+        {
+          "key": "fixed_assets",
+          "type": "number"
+        },
+        {
+          "key": "profit_to_op",
+          "type": "number"
+        },
+        {
+          "key": "q_saleexp_to_gr",
+          "type": "number"
+        },
+        {
+          "key": "q_gc_to_gr",
+          "type": "number"
+        },
+        {
+          "key": "q_roe",
+          "type": "number"
+        },
+        {
+          "key": "q_dt_roe",
+          "type": "number"
+        },
+        {
+          "key": "q_npta",
+          "type": "number"
+        },
+        {
+          "key": "q_ocf_to_sales",
+          "type": "number"
+        },
+        {
+          "key": "basic_eps_yoy",
+          "type": "number"
+        },
+        {
+          "key": "dt_eps_yoy",
+          "type": "number"
+        },
+        {
+          "key": "cfps_yoy",
+          "type": "number"
+        },
+        {
+          "key": "op_yoy",
+          "type": "number"
+        },
+        {
+          "key": "ebt_yoy",
+          "type": "number"
+        },
+        {
+          "key": "netprofit_yoy",
+          "type": "number"
+        },
+        {
+          "key": "dt_netprofit_yoy",
+          "type": "number"
+        },
+        {
+          "key": "ocf_yoy",
+          "type": "number"
+        },
+        {
+          "key": "roe_yoy",
+          "type": "number"
+        },
+        {
+          "key": "bps_yoy",
+          "type": "number"
+        },
+        {
+          "key": "assets_yoy",
+          "type": "number"
+        },
+        {
+          "key": "eqt_yoy",
+          "type": "number"
+        },
+        {
+          "key": "tr_yoy",
+          "type": "number"
+        },
+        {
+          "key": "or_yoy",
+          "type": "number"
+        },
+        {
+          "key": "q_sales_yoy",
+          "type": "number"
+        },
+        {
+          "key": "q_op_qoq",
+          "type": "number"
+        },
+        {
+          "key": "equity_yoy",
+          "type": "number"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_indicator_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_indicator_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_indicator.py"
+    },
+    "fina_mainbz": {
+      "api_name": "fina_mainbz",
+      "table_name": "fina_mainbz",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "end_date",
+          "type": "date"
+        },
+        {
+          "key": "bz_item",
+          "type": "string"
+        },
+        {
+          "key": "bz_type",
+          "type": "string"
+        },
+        {
+          "key": "bz_sales",
+          "type": "number"
+        },
+        {
+          "key": "bz_profit",
+          "type": "number"
+        },
+        {
+          "key": "bz_cost",
+          "type": "number"
+        },
+        {
+          "key": "curr_type",
+          "type": "string"
+        },
+        {
+          "key": "update_flag",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date",
+        "bz_type",
+        "bz_item"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fina_mainbz_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_mainbz_end_date",
+          "columns": [
+            "end_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fina_mainbz_type",
+          "columns": [
+            "bz_type"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fina_mainbz.py"
+    },
+    "fund_basic": {
+      "api_name": "fund_basic",
+      "table_name": "fund_basic",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "management",
+          "type": "string"
+        },
+        {
+          "key": "custodian",
+          "type": "string"
+        },
+        {
+          "key": "fund_type",
+          "type": "string"
+        },
+        {
+          "key": "found_date",
+          "type": "string"
+        },
+        {
+          "key": "due_date",
+          "type": "string"
+        },
+        {
+          "key": "list_date",
+          "type": "string"
+        },
+        {
+          "key": "issue_date",
+          "type": "string"
+        },
+        {
+          "key": "delist_date",
+          "type": "string"
+        },
+        {
+          "key": "issue_amount",
+          "type": "string"
+        },
+        {
+          "key": "m_fee",
+          "type": "string"
+        },
+        {
+          "key": "c_fee",
+          "type": "string"
+        },
+        {
+          "key": "duration_year",
+          "type": "string"
+        },
+        {
+          "key": "p_value",
+          "type": "string"
+        },
+        {
+          "key": "min_amount",
+          "type": "string"
+        },
+        {
+          "key": "exp_return",
+          "type": "string"
+        },
+        {
+          "key": "benchmark",
+          "type": "string"
+        },
+        {
+          "key": "status",
+          "type": "string"
+        },
+        {
+          "key": "invest_type",
+          "type": "string"
+        },
+        {
+          "key": "category_type",
+          "type": "string"
+        },
+        {
+          "key": "trustee",
+          "type": "string"
+        },
+        {
+          "key": "purc_startdate",
+          "type": "string"
+        },
+        {
+          "key": "redm_startdate",
+          "type": "string"
+        },
+        {
+          "key": "market",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_basic.py"
+    },
+    "fund_company": {
+      "api_name": "fund_company",
+      "table_name": "fund_company",
+      "columns": [
+        {
+          "key": "company_key",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "shortname",
+          "type": "string"
+        },
+        {
+          "key": "short_enname",
+          "type": "string"
+        },
+        {
+          "key": "province",
+          "type": "string"
+        },
+        {
+          "key": "city",
+          "type": "string"
+        },
+        {
+          "key": "address",
+          "type": "string"
+        },
+        {
+          "key": "phone",
+          "type": "string"
+        },
+        {
+          "key": "office",
+          "type": "string"
+        },
+        {
+          "key": "website",
+          "type": "string"
+        },
+        {
+          "key": "chairman",
+          "type": "string"
+        },
+        {
+          "key": "manager",
+          "type": "string"
+        },
+        {
+          "key": "reg_capital",
+          "type": "string"
+        },
+        {
+          "key": "setup_date",
+          "type": "string"
+        },
+        {
+          "key": "end_date",
+          "type": "string"
+        },
+        {
+          "key": "employees",
+          "type": "string"
+        },
+        {
+          "key": "main_business",
+          "type": "string"
+        },
+        {
+          "key": "org_code",
+          "type": "string"
+        },
+        {
+          "key": "credit_code",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_company.py"
+    },
+    "fund_holdings_diff_industry": {
+      "api_name": "fund_holdings_diff_industry",
+      "table_name": "fund_holdings_diff_industry",
+      "columns": [
+        {
+          "key": "old_period",
+          "type": "string"
+        },
+        {
+          "key": "new_period",
+          "type": "string"
+        },
+        {
+          "key": "industry",
+          "type": "string"
+        },
+        {
+          "key": "delta_mkv",
+          "type": "string"
+        },
+        {
+          "key": "mkv_old",
+          "type": "string"
+        },
+        {
+          "key": "mkv_new",
+          "type": "string"
+        },
+        {
+          "key": "n_symbols",
+          "type": "string"
+        },
+        {
+          "key": "ashare_only",
+          "type": "string"
+        },
+        {
+          "key": "listed_only",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "old_period",
+        "new_period",
+        "industry",
+        "ashare_only",
+        "listed_only"
+      ],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_holdings_diff_industry.py"
+    },
+    "fund_holdings_diff_segment": {
+      "api_name": "fund_holdings_diff_segment",
+      "table_name": "fund_holdings_diff_segment",
+      "columns": [
+        {
+          "key": "old_period",
+          "type": "string"
+        },
+        {
+          "key": "new_period",
+          "type": "string"
+        },
+        {
+          "key": "segment_key",
+          "type": "string"
+        },
+        {
+          "key": "index_code",
+          "type": "string"
+        },
+        {
+          "key": "index_level",
+          "type": "string"
+        },
+        {
+          "key": "sw_l2_code",
+          "type": "string"
+        },
+        {
+          "key": "sw_l2_name",
+          "type": "string"
+        },
+        {
+          "key": "delta_mkv",
+          "type": "string"
+        },
+        {
+          "key": "mkv_old",
+          "type": "string"
+        },
+        {
+          "key": "mkv_new",
+          "type": "string"
+        },
+        {
+          "key": "n_symbols",
+          "type": "string"
+        },
+        {
+          "key": "map_source",
+          "type": "string"
+        },
+        {
+          "key": "sw_src",
+          "type": "string"
+        },
+        {
+          "key": "ashare_only",
+          "type": "string"
+        },
+        {
+          "key": "listed_only",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "old_period",
+        "new_period",
+        "segment_key",
+        "index_code",
+        "index_level",
+        "ashare_only",
+        "listed_only"
+      ],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_holdings_diff_segment.py"
+    },
+    "fund_holdings_diff_stock": {
+      "api_name": "fund_holdings_diff_stock",
+      "table_name": "fund_holdings_diff_stock",
+      "columns": [
+        {
+          "key": "old_period",
+          "type": "string"
+        },
+        {
+          "key": "new_period",
+          "type": "string"
+        },
+        {
+          "key": "symbol",
+          "type": "string"
+        },
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "industry",
+          "type": "string"
+        },
+        {
+          "key": "exchange",
+          "type": "string"
+        },
+        {
+          "key": "list_status",
+          "type": "string"
+        },
+        {
+          "key": "mkv_old",
+          "type": "string"
+        },
+        {
+          "key": "mkv_new",
+          "type": "string"
+        },
+        {
+          "key": "delta_mkv",
+          "type": "string"
+        },
+        {
+          "key": "ashare_only",
+          "type": "string"
+        },
+        {
+          "key": "listed_only",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "old_period",
+        "new_period",
+        "symbol",
+        "ashare_only",
+        "listed_only"
+      ],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_holdings_diff_stock.py"
+    },
+    "fund_portfolio": {
+      "api_name": "fund_portfolio",
+      "table_name": "fund_portfolio",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ann_date",
+          "type": "string"
+        },
+        {
+          "key": "end_date",
+          "type": "string"
+        },
+        {
+          "key": "symbol",
+          "type": "string"
+        },
+        {
+          "key": "mkv",
+          "type": "string"
+        },
+        {
+          "key": "amount",
+          "type": "string"
+        },
+        {
+          "key": "stk_mkv_ratio",
+          "type": "string"
+        },
+        {
+          "key": "stk_float_ratio",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "end_date",
+        "symbol"
+      ],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_portfolio.py"
+    },
+    "fund_share": {
+      "api_name": "fund_share",
+      "table_name": "fund_share",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "string"
+        },
+        {
+          "key": "fd_share",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "trade_date"
+      ],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_share.py"
+    },
+    "fund_share_change": {
+      "api_name": "fund_share_change",
+      "table_name": "fund_share_change",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "string"
+        },
+        {
+          "key": "fd_share",
+          "type": "string"
+        },
+        {
+          "key": "prev_trade_date",
+          "type": "string"
+        },
+        {
+          "key": "fd_share_prev",
+          "type": "string"
+        },
+        {
+          "key": "delta_fd_share",
+          "type": "string"
+        },
+        {
+          "key": "delta_pct",
+          "type": "string"
+        },
+        {
+          "key": "disclosure_lag_td",
+          "type": "string"
+        },
+        {
+          "key": "disclosure_cadence",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "trade_date"
+      ],
+      "indexes": [
+        {
+          "name": "idx_fsc_td",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_fsc_td_cadence",
+          "columns": [
+            "trade_date",
+            "disclosure_cadence"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "fund_share_change.py"
+    },
+    "fund_share_change_daily_summary": {
+      "api_name": "fund_share_change_daily_summary",
+      "table_name": "fund_share_change_daily_summary",
+      "columns": [
+        {
+          "key": "trade_date",
+          "type": "string"
+        },
+        {
+          "key": "fund_count",
+          "type": "string"
+        },
+        {
+          "key": "delta_sum",
+          "type": "string"
+        },
+        {
+          "key": "delta_abs_sum",
+          "type": "string"
+        },
+        {
+          "key": "delta_mean",
+          "type": "string"
+        },
+        {
+          "key": "pos_count",
+          "type": "string"
+        },
+        {
+          "key": "neg_count",
+          "type": "string"
+        },
+        {
+          "key": "null_prev_count",
+          "type": "string"
+        },
+        {
+          "key": "daily_fund_count",
+          "type": "string"
+        },
+        {
+          "key": "daily_delta_sum",
+          "type": "string"
+        },
+        {
+          "key": "daily_pos_count",
+          "type": "string"
+        },
+        {
+          "key": "daily_neg_count",
+          "type": "string"
+        },
+        {
+          "key": "slow_fund_count",
+          "type": "string"
+        },
+        {
+          "key": "slow_delta_sum",
+          "type": "string"
+        },
+        {
+          "key": "slow_pos_count",
+          "type": "string"
+        },
+        {
+          "key": "slow_neg_count",
+          "type": "string"
+        },
+        {
+          "key": "slow_lag_td_max",
+          "type": "string"
+        },
+        {
+          "key": "unknown_fund_count",
+          "type": "string"
+        },
+        {
+          "key": "unknown_delta_sum",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_share_change_daily_summary.py"
+    },
+    "fund_sw_exposure": {
+      "api_name": "fund_sw_exposure",
+      "table_name": "fund_sw_exposure",
+      "columns": [
+        {
+          "key": "fund_ts_code",
+          "type": "string"
+        },
+        {
+          "key": "end_date",
+          "type": "string"
+        },
+        {
+          "key": "ann_date_max",
+          "type": "string"
+        },
+        {
+          "key": "primary_segment_key",
+          "type": "string"
+        },
+        {
+          "key": "primary_sw_index_code",
+          "type": "string"
+        },
+        {
+          "key": "primary_sw_index_level",
+          "type": "string"
+        },
+        {
+          "key": "primary_sw_l2_code",
+          "type": "string"
+        },
+        {
+          "key": "primary_sw_l2_name",
+          "type": "string"
+        },
+        {
+          "key": "primary_segment_weight",
+          "type": "string"
+        },
+        {
+          "key": "top3_segments",
+          "type": "text"
+        },
+        {
+          "key": "mapped_mkv_ratio",
+          "type": "string"
+        },
+        {
+          "key": "ashare_mkv_ratio",
+          "type": "string"
+        },
+        {
+          "key": "hhi",
+          "type": "string"
+        },
+        {
+          "key": "n_holdings_mapped",
+          "type": "string"
+        },
+        {
+          "key": "n_holdings_total",
+          "type": "string"
+        },
+        {
+          "key": "coverage_flag",
+          "type": "string"
+        },
+        {
+          "key": "map_source",
+          "type": "string"
+        },
+        {
+          "key": "sw_src",
+          "type": "string"
+        },
+        {
+          "key": "materialized_at",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "fund_ts_code",
+        "end_date"
+      ],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "fund_sw_exposure.py"
+    },
+    "index_basic": {
+      "api_name": "index_basic",
+      "table_name": "index_basic",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "fullname",
+          "type": "string"
+        },
+        {
+          "key": "market",
+          "type": "string"
+        },
+        {
+          "key": "publisher",
+          "type": "string"
+        },
+        {
+          "key": "index_type",
+          "type": "string"
+        },
+        {
+          "key": "category",
+          "type": "string"
+        },
+        {
+          "key": "base_date",
+          "type": "string"
+        },
+        {
+          "key": "base_point",
+          "type": "string"
+        },
+        {
+          "key": "list_date",
+          "type": "string"
+        },
+        {
+          "key": "weight_rule",
+          "type": "string"
+        },
+        {
+          "key": "desc",
+          "type": "text"
+        },
+        {
+          "key": "exp_date",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_index_basic_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_index_basic_market",
+          "columns": [
+            "market"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_index_basic_name",
+          "columns": [
+            "name"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "index_basic.py"
+    },
+    "index_classify": {
+      "api_name": "index_classify",
+      "table_name": "index_classify",
+      "columns": [
+        {
+          "key": "index_code",
+          "type": "string"
+        },
+        {
+          "key": "industry_name",
+          "type": "string"
+        },
+        {
+          "key": "parent_code",
+          "type": "string"
+        },
+        {
+          "key": "level",
+          "type": "string"
+        },
+        {
+          "key": "industry_code",
+          "type": "string"
+        },
+        {
+          "key": "is_pub",
+          "type": "string"
+        },
+        {
+          "key": "src",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "index_code",
+        "src"
+      ],
+      "indexes": [
+        {
+          "name": "idx_index_classify_level",
+          "columns": [
+            "level"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_index_classify_parent",
+          "columns": [
+            "parent_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_index_classify_src",
+          "columns": [
+            "src"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_index_classify_industry_code",
+          "columns": [
+            "industry_code"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "index_classify.py"
+    },
+    "index_daily": {
+      "api_name": "index_daily",
+      "table_name": "index_daily",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "open",
+          "type": "number"
+        },
+        {
+          "key": "high",
+          "type": "number"
+        },
+        {
+          "key": "low",
+          "type": "number"
+        },
+        {
+          "key": "close",
+          "type": "number"
+        },
+        {
+          "key": "pre_close",
+          "type": "number"
+        },
+        {
+          "key": "change",
+          "type": "number"
+        },
+        {
+          "key": "pct_chg",
+          "type": "number"
+        },
+        {
+          "key": "vol",
+          "type": "bigint"
+        },
+        {
+          "key": "amount",
+          "type": "number"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_index_daily_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_index_daily_trade_date",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_index_daily_ts_code_trade_date",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_index_daily_trade_date_ts_code",
+          "columns": [
+            "trade_date",
+            "ts_code"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "index_daily.py"
+    },
+    "index_member_all": {
+      "api_name": "index_member_all",
+      "table_name": "index_member_all",
+      "columns": [
+        {
+          "key": "l1_code",
+          "type": "string"
+        },
+        {
+          "key": "l1_name",
+          "type": "string"
+        },
+        {
+          "key": "l2_code",
+          "type": "string"
+        },
+        {
+          "key": "l2_name",
+          "type": "string"
+        },
+        {
+          "key": "l3_code",
+          "type": "string"
+        },
+        {
+          "key": "l3_name",
+          "type": "string"
+        },
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "in_date",
+          "type": "string"
+        },
+        {
+          "key": "out_date",
+          "type": "string"
+        },
+        {
+          "key": "is_new",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "l3_code",
+        "in_date"
+      ],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "index_member_all.py"
+    },
+    "mainbiz_relations_snapshot": {
+      "api_name": "mainbiz_relations_snapshot",
+      "table_name": "mainbiz_relations_snapshot",
+      "columns": [
+        {
+          "key": "run_id",
+          "type": "string"
+        },
+        {
+          "key": "from_ts_code",
+          "type": "string"
+        },
+        {
+          "key": "to_ts_code",
+          "type": "string"
+        },
+        {
+          "key": "relation_type",
+          "type": "string"
+        },
+        {
+          "key": "directed",
+          "type": "string"
+        },
+        {
+          "key": "confidence",
+          "type": "number"
+        },
+        {
+          "key": "evidence",
+          "type": "text"
+        },
+        {
+          "key": "source_report_period_from",
+          "type": "string"
+        },
+        {
+          "key": "source_report_period_to",
+          "type": "string"
+        },
+        {
+          "key": "model_version",
+          "type": "string"
+        },
+        {
+          "key": "prompt_version",
+          "type": "string"
+        },
+        {
+          "key": "snapshot_time",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_mainbiz_rel_run",
+          "columns": [
+            "run_id"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_mainbiz_rel_from",
+          "columns": [
+            "from_ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_mainbiz_rel_to",
+          "columns": [
+            "to_ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_mainbiz_rel_type",
+          "columns": [
+            "relation_type"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "mainbiz_relations_snapshot.py"
+    },
+    "mainbiz_run_metrics": {
+      "api_name": "mainbiz_run_metrics",
+      "table_name": "mainbiz_run_metrics",
+      "columns": [
+        {
+          "key": "run_id",
+          "type": "string"
+        },
+        {
+          "key": "mode",
+          "type": "string"
+        },
+        {
+          "key": "end_date",
+          "type": "string"
+        },
+        {
+          "key": "align_policy",
+          "type": "string"
+        },
+        {
+          "key": "output_dir",
+          "type": "string"
+        },
+        {
+          "key": "changed_stocks",
+          "type": "string"
+        },
+        {
+          "key": "unchanged_stocks",
+          "type": "string"
+        },
+        {
+          "key": "pairs_recalled",
+          "type": "string"
+        },
+        {
+          "key": "relations_filtered",
+          "type": "string"
+        },
+        {
+          "key": "llm_calls",
+          "type": "string"
+        },
+        {
+          "key": "llm_retries",
+          "type": "string"
+        },
+        {
+          "key": "estimated_tokens_in",
+          "type": "string"
+        },
+        {
+          "key": "estimated_tokens_out",
+          "type": "string"
+        },
+        {
+          "key": "metrics_json",
+          "type": "text"
+        },
+        {
+          "key": "run_at",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "orm",
+      "model_file": "mainbiz_run_metrics.py"
+    },
+    "minute_kline_bars": {
+      "api_name": "minute_kline_bars",
+      "table_name": "minute_kline_bars",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "bar_time",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "open",
+          "type": "string"
+        },
+        {
+          "key": "high",
+          "type": "string"
+        },
+        {
+          "key": "low",
+          "type": "string"
+        },
+        {
+          "key": "close",
+          "type": "string"
+        },
+        {
+          "key": "vol",
+          "type": "bigint"
+        },
+        {
+          "key": "amount",
+          "type": "string"
+        },
+        {
+          "key": "freq",
+          "type": "string"
+        },
+        {
+          "key": "sync_time",
+          "type": "string"
+        },
+        {
+          "key": "data_source",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "bar_time",
+        "freq"
+      ],
+      "indexes": [
+        {
+          "name": "idx_minute_kline_bars_ts_trade",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "minute_kline_bar.py"
+    },
+    "minute_sync_universe": {
+      "api_name": "minute_sync_universe",
+      "table_name": "minute_sync_universe",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "enabled",
+          "type": "string"
+        },
+        {
+          "key": "eod_enabled",
+          "type": "string"
+        },
+        {
+          "key": "intraday_enabled",
+          "type": "string"
+        },
+        {
+          "key": "priority",
+          "type": "string"
+        },
+        {
+          "key": "note",
+          "type": "string"
+        },
+        {
+          "key": "source",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_minute_sync_universe_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_minute_sync_universe_eod",
+          "columns": [
+            "priority",
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_minute_sync_universe_intraday",
+          "columns": [
+            "priority",
+            "ts_code"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "minute_sync_universe.py"
+    },
+    "minute_time_bars": {
+      "api_name": "minute_time_bars",
+      "table_name": "minute_time_bars",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "bar_time",
+          "type": "string"
+        },
+        {
+          "key": "minute_idx",
+          "type": "string"
+        },
+        {
+          "key": "price",
+          "type": "string"
+        },
+        {
+          "key": "vol",
+          "type": "bigint"
+        },
+        {
+          "key": "sync_time",
+          "type": "string"
+        },
+        {
+          "key": "data_source",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [
+        "ts_code",
+        "trade_date",
+        "bar_time"
+      ],
+      "indexes": [
+        {
+          "name": "idx_minute_time_bars_ts_trade",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "minute_time_bar.py"
+    },
+    "moneyflow": {
+      "api_name": "moneyflow",
+      "table_name": "moneyflow",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "buy_sm_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "buy_sm_amount",
+          "type": "number"
+        },
+        {
+          "key": "sell_sm_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "sell_sm_amount",
+          "type": "number"
+        },
+        {
+          "key": "buy_md_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "buy_md_amount",
+          "type": "number"
+        },
+        {
+          "key": "sell_md_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "sell_md_amount",
+          "type": "number"
+        },
+        {
+          "key": "buy_lg_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "buy_lg_amount",
+          "type": "number"
+        },
+        {
+          "key": "sell_lg_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "sell_lg_amount",
+          "type": "number"
+        },
+        {
+          "key": "buy_elg_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "buy_elg_amount",
+          "type": "number"
+        },
+        {
+          "key": "sell_elg_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "sell_elg_amount",
+          "type": "number"
+        },
+        {
+          "key": "net_mf_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "net_mf_amount",
+          "type": "number"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_moneyflow_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_moneyflow_trade_date",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_moneyflow_ts_code_trade_date",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_moneyflow_trade_date_ts_code",
+          "columns": [
+            "trade_date",
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_moneyflow_net_mf_amount",
+          "columns": [
+            "net_mf_amount"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_moneyflow_trade_date_net_mf",
+          "columns": [
+            "trade_date",
+            "net_mf_amount"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "moneyflow.py"
+    },
+    "realtime_quotes": {
+      "api_name": "realtime_quotes",
+      "table_name": "realtime_quotes",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ak_code",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "latest_price",
+          "type": "number"
+        },
+        {
+          "key": "change_amount",
+          "type": "number"
+        },
+        {
+          "key": "pct_chg",
+          "type": "number"
+        },
+        {
+          "key": "bid_price",
+          "type": "number"
+        },
+        {
+          "key": "ask_price",
+          "type": "number"
+        },
+        {
+          "key": "pre_close",
+          "type": "number"
+        },
+        {
+          "key": "open",
+          "type": "number"
+        },
+        {
+          "key": "high",
+          "type": "number"
+        },
+        {
+          "key": "low",
+          "type": "number"
+        },
+        {
+          "key": "vol",
+          "type": "bigint"
+        },
+        {
+          "key": "amount",
+          "type": "number"
+        },
+        {
+          "key": "quote_time",
+          "type": "string"
+        },
+        {
+          "key": "sync_time",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_realtime_quotes_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_realtime_quotes_sync_time",
+          "columns": [
+            "sync_time"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "realtime_quote.py"
+    },
+    "realtime_quote_hist": {
+      "api_name": "realtime_quote_hist",
+      "table_name": "realtime_quote_hist",
+      "columns": [
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "ak_code",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "latest_price",
+          "type": "number"
+        },
+        {
+          "key": "change_amount",
+          "type": "number"
+        },
+        {
+          "key": "pct_chg",
+          "type": "number"
+        },
+        {
+          "key": "bid_price",
+          "type": "number"
+        },
+        {
+          "key": "ask_price",
+          "type": "number"
+        },
+        {
+          "key": "pre_close",
+          "type": "number"
+        },
+        {
+          "key": "open",
+          "type": "number"
+        },
+        {
+          "key": "high",
+          "type": "number"
+        },
+        {
+          "key": "low",
+          "type": "number"
+        },
+        {
+          "key": "vol",
+          "type": "bigint"
+        },
+        {
+          "key": "amount",
+          "type": "number"
+        },
+        {
+          "key": "quote_time",
+          "type": "string"
+        },
+        {
+          "key": "sync_time",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_rqh_trade_date",
+          "columns": [
+            "trade_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_rqh_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_rqh_trade_ts_sync",
+          "columns": [
+            "trade_date",
+            "ts_code",
+            "sync_time",
+            "unique=True"
+          ],
+          "unique": true
+        },
+        {
+          "name": "idx_rqh_sync_time",
+          "columns": [
+            "sync_time"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "realtime_quote_hist.py"
+    },
+    "stock_basic": {
+      "api_name": "stock_basic",
+      "table_name": "stock_basic",
+      "columns": [
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "symbol",
+          "type": "string"
+        },
+        {
+          "key": "name",
+          "type": "string"
+        },
+        {
+          "key": "area",
+          "type": "string"
+        },
+        {
+          "key": "industry",
+          "type": "string"
+        },
+        {
+          "key": "fullname",
+          "type": "string"
+        },
+        {
+          "key": "enname",
+          "type": "string"
+        },
+        {
+          "key": "cnspell",
+          "type": "string"
+        },
+        {
+          "key": "market",
+          "type": "string"
+        },
+        {
+          "key": "exchange",
+          "type": "string"
+        },
+        {
+          "key": "curr_type",
+          "type": "string"
+        },
+        {
+          "key": "list_status",
+          "type": "string"
+        },
+        {
+          "key": "list_date",
+          "type": "date"
+        },
+        {
+          "key": "delist_date",
+          "type": "date"
+        },
+        {
+          "key": "is_hs",
+          "type": "string"
+        },
+        {
+          "key": "act_name",
+          "type": "string"
+        },
+        {
+          "key": "act_ent_type",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_stock_basic_ts_code",
+          "columns": [
+            "ts_code"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_stock_basic_symbol",
+          "columns": [
+            "symbol"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_stock_basic_exchange",
+          "columns": [
+            "exchange"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_stock_basic_list_status",
+          "columns": [
+            "list_status"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_stock_basic_market",
+          "columns": [
+            "market"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_stock_basic_industry",
+          "columns": [
+            "industry"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_stock_basic_list_date",
+          "columns": [
+            "list_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "stock_basic.py"
+    },
+    "stock_risk_scan_cache": {
+      "api_name": "stock_risk_scan_cache",
+      "table_name": "stock_risk_scan_cache",
+      "columns": [
+        {
+          "key": "cache_key",
+          "type": "string"
+        },
+        {
+          "key": "ts_code",
+          "type": "string"
+        },
+        {
+          "key": "trade_date",
+          "type": "date"
+        },
+        {
+          "key": "window_start",
+          "type": "date"
+        },
+        {
+          "key": "window_end",
+          "type": "date"
+        },
+        {
+          "key": "prompt_version",
+          "type": "string"
+        },
+        {
+          "key": "model_name",
+          "type": "string"
+        },
+        {
+          "key": "use_content",
+          "type": "string"
+        },
+        {
+          "key": "ann_fingerprint",
+          "type": "string"
+        },
+        {
+          "key": "result_markdown",
+          "type": "text"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_risk_scan_ts_trade",
+          "columns": [
+            "ts_code",
+            "trade_date"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "stock_risk_scan_cache.py"
+    },
+    "trade_cal": {
+      "api_name": "trade_cal",
+      "table_name": "trade_cal",
+      "columns": [
+        {
+          "key": "exchange",
+          "type": "string"
+        },
+        {
+          "key": "cal_date",
+          "type": "date"
+        },
+        {
+          "key": "is_open",
+          "type": "string"
+        },
+        {
+          "key": "pretrade_date",
+          "type": "date"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_trade_cal_exchange",
+          "columns": [
+            "exchange"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_trade_cal_cal_date",
+          "columns": [
+            "cal_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_trade_cal_exchange_date",
+          "columns": [
+            "exchange",
+            "cal_date"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_trade_cal_is_open",
+          "columns": [
+            "is_open"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "trade_cal.py"
+    },
+    "wx_message_queue": {
+      "api_name": "wx_message_queue",
+      "table_name": "wx_message_queue",
+      "columns": [
+        {
+          "key": "biz_date",
+          "type": "date"
+        },
+        {
+          "key": "msg_type",
+          "type": "string"
+        },
+        {
+          "key": "content",
+          "type": "text"
+        },
+        {
+          "key": "target_group_name",
+          "type": "string"
+        },
+        {
+          "key": "status",
+          "type": "string"
+        },
+        {
+          "key": "dedup_key",
+          "type": "string"
+        },
+        {
+          "key": "retry_count",
+          "type": "string"
+        },
+        {
+          "key": "last_error",
+          "type": "text"
+        },
+        {
+          "key": "sent_at",
+          "type": "string"
+        }
+      ],
+      "unique_keys": [],
+      "indexes": [
+        {
+          "name": "idx_wx_msg_status_created",
+          "columns": [
+            "status",
+            "created_at"
+          ],
+          "unique": false
+        },
+        {
+          "name": "idx_wx_msg_biz_type",
+          "columns": [
+            "biz_date",
+            "msg_type"
+          ],
+          "unique": false
+        }
+      ],
+      "source": "orm",
+      "model_file": "wx_message_queue.py"
+    },
+    "namechange": {
+      "api_name": "namechange",
+      "table_name": "namechange",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "hs_const": {
+      "api_name": "hs_const",
+      "table_name": "hs_const",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stock_company": {
+      "api_name": "stock_company",
+      "table_name": "stock_company",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_managers": {
+      "api_name": "stk_managers",
+      "table_name": "stk_managers",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_rewards": {
+      "api_name": "stk_rewards",
+      "table_name": "stk_rewards",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "new_share": {
+      "api_name": "new_share",
+      "table_name": "new_share",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "bse_mapping": {
+      "api_name": "bse_mapping",
+      "table_name": "bse_mapping",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "st_list": {
+      "api_name": "st_list",
+      "table_name": "st_list",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stock_hsgt": {
+      "api_name": "stock_hsgt",
+      "table_name": "stock_hsgt",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "weekly": {
+      "api_name": "weekly",
+      "table_name": "weekly",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "monthly": {
+      "api_name": "monthly",
+      "table_name": "monthly",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "suspend_d": {
+      "api_name": "suspend_d",
+      "table_name": "suspend_d",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_limit": {
+      "api_name": "stk_limit",
+      "table_name": "stk_limit",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_auction_o": {
+      "api_name": "stk_auction_o",
+      "table_name": "stk_auction_o",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_auction_c": {
+      "api_name": "stk_auction_c",
+      "table_name": "stk_auction_c",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_factor": {
+      "api_name": "stk_factor",
+      "table_name": "stk_factor",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_factor_pro": {
+      "api_name": "stk_factor_pro",
+      "table_name": "stk_factor_pro",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "top10_holders": {
+      "api_name": "top10_holders",
+      "table_name": "top10_holders",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "top10_floatholders": {
+      "api_name": "top10_floatholders",
+      "table_name": "top10_floatholders",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "pledge_stat": {
+      "api_name": "pledge_stat",
+      "table_name": "pledge_stat",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "pledge_detail": {
+      "api_name": "pledge_detail",
+      "table_name": "pledge_detail",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "repurchase": {
+      "api_name": "repurchase",
+      "table_name": "repurchase",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "share_float": {
+      "api_name": "share_float",
+      "table_name": "share_float",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "block_trade": {
+      "api_name": "block_trade",
+      "table_name": "block_trade",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_holdernumber": {
+      "api_name": "stk_holdernumber",
+      "table_name": "stk_holdernumber",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_holdertrade": {
+      "api_name": "stk_holdertrade",
+      "table_name": "stk_holdertrade",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "moneyflow_hsgt": {
+      "api_name": "moneyflow_hsgt",
+      "table_name": "moneyflow_hsgt",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "margin": {
+      "api_name": "margin",
+      "table_name": "margin",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "margin_detail": {
+      "api_name": "margin_detail",
+      "table_name": "margin_detail",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "margin_target": {
+      "api_name": "margin_target",
+      "table_name": "margin_target",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "top_list": {
+      "api_name": "top_list",
+      "table_name": "top_list",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "top_inst": {
+      "api_name": "top_inst",
+      "table_name": "top_inst",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "limit_list": {
+      "api_name": "limit_list",
+      "table_name": "limit_list",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "limit_list_d": {
+      "api_name": "limit_list_d",
+      "table_name": "limit_list_d",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "hm_list": {
+      "api_name": "hm_list",
+      "table_name": "hm_list",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "hm_detail": {
+      "api_name": "hm_detail",
+      "table_name": "hm_detail",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "cyq_perf": {
+      "api_name": "cyq_perf",
+      "table_name": "cyq_perf",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "cyq_chips": {
+      "api_name": "cyq_chips",
+      "table_name": "cyq_chips",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "ggt_top10": {
+      "api_name": "ggt_top10",
+      "table_name": "ggt_top10",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "hsgt_top10": {
+      "api_name": "hsgt_top10",
+      "table_name": "hsgt_top10",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "ggt_daily": {
+      "api_name": "ggt_daily",
+      "table_name": "ggt_daily",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "hk_hold": {
+      "api_name": "hk_hold",
+      "table_name": "hk_hold",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "concept": {
+      "api_name": "concept",
+      "table_name": "concept",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "concept_detail": {
+      "api_name": "concept_detail",
+      "table_name": "concept_detail",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "ths_hot": {
+      "api_name": "ths_hot",
+      "table_name": "ths_hot",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "dc_hot": {
+      "api_name": "dc_hot",
+      "table_name": "dc_hot",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "broker_recommend": {
+      "api_name": "broker_recommend",
+      "table_name": "broker_recommend",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "report_rc": {
+      "api_name": "report_rc",
+      "table_name": "report_rc",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "stk_surv": {
+      "api_name": "stk_surv",
+      "table_name": "stk_surv",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "index_member": {
+      "api_name": "index_member",
+      "table_name": "index_member",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    },
+    "index_weight": {
+      "api_name": "index_weight",
+      "table_name": "index_weight",
+      "columns": [],
+      "unique_keys": [],
+      "indexes": [],
+      "source": "inferred"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+"""Scan adapter package."""

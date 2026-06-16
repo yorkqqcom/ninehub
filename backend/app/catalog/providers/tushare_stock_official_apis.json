@@ -1,0 +1,612 @@
+{
+  "provider": "tushare",
+  "scope": "stock_a",
+  "version": "2025-06-stock-a",
+  "source": "bundled",
+  "description": "Tushare Pro A股/股票专题接口快照，对齐 document/2 股票与相关专题",
+  "apis": [
+    {
+      "api": "stock_basic",
+      "doc_id": 25,
+      "category": "基础",
+      "probe_category": "list_basic",
+      "min_points": 120,
+      "label": "股票列表",
+      "scope": "stock_a"
+    },
+    {
+      "api": "trade_cal",
+      "doc_id": 26,
+      "category": "基础",
+      "probe_category": "trade_date",
+      "min_points": 120,
+      "label": "交易日历",
+      "scope": "stock_a"
+    },
+    {
+      "api": "namechange",
+      "doc_id": 100,
+      "category": "基础",
+      "probe_category": "list_limit",
+      "min_points": 120,
+      "label": "股票曾用名",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stock_company",
+      "doc_id": 112,
+      "category": "基础",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "上市公司基本信息",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_managers",
+      "doc_id": 193,
+      "category": "基础",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "上市公司管理层",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_rewards",
+      "doc_id": 194,
+      "category": "基础",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "管理层薪酬持股",
+      "scope": "stock_a"
+    },
+    {
+      "api": "new_share",
+      "doc_id": 123,
+      "category": "基础",
+      "probe_category": "list_limit",
+      "min_points": 120,
+      "label": "IPO新股",
+      "scope": "stock_a"
+    },
+    {
+      "api": "bse_mapping",
+      "doc_id": 375,
+      "category": "基础",
+      "probe_category": "list_limit",
+      "min_points": 120,
+      "label": "北交所代码对照",
+      "scope": "stock_a"
+    },
+    {
+      "api": "st_list",
+      "doc_id": 397,
+      "category": "基础",
+      "probe_category": "list_limit",
+      "min_points": 120,
+      "label": "ST股票列表",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stock_hsgt",
+      "doc_id": 398,
+      "category": "基础",
+      "probe_category": "list_limit",
+      "min_points": 120,
+      "label": "沪深港通股票列表",
+      "scope": "stock_a"
+    },
+    {
+      "api": "daily",
+      "doc_id": 27,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120,
+      "label": "日线",
+      "scope": "stock_a"
+    },
+    {
+      "api": "weekly",
+      "doc_id": 144,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 2000,
+      "label": "周线",
+      "scope": "stock_a"
+    },
+    {
+      "api": "monthly",
+      "doc_id": 29,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120,
+      "label": "月线",
+      "scope": "stock_a"
+    },
+    {
+      "api": "pro_bar",
+      "doc_id": 30,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120,
+      "label": "复权行情",
+      "scope": "stock_a"
+    },
+    {
+      "api": "adj_factor",
+      "doc_id": 31,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120,
+      "label": "复权因子",
+      "scope": "stock_a"
+    },
+    {
+      "api": "suspend_d",
+      "doc_id": 32,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120,
+      "label": "停复牌",
+      "scope": "stock_a"
+    },
+    {
+      "api": "daily_basic",
+      "doc_id": 32,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 120,
+      "label": "每日指标",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_limit",
+      "doc_id": 183,
+      "category": "行情",
+      "probe_category": "trade_date",
+      "min_points": 120,
+      "label": "涨跌停价格",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_auction_o",
+      "doc_id": 353,
+      "category": "行情",
+      "probe_category": "trade_date",
+      "min_points": 120,
+      "label": "开盘集合竞价",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_auction_c",
+      "doc_id": 354,
+      "category": "行情",
+      "probe_category": "trade_date",
+      "min_points": 120,
+      "label": "收盘集合竞价",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_factor",
+      "doc_id": 296,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 5000,
+      "label": "技术面因子",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_factor_pro",
+      "doc_id": 328,
+      "category": "行情",
+      "probe_category": "ts_code_date_range",
+      "min_points": 5000,
+      "label": "技术面因子Pro",
+      "scope": "stock_a"
+    },
+    {
+      "api": "income",
+      "doc_id": 33,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600,
+      "label": "利润表",
+      "scope": "stock_a"
+    },
+    {
+      "api": "balancesheet",
+      "doc_id": 36,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600,
+      "label": "资产负债表",
+      "scope": "stock_a"
+    },
+    {
+      "api": "cashflow",
+      "doc_id": 44,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600,
+      "label": "现金流量表",
+      "scope": "stock_a"
+    },
+    {
+      "api": "forecast",
+      "doc_id": 45,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600,
+      "label": "业绩预告",
+      "scope": "stock_a"
+    },
+    {
+      "api": "express",
+      "doc_id": 46,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600,
+      "label": "业绩快报",
+      "scope": "stock_a"
+    },
+    {
+      "api": "dividend",
+      "doc_id": 103,
+      "category": "财务",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "分红送股",
+      "scope": "stock_a"
+    },
+    {
+      "api": "fina_indicator",
+      "doc_id": 48,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600,
+      "label": "财务指标",
+      "scope": "stock_a"
+    },
+    {
+      "api": "fina_audit",
+      "doc_id": 47,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600,
+      "label": "审计意见",
+      "scope": "stock_a"
+    },
+    {
+      "api": "fina_mainbz",
+      "doc_id": 81,
+      "category": "财务",
+      "probe_category": "period_financial",
+      "min_points": 600,
+      "label": "主营业务构成",
+      "scope": "stock_a"
+    },
+    {
+      "api": "disclosure_date",
+      "doc_id": 162,
+      "category": "财务",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "财报披露计划",
+      "scope": "stock_a"
+    },
+    {
+      "api": "top10_holders",
+      "doc_id": 61,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "前十大股东",
+      "scope": "stock_a"
+    },
+    {
+      "api": "top10_floatholders",
+      "doc_id": 62,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "前十大流通股东",
+      "scope": "stock_a"
+    },
+    {
+      "api": "pledge_stat",
+      "doc_id": 110,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "股权质押统计",
+      "scope": "stock_a"
+    },
+    {
+      "api": "pledge_detail",
+      "doc_id": 111,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "股权质押明细",
+      "scope": "stock_a"
+    },
+    {
+      "api": "repurchase",
+      "doc_id": 124,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "股票回购",
+      "scope": "stock_a"
+    },
+    {
+      "api": "share_float",
+      "doc_id": 160,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "限售股解禁",
+      "scope": "stock_a"
+    },
+    {
+      "api": "block_trade",
+      "doc_id": 161,
+      "category": "参考",
+      "probe_category": "trade_date",
+      "min_points": 120,
+      "label": "大宗交易",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_holdernumber",
+      "doc_id": 166,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "股东人数",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_holdertrade",
+      "doc_id": 175,
+      "category": "参考",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "股东增减持",
+      "scope": "stock_a"
+    },
+    {
+      "api": "moneyflow",
+      "doc_id": 55,
+      "category": "资金",
+      "probe_category": "ts_code_date_range",
+      "min_points": 2000,
+      "label": "个股资金流向",
+      "scope": "stock_a"
+    },
+    {
+      "api": "moneyflow_hsgt",
+      "doc_id": 56,
+      "category": "资金",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "沪深港通资金",
+      "scope": "stock_a"
+    },
+    {
+      "api": "margin",
+      "doc_id": 58,
+      "category": "两融",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "融资融券汇总",
+      "scope": "stock_a"
+    },
+    {
+      "api": "margin_detail",
+      "doc_id": 59,
+      "category": "两融",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "融资融券明细",
+      "scope": "stock_a"
+    },
+    {
+      "api": "margin_target",
+      "doc_id": 326,
+      "category": "两融",
+      "probe_category": "list_limit",
+      "min_points": 120,
+      "label": "融资融券标的",
+      "scope": "stock_a"
+    },
+    {
+      "api": "top_list",
+      "doc_id": 106,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "龙虎榜每日统计",
+      "scope": "stock_a"
+    },
+    {
+      "api": "top_inst",
+      "doc_id": 107,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 5000,
+      "label": "龙虎榜机构",
+      "scope": "stock_a"
+    },
+    {
+      "api": "limit_list",
+      "doc_id": 356,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "涨跌停列表",
+      "scope": "stock_a"
+    },
+    {
+      "api": "limit_list_d",
+      "doc_id": 357,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "涨跌停明细",
+      "scope": "stock_a"
+    },
+    {
+      "api": "hm_list",
+      "doc_id": 311,
+      "category": "特色",
+      "probe_category": "list_limit",
+      "min_points": 2000,
+      "label": "游资名录",
+      "scope": "stock_a"
+    },
+    {
+      "api": "hm_detail",
+      "doc_id": 312,
+      "category": "特色",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "游资明细",
+      "scope": "stock_a"
+    },
+    {
+      "api": "cyq_perf",
+      "doc_id": 293,
+      "category": "特色",
+      "probe_category": "ts_code_date_range",
+      "min_points": 5000,
+      "label": "筹码及胜率",
+      "scope": "stock_a"
+    },
+    {
+      "api": "cyq_chips",
+      "doc_id": 294,
+      "category": "特色",
+      "probe_category": "ts_code_date_range",
+      "min_points": 5000,
+      "label": "筹码分布",
+      "scope": "stock_a"
+    },
+    {
+      "api": "ggt_top10",
+      "doc_id": 73,
+      "category": "港股通",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "港股通十大成交",
+      "scope": "stock_a"
+    },
+    {
+      "api": "hsgt_top10",
+      "doc_id": 74,
+      "category": "港股通",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "沪股通十大成交",
+      "scope": "stock_a"
+    },
+    {
+      "api": "ggt_daily",
+      "doc_id": 75,
+      "category": "港股通",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "港股通每日成交",
+      "scope": "stock_a"
+    },
+    {
+      "api": "hk_hold",
+      "doc_id": 274,
+      "category": "港股通",
+      "probe_category": "ts_code",
+      "min_points": 2000,
+      "label": "中央结算持股",
+      "scope": "stock_a"
+    },
+    {
+      "api": "concept",
+      "doc_id": 71,
+      "category": "概念",
+      "probe_category": "list_limit",
+      "min_points": 120,
+      "label": "概念分类",
+      "scope": "stock_a"
+    },
+    {
+      "api": "concept_detail",
+      "doc_id": 72,
+      "category": "概念",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "概念成分",
+      "scope": "stock_a"
+    },
+    {
+      "api": "ths_hot",
+      "doc_id": 259,
+      "category": "热榜",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "同花顺热榜",
+      "scope": "stock_a"
+    },
+    {
+      "api": "dc_hot",
+      "doc_id": 321,
+      "category": "热榜",
+      "probe_category": "trade_date",
+      "min_points": 2000,
+      "label": "东财热榜",
+      "scope": "stock_a"
+    },
+    {
+      "api": "broker_recommend",
+      "doc_id": 267,
+      "category": "研报",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "券商金股",
+      "scope": "stock_a"
+    },
+    {
+      "api": "report_rc",
+      "doc_id": 77,
+      "category": "研报",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "研报评级",
+      "scope": "stock_a"
+    },
+    {
+      "api": "stk_surv",
+      "doc_id": 275,
+      "category": "调研",
+      "probe_category": "ts_code",
+      "min_points": 120,
+      "label": "机构调研",
+      "scope": "stock_a"
+    },
+    {
+      "api": "index_member",
+      "doc_id": 61,
+      "category": "指数",
+      "probe_category": "list_limit",
+      "min_points": 120,
+      "label": "指数成分",
+      "scope": "stock_a"
+    },
+    {
+      "api": "index_weight",
+      "doc_id": 61,
+      "category": "指数",
+      "probe_category": "trade_date",
+      "min_points": 120,
+      "label": "指数权重",
+      "scope": "stock_a"
+    }
+  ]
+}

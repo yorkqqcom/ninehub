@@ -1,0 +1,1230 @@
+{
+  "provider": "tushare",
+  "source_url": "https://tushare.pro/document/2",
+  "synced_at": "2026-06-16T05:58:13.430715+00:00",
+  "note": "Live sync from document/2 interface pages (Playwright auth)",
+  "page_count": 136,
+  "pages": {
+    "25": {
+      "api": "stock_basic",
+      "raw_text": "接口：stock_basic 描述：获取基础信息数据，包括股票代码、名称、上市日期、退市日期等 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=25",
+      "points_section": "积分：120积分可以试用，每天10次请求 用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "26": {
+      "api": "trade_cal",
+      "raw_text": "接口：trade_cal 描述：获取各大交易所交易日历数据,默认提取的是上交所 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=26",
+      "points_section": "积分：需2000积分",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "27": {
+      "api": "daily",
+      "raw_text": "接口：daily 描述：获取股票行情数据，或通过[**通用行情接口**]( https://tushare.pro/document/2?doc_id=109)获取数据，包含了前后复权数据",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=27",
+      "fetcher": "wctapi_md"
+    },
+    "28": {
+      "api": "adj_factor",
+      "raw_text": "接口：adj_factor 描述：本接口由Tushare自行生产，获取股票复权因子，可提取单只股票全部历史复权因子，也可以提取单日全部股票的复权因子。 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=28",
+      "points_section": "积分要求：2000积分起，5000以上可高频调取",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "29": {
+      "api": "monthly",
+      "raw_text": "接口：monthly 描述：获取A股月线数据 输入参数",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=29",
+      "fetcher": "mcp_live_compile"
+    },
+    "32": {
+      "api": "daily_basic",
+      "raw_text": "接口：daily_basic 描述：获取全部股票每日重要的基本面指标，可用于选股分析、报表展示等。单次请求最大返回6000条数据，可按日线循环提取全部历史。 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=32",
+      "points_section": "积分：至少2000积分才可以调取，5000积分无总量限制",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "33": {
+      "api": "income",
+      "raw_text": "接口：income 描述：获取上市公司财务利润表数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=33",
+      "points_section": "积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "35": {
+      "api": "hs_const",
+      "raw_text": "接口：hs_const 描述：获取沪深港股通成分股数据 积分：120积分可以试用。本接口是VIP数据，需单独开通权限，请参考权限说明",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=35",
+      "points_section": "积分：120积分可以试用。本接口是VIP数据，需单独开通权限，请参考",
+      "fetcher": "mcp_live_compile"
+    },
+    "36": {
+      "api": "balancesheet",
+      "raw_text": "接口：balancesheet 描述：获取上市公司资产负债表 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=36",
+      "fetcher": "wctapi_md",
+      "min_points": 2000
+    },
+    "44": {
+      "api": "cashflow",
+      "raw_text": "接口：cashflow 描述：获取上市公司现金流量表 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=44",
+      "points_section": "积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "45": {
+      "api": "forecast",
+      "raw_text": "接口：forecast 描述：获取业绩预告数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=45",
+      "points_section": "积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "46": {
+      "api": "express",
+      "raw_text": "接口：express 描述：获取上市公司业绩快报 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=46",
+      "points_section": "积分，且Finance接口勾选要求超过5000",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "48": {
+      "api": "hsgt_top10",
+      "raw_text": "接口：hsgt_top10 描述：获取沪股通、深股通每日前十大成交详细数据，每天18~20点之间完成当日更新",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=48",
+      "points_section": "积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "55": {
+      "api": "moneyflow",
+      "raw_text": "接口：moneyflow 描述：获取沪深A股票资金流向数据 输入参数",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=55",
+      "fetcher": "mcp_live_compile"
+    },
+    "56": {
+      "api": "margin",
+      "raw_text": "接口：margin 描述：获取融资融券每日交易汇总数据 积分：2000积分起",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=56",
+      "points_section": "积分：2000积分起",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "57": {
+      "api": "margin_detail",
+      "raw_text": "接口：margin_detail 描述：获取沪深两市每日融资融券明细 积分：2000积分起",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=57",
+      "points_section": "积分：2000积分起",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "58": {
+      "api": "margin",
+      "raw_text": "接口：margin 描述：获取融资融券每日交易汇总数据，交易所于每天8点30左右更新上一日数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=58",
+      "fetcher": "wctapi_md",
+      "min_points": 2000
+    },
+    "59": {
+      "api": "margin_detail",
+      "raw_text": "接口：margin_detail 描述：获取沪深两市每日融资融券明细，，交易所于每天8点30左右更新上一日数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=59",
+      "fetcher": "wctapi_md",
+      "min_points": 2000
+    },
+    "60": {
+      "api": "index_daily",
+      "raw_text": "接口：index_daily 描述：获取指数每日行情 输入参数",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=60",
+      "fetcher": "mcp_live_compile"
+    },
+    "61": {
+      "api": "top10_holders",
+      "raw_text": "接口：top10_holders 描述：获取上市公司前十大股东数据，包括持有数量和比例等信息 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=61",
+      "points_section": "积分：需2000积分才可以调取，每分钟可以请求200次",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "62": {
+      "api": "top10_floatholders",
+      "raw_text": "接口：top10_floatholders 描述：获取上市公司前十大流通股东数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=62",
+      "points_section": "积分：需2000积分才可以调取，每分钟可以请求200次",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "63": {
+      "api": "fund_nav",
+      "raw_text": "接口：fund_nav 描述：获取公募基金净值 积分消耗：单次3000条，需要消耗用户积分",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=63",
+      "points_section": "积分消耗：单次3000条，需要消耗用户积分",
+      "fetcher": "mcp_live_compile"
+    },
+    "64": {
+      "api": "fund_div",
+      "raw_text": "接口：fund_div 描述：公募基金分红 积分消耗：单次4000条，需要消耗用户积分",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=64",
+      "points_section": "积分消耗：单次4000条，需要消耗用户积分",
+      "fetcher": "mcp_live_compile"
+    },
+    "65": {
+      "api": "fut_basic",
+      "raw_text": "接口：fut_basic 描述：获取期货合约列表 输入参数",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=65",
+      "fetcher": "mcp_live_compile"
+    },
+    "66": {
+      "api": "index_weight",
+      "raw_text": "接口：index_weight 描述：获取各类指数成分和权重 积分：需2000积分才可以调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=66",
+      "points_section": "积分：需2000积分才可以调取",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "67": {
+      "api": "index_dailybasic",
+      "raw_text": "接口：index_dailybasic 描述：获取大盘指数每日指标 积分：需2000积分才可以调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=67",
+      "points_section": "积分：需2000积分才可以调取",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "68": {
+      "api": "index_daily",
+      "raw_text": "接口：index_daily 描述：获取指数每日行情 积分：需2000积分才可以调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=68",
+      "points_section": "积分：需2000积分才可以调取",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "69": {
+      "api": "fund_daily",
+      "raw_text": "接口：fund_daily 描述：获取场内基金日线行情 积分：需2000积分才可以调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=69",
+      "points_section": "积分：需2000积分才可以调取",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "70": {
+      "api": "fund_company",
+      "raw_text": "接口：fund_company 描述：获取公募基金管理人列表 积分：120积分可以试用 用户需要至少2000积分才可以调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=70",
+      "points_section": "积分：120积分可以试用 用户需要至少2000积分才可以调取",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "71": {
+      "api": "fund_div",
+      "raw_text": "接口：fund_div 描述：公募基金分红 积分：用户需要至少2000积分才可以调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=71",
+      "points_section": "积分：用户需要至少2000积分才可以调取",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "72": {
+      "api": "index_member",
+      "raw_text": "接口：index_member 描述：按三级分类提取指数成分 权限：1500积分可调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=72",
+      "points_section": "权限：1500积分可调取",
+      "min_points": 1500,
+      "fetcher": "mcp_live_compile"
+    },
+    "73": {
+      "api": "hsgt_top10",
+      "raw_text": "接口：hsgt_top10 描述：获取沪股通、深股通每日前十大成交 权限：需2000积分才可以多次调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=73",
+      "points_section": "权限：需2000积分才可以多次调取",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "74": {
+      "api": "ggt_top10",
+      "raw_text": "接口：ggt_top10 描述：获取港股通每日成交 权限：需2000积分才可以多次调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=74",
+      "points_section": "权限：需2000积分才可以多次调取",
+      "min_points": 2000,
+      "fetcher": "mcp_live_compile"
+    },
+    "75": {
+      "api": "cn_gdp",
+      "raw_text": "接口：cn_gdp 描述：获取国民经济之GDP数据 输入参数",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=75",
+      "fetcher": "mcp_live_compile"
+    },
+    "76": {
+      "api": "cn_cpi",
+      "raw_text": "接口：cn_cpi 描述：获取CPI数据 积分：1000积分可重复调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=76",
+      "points_section": "积分：1000积分可重复调取",
+      "min_points": 1000,
+      "fetcher": "mcp_live_compile"
+    },
+    "81": {
+      "api": "fina_mainbz",
+      "raw_text": "接口：fina_mainbz 描述：获得上市公司主营业务构成，分地区和产品两种方式 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=81",
+      "points_section": "积分：前10万名用户积分有600分",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "100": {
+      "api": "namechange",
+      "raw_text": "接口：namechange 描述：历史名称变更记录",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=100",
+      "points_section": "积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "103": {
+      "api": "dividend",
+      "raw_text": "接口：dividend 描述：分红送股数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=103",
+      "points_section": "积分：用户积1000积分后可用",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "106": {
+      "api": "top_list",
+      "raw_text": "接口：top_list 描述：龙虎榜每日交易明细 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=106",
+      "points_section": "积分：需2000积分以上才可以调取本接口，5000积分以上",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "107": {
+      "api": "top_inst",
+      "raw_text": "接口：top_inst 描述：龙虎榜机构成交明细 积分：5000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=107",
+      "points_section": "积分：5000积分以上才可以调取，具体请参阅积分获取办法",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "110": {
+      "api": "pledge_stat",
+      "raw_text": "接口：pledge_stat 描述：获取股票质押统计数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=110",
+      "points_section": "积分：用户需要至少2000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "111": {
+      "api": "pledge_detail",
+      "raw_text": "接口：pledge_detail 描述：获取股票质押明细数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=111",
+      "points_section": "积分：2000积分每分钟可以请求2000次",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "112": {
+      "api": "stock_company",
+      "raw_text": "接口：stock_company 描述：获取上市公司基础信息，单次提取4500条，可以根据交易所分批提取 积分：120积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=112",
+      "points_section": "积分：2000积分以上",
+      "min_points": 120,
+      "fetcher": "wctapi_md"
+    },
+    "123": {
+      "api": "new_share",
+      "raw_text": "接口：new_share 描述：获取新股上市列表数据 积分：120积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=123",
+      "points_section": "积分：1000积分可以使用",
+      "min_points": 120,
+      "fetcher": "wctapi_md"
+    },
+    "124": {
+      "api": "repurchase",
+      "raw_text": "接口：repurchase 描述：获取上市公司回购股票数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=124",
+      "points_section": "积分：需5000积分才可以调取",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "144": {
+      "api": "weekly",
+      "raw_text": "接口：weekly 描述：获取A股周线行情，本接口每周最后一个交易日更新，如需要使用每天更新的周线数据，请使用[日度更新的周线行情接口](https://tushare.pro/document/2?doc_id=336)。 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=144",
+      "points_section": "积分：需2000积分以上才可以调取本接口，5000积分以上",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "146": {
+      "api": "stk_factor_pro",
+      "raw_text": "接口：stk_factor_pro 描述：获取股票每日技术面因子专业版 积分：至少6000积分才可以调取",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=146",
+      "points_section": "积分：至少6000积分才可以调取",
+      "min_points": 6000,
+      "fetcher": "mcp_live_compile"
+    },
+    "160": {
+      "api": "share_float",
+      "raw_text": "接口：share_float 描述：获取限售股解禁 积分：5000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=160",
+      "points_section": "积分：用户需要至少3000积分才可以调取",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "161": {
+      "api": "block_trade",
+      "raw_text": "接口：block_trade 描述：大宗交易 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=161",
+      "points_section": "积分：用户需要至少3000积分才可以调取",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "162": {
+      "api": "disclosure_date",
+      "raw_text": "接口：disclosure_date 描述：获取财报披露计划日期 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=162",
+      "points_section": "权限：2000积分以上",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "166": {
+      "api": "stk_holdernumber",
+      "raw_text": "接口：stk_holdernumber 描述：获取上市公司股东户数数据，数据不定期公布 积分：600积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=166",
+      "points_section": "积分：需2000积分才可以调取，每分钟可以请求200次",
+      "min_points": 600,
+      "fetcher": "wctapi_md"
+    },
+    "175": {
+      "api": "stk_holdertrade",
+      "raw_text": "接口：stk_holdertrade 描述：获取上市公司增减持数据，了解重要股东近期及历史上的股份增减变化 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=175",
+      "fetcher": "wctapi_md",
+      "min_points": 2000
+    },
+    "214": {
+      "api": "suspend_d",
+      "raw_text": "接口：suspend_d 描述：按日期方式获取股票每日停复牌信息",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=214",
+      "points_section": "权限：5000积分每分钟5000次",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "244": {
+      "api": "stk_rewards",
+      "raw_text": "接口：stk_rewards 描述：管理层薪酬和持股 积分：需5000积分",
+      "source": "official_text",
+      "min_points_source": "doc_page_parsed",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=244",
+      "points_section": "积分：需5000积分",
+      "min_points": 5000,
+      "fetcher": "mcp_live_compile"
+    },
+    "259": {
+      "api": "ths_index",
+      "raw_text": "接口：ths_index 描述：获取板块指数，包括概念、行业、特色指数。 积分：6000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=259",
+      "fetcher": "wctapi_md",
+      "min_points": 6000
+    },
+    "267": {
+      "api": "broker_recommend",
+      "raw_text": "接口：broker_recommend 描述：获取券商月度金股，一般1日~3日内更新当月数据",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=267",
+      "points_section": "积分：5000积分可多次调取",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "274": {
+      "api": "ccass_hold_detail",
+      "raw_text": "接口：ccass_hold_detail 描述：获取中央结算系统机构席位持股明细，数据覆盖**全历史**，根据交易所披露时间，当日数据在下一交易日早上9点前完成 积分：8000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=274",
+      "fetcher": "wctapi_md",
+      "min_points": 8000
+    },
+    "275": {
+      "api": "stk_surv",
+      "raw_text": "接口：stk_surv 描述：获取上市公司机构调研记录数据 积分：5000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=275",
+      "points_section": "积分：120积分正常使用",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "292": {
+      "api": "report_rc",
+      "raw_text": "接口：report_rc 描述：获取券商（卖方）每天研报的盈利预测数据，数据从2010年开始，每晚19~22点更新当日数据 积分：8000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=292",
+      "points_section": "积分：用户需要至少1000积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 8000,
+      "fetcher": "wctapi_md"
+    },
+    "293": {
+      "api": "cyq_perf",
+      "raw_text": "接口：cyq_perf 描述：获取A股每日筹码平均成本和胜率情况，每天18~19点左右更新，数据从2018年开始 积分：5000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=293",
+      "points_section": "积分：5000积分可多次调取",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "294": {
+      "api": "cyq_chips",
+      "raw_text": "接口：cyq_chips 描述：获取A股每日的筹码分布情况，提供各价位占比，数据从2018年开始，每天18~19点之间更新当日数据 积分：5000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=294",
+      "points_section": "积分：5000积分无每天总量限制",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "296": {
+      "api": "stk_factor",
+      "raw_text": "接口：stk_factor 描述：获取股票每日技术面因子数据，用于跟踪股票当前走势情况，数据由Tushare社区自产，覆盖全历史 积分：5000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=296",
+      "points_section": "积分：5000积分每分钟可以请求500次",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "311": {
+      "api": "hm_list",
+      "raw_text": "接口：hm_list 描述：获取游资分类名录信息 积分：5000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=311",
+      "points_section": "积分：10000积分以上可调取",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "312": {
+      "api": "hm_detail",
+      "raw_text": "接口：hm_detail 描述：获取每日游资交易明细，数据开始于2022年8。游资分类名录，请点击<a href=\"https://tushare.pro/document/2?doc_id=311\">游资名录</a> 积分：10000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=312",
+      "points_section": "积分：10000积分可一次获取全部数据",
+      "min_points": 10000,
+      "fetcher": "wctapi_md"
+    },
+    "321": {
+      "api": "dc_hot",
+      "raw_text": "接口：dc_hot 描述：获取热榜数据，包括A股市场、ETF基金、港股市场、美股市场等等，每日盘中提取4次，收盘后4次，最晚22点提取一次。 积分：8000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=321",
+      "fetcher": "wctapi_md",
+      "min_points": 8000
+    },
+    "326": {
+      "api": "margin_secs",
+      "raw_text": "接口：margin_secs 描述：获取沪深京三大交易所融资融券标的（包括ETF），每天盘前更新 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=326",
+      "fetcher": "wctapi_md",
+      "min_points": 2000
+    },
+    "328": {
+      "api": "stk_factor_pro",
+      "raw_text": "接口：stk_factor_pro 描述：获取股票每日技术面因子数据，用于跟踪股票当前走势情况，数据由Tushare社区自产，覆盖全历史；输出参数_bfq表示不复权，_qfq表示前复权 _hfq表示后复权，描述中说明了因子的默认传参，如需要特殊参数或者更多因子可以联系管理员评估 积分：5000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=328",
+      "points_section": "积分：5000积分每分钟可以请求1000次",
+      "min_points": 5000,
+      "fetcher": "wctapi_md"
+    },
+    "329": {
+      "api": "stk_premarket",
+      "raw_text": "接口：stk_premarket 描述：每日开盘前获取当日股票的股本情况，包括总股本和流通股本，涨跌停价格等。",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=329",
+      "points_section": "积分：用户需要至少120积分才可以调取，具体请参阅积分获取办法",
+      "min_points": 120,
+      "fetcher": "wctapi_md"
+    },
+    "353": {
+      "api": "stk_auction_o",
+      "raw_text": "接口：stk_auction_o 描述：股票开盘9:30集合竞价数据，每天盘后更新",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=353",
+      "points_section": "积分：本接口是VIP接口",
+      "fetcher": "wctapi_md"
+    },
+    "354": {
+      "api": "stk_auction_c",
+      "raw_text": "接口：stk_auction_c 描述：股票收盘15:00集合竞价数据，每天盘后更新",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=354",
+      "points_section": "积分：本接口是VIP接口",
+      "fetcher": "wctapi_md"
+    },
+    "356": {
+      "api": "limit_step",
+      "raw_text": "接口：limit_step 描述：获取每天连板个数晋级的股票，可以分析出每天连续涨停进阶个数，判断强势热度 积分：8000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=356",
+      "points_section": "积分：需2000积分才可以调取",
+      "min_points": 8000,
+      "fetcher": "wctapi_md"
+    },
+    "357": {
+      "api": "limit_cpt_list",
+      "raw_text": "接口：limit_cpt_list 描述：获取每天涨停股票最多最强的概念板块，可以分析强势板块的轮动，判断资金动向 积分：8000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=357",
+      "points_section": "积分：本接口是VIP接口",
+      "fetcher": "wctapi_md",
+      "min_points": 8000
+    },
+    "366": {
+      "api": "irm_qa_sh",
+      "raw_text": "接口：irm_qa_sh 描述：获取上交所e互动董秘问答文本数据。上证e互动是由上海证券交易所建立、上海证券市场所有参与主体无偿使用的沟通平台,旨在引导和促进上市公司、投资者等各市场参与主体之间的信息沟通,构建集中、便捷的互动渠道。本接口数据记录了以上沟通问答的文本数据。",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=366",
+      "points_section": "积分：2000积分",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "370": {
+      "api": "stk_mins",
+      "raw_text": "接口：stk_mins 描述：获取A股分钟数据，支持1min/5min/15min/30min/60min行情，提供Python SDK和 http Restful API两种方式",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=370",
+      "points_section": "积分：8000积分/次",
+      "min_points": 8000,
+      "fetcher": "wctapi_md"
+    },
+    "371": {
+      "api": "moneyflow_cnt_ths",
+      "raw_text": "接口：moneyflow_cnt_ths 描述：获取同花顺概念板块每日资金流向 积分：6000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=371",
+      "points_section": "积分：8000积分/分钟",
+      "min_points": 6000,
+      "fetcher": "wctapi_md"
+    },
+    "372": {
+      "api": "rt_k",
+      "raw_text": "接口：rt_k 描述：获取实时日k线行情，支持按股票代码及股票代码通配符一次性提取全部股票实时日k线行情",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=372",
+      "points_section": "积分：8000积分/天",
+      "min_points": 8000,
+      "fetcher": "wctapi_md"
+    },
+    "374": {
+      "api": "rt_min",
+      "raw_text": "接口：rt_min 描述：获取全A股票实时分钟数据，包括1~60min",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=374",
+      "points_section": "积分：8000积分/分钟",
+      "min_points": 8000,
+      "fetcher": "wctapi_md"
+    },
+    "375": {
+      "api": "bse_mapping",
+      "raw_text": "接口：bse_mapping 描述：获取北交所股票代码变更后新旧代码映射表数据 积分：2000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=375",
+      "points_section": "积分：2000积分起",
+      "min_points": 2000,
+      "fetcher": "wctapi_md"
+    },
+    "382": {
+      "api": "dc_daily",
+      "raw_text": "接口：dc_daily 描述：获取概念板块、行业指数板块、地域板块行情数据，历史数据开始于2020年 积分：6000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=382",
+      "points_section": "积分：8000积分/天",
+      "min_points": 6000,
+      "fetcher": "wctapi_md"
+    },
+    "397": {
+      "api": "stock_st",
+      "raw_text": "接口：stock_st 描述：获取ST股票列表，可根据交易日期获取历史上每天的ST列表 积分：3000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=397",
+      "points_section": "积分：需3000积分才可以调取",
+      "min_points": 3000,
+      "fetcher": "wctapi_md"
+    },
+    "398": {
+      "api": "stock_hsgt",
+      "raw_text": "接口：stock_hsgt 描述：获取沪深港通股票列表 积分：3000积分",
+      "source": "official_text",
+      "min_points_source": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=398",
+      "points_section": "积分：需6000积分才可以调取",
+      "min_points": 3000,
+      "fetcher": "wctapi_md"
+    },
+    "47": {
+      "api": "moneyflow_hsgt",
+      "raw_text": "接口：moneyflow_hsgt 描述：获取沪股通、深股通、港股通每日资金流向数据，每次最多返回300条记录，总量不限制。 积分：5000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=47",
+      "min_points": 5000
+    },
+    "49": {
+      "api": "ggt_top10",
+      "raw_text": "接口：ggt_top10 描述：获取港股通每日成交数据，其中包括沪市、深市详细数据，每天18~20点之间完成当日更新",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=49"
+    },
+    "79": {
+      "api": "fina_indicator",
+      "raw_text": "接口：fina_indicator 描述：获取上市公司财务指标数据，为避免服务器压力，现阶段每次请求最多返回100条记录，可通过设置日期多次请求获取更多数据。 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=79",
+      "min_points": 2000
+    },
+    "80": {
+      "api": "fina_audit",
+      "raw_text": "接口：fina_audit 描述：获取上市公司定期财务审计意见数据 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=80",
+      "min_points": 2000
+    },
+    "183": {
+      "api": "stk_limit",
+      "raw_text": "接口：stk_limit 描述：获取全市场（包含A/B股和基金）每日涨跌停价格，包括涨停价格，跌停价格等，每个交易日8点40左右更新当日股票涨跌停价格。 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=183",
+      "min_points": 2000
+    },
+    "193": {
+      "api": "stk_managers",
+      "raw_text": "接口：stk_managers 描述：获取上市公司管理层 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=193",
+      "min_points": 2000
+    },
+    "194": {
+      "api": "stk_rewards",
+      "raw_text": "接口：stk_rewards 描述：获取上市公司管理层薪酬和持股 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=194",
+      "min_points": 2000
+    },
+    "145": {
+      "api": "monthly",
+      "raw_text": "接口：monthly 描述：获取A股月线数据 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=145",
+      "min_points": 2000
+    },
+    "164": {
+      "api": "stk_account",
+      "raw_text": "接口：stk_account 描述：获取股票账户开户数据，统计周期为一周 积分：600积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=164",
+      "min_points": 600
+    },
+    "165": {
+      "api": "stk_account_old",
+      "raw_text": "接口：stk_account_old 描述：获取股票账户开户数据旧版格式数据，数据从2008年1月开始，到2015年5月29，新数据请通过[股票开户数据](https://tushare.pro/document/2?doc_id=164)获取。 积分：600积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=165",
+      "min_points": 600
+    },
+    "170": {
+      "api": "moneyflow",
+      "raw_text": "接口：moneyflow 描述：获取沪深A股票资金流向数据，分析大单小单成交情况，用于判别资金动向，数据开始于2010年。 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=170",
+      "min_points": 2000
+    },
+    "188": {
+      "api": "hk_hold",
+      "raw_text": "接口：hk_hold 描述：获取沪深港股通持股明细，数据来源港交所。 积分：120积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=188",
+      "min_points": 120
+    },
+    "260": {
+      "api": "ths_daily",
+      "raw_text": "接口：ths_daily 描述：获取板块指数行情 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=260",
+      "min_points": 6000
+    },
+    "261": {
+      "api": "ths_member",
+      "raw_text": "接口：ths_member 描述：获取概念板块成分列表 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=261",
+      "min_points": 6000
+    },
+    "262": {
+      "api": "bak_basic",
+      "raw_text": "接口：bak_basic 描述：获取备用基础列表，数据从2016年开始 积分：5000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=262",
+      "min_points": 5000
+    },
+    "295": {
+      "api": "ccass_hold",
+      "raw_text": "接口：ccass_hold 描述：获取中央结算系统持股汇总数据，覆盖全部历史数据，根据交易所披露时间，当日数据在下一交易日早上9点前完成入库 积分：5000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=295",
+      "min_points": 5000
+    },
+    "320": {
+      "api": "ths_hot",
+      "raw_text": "接口：ths_hot 描述：获取热榜数据，包括热股、概念板块、ETF、可转债、港美股等等，每日盘中提取4次，收盘后4次，最晚22点提取一次。 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=320",
+      "min_points": 6000
+    },
+    "331": {
+      "api": "slb_len",
+      "raw_text": "接口：slb_len 描述：转融通融资汇总 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=331",
+      "min_points": 2000
+    },
+    "332": {
+      "api": "slb_sec",
+      "raw_text": "接口：slb_sec 描述：转融通转融券交易汇总 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=332",
+      "min_points": 2000
+    },
+    "333": {
+      "api": "slb_sec_detail",
+      "raw_text": "接口：slb_sec_detail 描述：转融券交易明细 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=333",
+      "min_points": 2000
+    },
+    "334": {
+      "api": "slb_len_mm",
+      "raw_text": "接口：slb_len_mm 描述：做市借券交易汇总 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=334",
+      "min_points": 2000
+    },
+    "336": {
+      "api": "stk_weekly_monthly",
+      "raw_text": "接口：stk_weekly_monthly 描述：股票周/月线行情(每日更新) 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=336",
+      "min_points": 2000
+    },
+    "343": {
+      "api": "moneyflow_ind_ths",
+      "raw_text": "接口：moneyflow_ind_ths 描述：获取同花顺行业资金流向，每日盘后更新 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=343",
+      "min_points": 6000
+    },
+    "344": {
+      "api": "moneyflow_ind_dc",
+      "raw_text": "接口：moneyflow_ind_dc 描述：获取东方财富板块资金流向，每天盘后更新 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=344",
+      "min_points": 6000
+    },
+    "345": {
+      "api": "moneyflow_mkt_dc",
+      "raw_text": "接口：moneyflow_mkt_dc 描述：获取东方财富大盘资金流向数据，每日盘后更新 积分：120积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=345",
+      "min_points": 120
+    },
+    "347": {
+      "api": "kpl_list",
+      "raw_text": "接口：kpl_list 描述：获取涨停、跌停、炸板等榜单数据 积分：5000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=347",
+      "min_points": 5000
+    },
+    "348": {
+      "api": "moneyflow_ths",
+      "raw_text": "接口：moneyflow_ths 描述：获取同花顺个股资金流向数据，每日盘后更新 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=348",
+      "min_points": 6000
+    },
+    "349": {
+      "api": "moneyflow_dc",
+      "raw_text": "接口：moneyflow_dc 描述：获取东方财富个股资金流向数据，每日盘后更新，数据开始于20230911 积分：5000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=349",
+      "min_points": 5000
+    },
+    "351": {
+      "api": "kpl_concept_cons",
+      "raw_text": "接口：kpl_concept_cons 描述：获取概念题材的成分股 积分：5000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=351",
+      "min_points": 5000
+    },
+    "355": {
+      "api": "limit_list_ths",
+      "raw_text": "接口：limit_list_ths 描述：获取同花顺每日涨跌停榜单数据，历史数据从20231101开始提供，增量每天16点左右更新 积分：8000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=355",
+      "min_points": 8000
+    },
+    "358": {
+      "api": "idx_factor_pro",
+      "raw_text": "接口：idx_factor_pro 描述：获取指数每日技术面因子数据，用于跟踪指数当前走势情况，数据由Tushare社区自产，覆盖全历史；输出参数_bfq表示不复权描述中说明了因子的默认传参，如需要特殊参数或者更多因子可以联系管理员评估，指数包括大盘指数 申万行业指数 中信指数 积分：5000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=358",
+      "min_points": 5000
+    },
+    "362": {
+      "api": "dc_index",
+      "raw_text": "接口：dc_index 描述：获取每个交易日的概念板块数据，支持按日期查询 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=362",
+      "min_points": 6000
+    },
+    "363": {
+      "api": "dc_member",
+      "raw_text": "接口：dc_member 描述：获取板块每日成分数据，可以根据概念板块代码和交易日期，获取历史成分 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=363",
+      "min_points": 6000
+    },
+    "364": {
+      "api": "stk_nineturn",
+      "raw_text": "接口：stk_nineturn 描述：神奇九转（又称“九转序列”）是一种基于技术分析的股票趋势反转指标，其思想来源于技术分析大师汤姆·迪马克（Tom DeMark）的TD序列。该指标的核心功能是通过识别股价在上涨或下跌过程中连续9天的特定走势，来判断股价的潜在反转点，从而帮助投资者提高抄底和逃顶的成功率，日线级别配合60min的九转效果更好，数据从20230101开始。 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=364",
+      "min_points": 6000
+    },
+    "365": {
+      "api": "stk_week_month_adj",
+      "raw_text": "接口：stk_week_month_adj 描述：股票周/月线行情(复权--每日更新) 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=365",
+      "min_points": 2000
+    },
+    "369": {
+      "api": "stk_auction",
+      "raw_text": "接口：stk_auction 描述：获取当日个股和ETF的集合竞价成交情况，每天9点26~29分之间可以获取当日的集合竞价成交数据。本接口历史数据开始于2025年1月。",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=369"
+    },
+    "376": {
+      "api": "tdx_index",
+      "raw_text": "接口：tdx_index 描述：获取板块基础信息，包括概念板块、行业、风格、地域等 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=376",
+      "min_points": 6000
+    },
+    "377": {
+      "api": "tdx_member",
+      "raw_text": "接口：tdx_member 描述：获取各板块成分股信息 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=377",
+      "min_points": 6000
+    },
+    "378": {
+      "api": "tdx_daily",
+      "raw_text": "接口：tdx_daily 描述：获取各板块行情，包括成交和估值等数据 积分：6000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=378",
+      "min_points": 6000
+    },
+    "19": {
+      "api": "fund_basic",
+      "raw_text": "接口：fund_basic 描述：获取公募基金数据列表，包括场内和场外基金 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=19",
+      "min_points": 2000
+    },
+    "94": {
+      "api": "index_basic",
+      "raw_text": "接口：index_basic 描述：获取指数基础信息。",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=94"
+    },
+    "95": {
+      "api": "index_daily",
+      "raw_text": "接口：index_daily 描述：获取指数每日行情，还可以通过bar接口获取。由于服务器压力，目前规则是单次调取最多取8000行记录，可以设置start和end日期补全。指数行情也可以通过[**通用行情接口**]( https://tushare.pro/document/2?doc_id=109)获取数据。本接口不包含[申万行业指数行情数据](https://tushare.pro/document/2?doc_id=327)。 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=95",
+      "min_points": 2000
+    },
+    "96": {
+      "api": "index_weight",
+      "raw_text": "接口：index_weight 描述：获取各类指数成分和权重，**月度数据** ，建议输入参数里开始日期和结束日分别输入当月第一天和最后一天的日期。 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=96",
+      "min_points": 2000
+    },
+    "119": {
+      "api": "fund_nav",
+      "raw_text": "接口：fund_nav 描述：获取公募基金净值数据 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=119",
+      "min_points": 2000
+    },
+    "120": {
+      "api": "fund_div",
+      "raw_text": "接口：fund_div 描述：获取公募基金分红数据 积分：400积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=120",
+      "min_points": 400
+    },
+    "128": {
+      "api": "index_dailybasic",
+      "raw_text": "接口：index_dailybasic 描述：目前只提供上证综指，深证成指，上证50，中证500，中小板指，创业板指的每日指标数据 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=128",
+      "min_points": 2000
+    },
+    "135": {
+      "api": "fut_basic",
+      "raw_text": "接口：fut_basic 描述：获取期货合约列表数据 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=135",
+      "min_points": 2000
+    },
+    "138": {
+      "api": "fut_daily",
+      "raw_text": "接口：fut_daily 描述：期货日线行情数据 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=138",
+      "min_points": 2000
+    },
+    "180": {
+      "api": "teleplay_record",
+      "raw_text": "接口：teleplay_record 描述：获取2009年以来全国拍摄制作电视剧备案公示数据",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=180"
+    },
+    "181": {
+      "api": "index_classify",
+      "raw_text": "接口：index_classify 描述：获取申万行业分类，可以获取申万2014年版本（28个一级分类，104个二级分类，227个三级分类）和2021年本版（31个一级分类，134个二级分类，346个三级分类）列表信息 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=181",
+      "min_points": 2000
+    },
+    "185": {
+      "api": "cb_basic",
+      "raw_text": "接口：cb_basic 描述：获取可转债基本信息 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=185",
+      "min_points": 2000
+    },
+    "187": {
+      "api": "cb_daily",
+      "raw_text": "接口：cb_daily 描述：获取可转债行情 积分：2000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=187",
+      "min_points": 2000
+    },
+    "227": {
+      "api": "cn_gdp",
+      "raw_text": "接口：cn_gdp 描述：获取国民经济之GDP数据 积分：600积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=227",
+      "min_points": 600
+    },
+    "228": {
+      "api": "cn_cpi",
+      "raw_text": "接口：cn_cpi 描述：获取CPI居民消费价格数据，包括全国、城市和农村的数据 积分：600积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=228",
+      "min_points": 600
+    },
+    "121": {
+      "api": "fund_portfolio",
+      "raw_text": "接口：fund_portfolio 描述：获取公募基金持仓数据，季度更新 积分：5000积分",
+      "min_points_source": "wctapi_md",
+      "fetcher": "wctapi_md",
+      "fetched_url": "https://tushare.pro/document/2?doc_id=121",
+      "min_points": 5000
+    }
+  }
+}

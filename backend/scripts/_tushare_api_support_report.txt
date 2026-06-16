@@ -1,0 +1,109 @@
+﻿=== tushare 鍖呬俊鎭?===
+version: 1.2.89
+path:    D:\Programs\Python\Python312\Lib\site-packages\tushare\__init__.py
+椤跺眰瀵煎嚭: 130 涓?
+Pro DataApi 鏄惧紡鏂规硶: query + __getattr__锛堜换鎰?api 鍚嶅潎鍙粦瀹氾級
+pro_bar 纭紪鐮佸紩鐢? 15 涓?
+   adj_factor, cb_daily, coinbar, daily, daily_basic, ft_mins, fund_daily, fut_daily, index_daily, index_monthly, index_weekly, monthly, opt_daily, stk_mins, weekly ...
+
+ninehub document/2 stock_a 绱㈠紩: 58 涓?API
+
+=== meta API 鎺㈡祴锛圫DK 鏃犻潤鎬佹帴鍙ｈ〃锛屽皾璇曞父瑙?meta 鍚嶏級===
+  api_list           code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  interface_list     code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  query_api          code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  apis               code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  interface          code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  user_info          code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  user               code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  token_info         code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  permission         code=40101  ok=False msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+
+=== 甯歌鎺ュ彛 live 璋冪敤 ===
+  trade_cal      code=0 rows=5 perm=False live_pts=None level=None
+  stock_basic    code=0 rows=3 perm=False live_pts=None level=None
+  daily          code=0 rows=1 perm=False live_pts=None level=None
+  income         code=0 rows=1 perm=False live_pts=None level=None
+  top_inst       code=0 rows=740 perm=False live_pts=None level=None
+
+=== 瀹樻柟绱㈠紩 stock_a live 鎺㈡祴锛堟渶澶?58 涓紝鏈?probe 瑙勬牸锛?==
+  stock_basic          ok               code=0 msg=
+  daily                ok               code=0 msg=
+  adj_factor           ok               code=0 msg=
+  daily_basic          ok               code=0 msg=
+  income               ok               code=0 msg=
+  balancesheet         ok               code=0 msg=
+  cashflow             ok               code=0 msg=
+  forecast             failed_empty     code=0 msg=
+  express              failed_empty     code=0 msg=
+  fina_indicator       ok               code=0 msg=
+  pro                  failed           code=40101 msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  index_basic          ok               code=0 msg=
+  top10_holders        ok               code=0 msg=
+  top10_floatholders   ok               code=0 msg=
+  fina_mainbz          ok               code=0 msg=
+  namechange           ok               code=0 msg=
+  dividend             ok               code=0 msg=
+  top_list             ok               code=0 msg=
+  top_inst             ok               code=0 msg=
+  pledge_stat          ok               code=0 msg=
+  pledge_detail        failed_empty     code=0 msg=
+  stk_managers         ok               code=0 msg=
+  new_share            ok               code=0 msg=
+  repurchase           failed_empty     code=0 msg=
+  weekly               ok               code=0 msg=
+  stk_factor_pro       failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(stk_factor_pro)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.p
+  share_float          ok               code=0 msg=
+  block_trade          ok               code=0 msg=
+  disclosure_date      ok               code=0 msg=
+  stk_holdernumber     ok               code=0 msg=
+  stk_holdertrade      ok               code=0 msg=
+  suspend_d            failed_empty     code=0 msg=
+  stk_rewards          failed           code=50101 msg=蹇呭～鍙傛暟, ts_code
+  ths_hot              failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(ths_hot)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/docu
+  broker_recommend     failed           code=50101 msg=蹇呭～鍙傛暟, month
+  hk_hold              ok               code=0 msg=
+  stk_surv             failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(stk_surv)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/doc
+  report_rc            failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(report_rc)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/do
+  broker_rec           failed           code=40101 msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  cyq_chips            failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(cyq_chips)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/do
+  hm_list              failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(hm_list)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/docu
+  hm_detail            failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(hm_detail)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/do
+  dc_hot               failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(dc_hot)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/docum
+  margin_target        failed           code=40101 msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  stock_company        ok               code=0 msg=
+  stk_auction_o        failed_points    code=40203 msg=鎶辨瓑锛屾偍娌℃湁鎺ュ彛(stk_auction_o)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/do
+  stk_auction_c        failed_points    code=40203 msg=鎶辨瓑锛屾偍娌℃湁鎺ュ彛(stk_auction_c)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/do
+  fund_portfolio       failed_points    code=40203 msg=鎶辨瓑锛屾偍娌℃湁鎺ュ彛(fund_portfolio)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/d
+  limit_list_d         failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(limit_list_d)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro
+  stk_limit            ok               code=0 msg=
+  dc_index             failed_points    code=40203 msg=鎶辨瓑锛屾偍娌℃湁鎺ュ彛(dc_index)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/documen
+  dc_daily             failed_points    code=40203 msg=鎶辨瓑锛屾偍娌℃湁鎺ュ彛(dc_daily)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/documen
+  dc_member            failed_points    code=40203 msg=鎶辨瓑锛屾偍娌℃湁鎺ュ彛(dc_member)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/docume
+  stk_mins             failed           code=40203 msg=鎶辨瓑锛屾偍璁块棶鎺ュ彛(stk_mins)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/doc
+  bse_mapping          ok               code=0 msg=
+  barrelated           failed           code=40101 msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  st_list              failed           code=40101 msg=璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  stock_hsgt           failed_points    code=40203 msg=鎶辨瓑锛屾偍娌℃湁鎺ュ彛(stock_hsgt)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/docum
+
+缁熻: {'ok': 29, 'failed_empty': 5, 'failed': 17, 'failed_points': 7}
+
+=== 閿欒鐮佷笌鏉冮檺鍝嶅簲鏍蜂緥 ===
+  stk_auction_o      code=40203 perm=True pts=None
+    msg: 鎶辨瓑锛屾偍娌℃湁鎺ュ彛(stk_auction_o)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/document/1?doc_id=108銆?
+  fund_portfolio     code=40203 perm=True pts=None
+    msg: 鎶辨瓑锛屾偍娌℃湁鎺ュ彛(fund_portfolio)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/document/1?doc_id=108銆?
+  dc_index           code=40203 perm=True pts=None
+    msg: 鎶辨瓑锛屾偍娌℃湁鎺ュ彛(dc_index)璁块棶鏉冮檺锛屾潈闄愮殑鍏蜂綋璇︽儏璁块棶锛歨ttps://tushare.pro/document/1?doc_id=108銆?
+  pro                code=40101 perm=False pts=None
+    msg: 璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  broker_rec         code=40101 perm=False pts=None
+    msg: 璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  barrelated         code=40101 perm=False pts=None
+    msg: 璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  margin_target      code=40101 perm=False pts=None
+    msg: 璇锋寚瀹氭纭殑鎺ュ彛鍚?
+  ths_hot            code=40203 perm=False pts=None
+    msg: 鎶辨瓑锛屾偍璁块棶鎺ュ彛(ths_hot)棰戠巼瓒呴檺(1娆?鍒嗛挓)锛屽叿浣撻娆¤鎯咃細https://tushare.pro/document/1?doc_id=108銆?
+
+鎶ュ憡宸插啓鍏? D:\PycharmProjects\ninehub\backend\scripts\_tushare_api_support_report.json

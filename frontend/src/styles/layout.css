@@ -1,0 +1,178 @@
+/* 应用壳层 — 对标 xtqmt cockpit-app */
+.app-shell {
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 侧栏导航 — 紧凑分组 */
+.app-sidebar {
+  width: var(--aside-w);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  padding: var(--space-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.app-sidebar__section {
+  padding: var(--space-md) var(--space-lg) var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.app-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 6px var(--space-lg);
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.app-sidebar__link:hover {
+  background: var(--color-row-hover);
+  color: var(--color-text);
+}
+
+.app-sidebar__link.active {
+  background: var(--color-nav-active-bg);
+  color: var(--color-nav-active-text);
+  border-left-color: var(--color-primary);
+  font-weight: 500;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-lg) var(--space-xl);
+}
+
+/* 页面头 — 紧凑行内 */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.page-header__main {
+  min-width: 0;
+}
+
+.page-header__title {
+  margin: 0 0 2px;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.page-header__desc {
+  margin: 0;
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+}
+
+.page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  flex-shrink: 0;
+}
+
+/* 页面工具条 — 筛选/操作横条 */
+.page-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  margin-bottom: var(--space-lg);
+}
+
+.page-toolbar .form-field {
+  margin: 0;
+}
+
+/* 双栏布局 — 数据浏览等 */
+.page-split {
+  display: grid;
+  gap: var(--space-lg);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.page-split--chart {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1100px) {
+  .page-split--chart {
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .app-body {
+    flex-direction: column;
+  }
+
+  .app-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .app-sidebar__section {
+    display: none;
+  }
+
+  .app-sidebar__link {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .app-sidebar__link.active {
+    border-bottom-color: var(--color-primary);
+  }
+
+  .app-main {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
