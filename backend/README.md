@@ -2,7 +2,7 @@
 
 FastAPI + Celery + PostgreSQL 驱动的 A 股数据平台后端。提供 REST API（`/api/v1`）、长任务调度（`platform_jobs`）、Catalog 查询引擎与 TIA 治理流水线。
 
-> 全栈说明见仓库根目录 [README.md](../README.md)；架构终稿见 [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md)。
+> 全栈说明见仓库根目录 [README.md](../README.md)；架构终稿见本地 `docs/ARCHITECTURE.md`（不入库）。
 
 ---
 
@@ -283,12 +283,12 @@ python ../scripts/capture_ui_screenshots.py
 
 ---
 
-## 相关文档
+## 相关文档（本地 `docs/` 不入库）
 
-| 文档 | 说明 |
+| 路径 | 说明 |
 |------|------|
 | [../README.md](../README.md) | 全栈安装与功能清单 |
-| [../docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md) | C4、数据流、进程职责 |
-| [../docs/IMPLEMENTATION_STATUS.md](../docs/IMPLEMENTATION_STATUS.md) | 需求实现矩阵 |
-| [../docs/DATA_NAMING_STANDARD.md](../docs/DATA_NAMING_STANDARD.md) | 表名 / 字段命名 |
+| `../docs/ARCHITECTURE.md` | C4、数据流、进程职责 |
+| `../docs/IMPLEMENTATION_STATUS.md` | 需求实现矩阵 |
+| `../docs/DATA_NAMING_STANDARD.md` | 表名 / 字段命名 |
 | [../AGENTS.md](../AGENTS.md) | 开发约定与常用命令 |

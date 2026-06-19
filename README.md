@@ -14,7 +14,7 @@
 | 可运维可质检 | 数据源管理、执行日志、平台 Job 进度、质量规则与定时报告 |
 | 平台与内容分离 | 平台提供引擎与编排；具体 `data_type` 由 TIA L3 激活后动态扩展 |
 
-更完整的架构说明见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
+更完整的架构说明见本地 `docs/ARCHITECTURE.md`（该目录不入库，见 `.gitignore`）。
 
 ---
 
@@ -148,9 +148,10 @@ ninehub/
 │   ├── app/              # FastAPI、Celery、Catalog、Sync、Services
 │   ├── migrations/       # Alembic 迁移
 │   ├── scripts/          # init_db.py 等
-│   └── static/           # 前端构建产物（生产）
+│   └── static/           # 前端构建产物（npm run build，不入库）
 ├── frontend/src/         # Vue 3 源码
-├── docs/                 # 架构、实施状态、UI 设计
+├── docs/                 # 本地架构文档（.gitignore，不入库）
+├── .cursor/rules/        # 本地 Cursor 规则（.gitignore，不入库）
 └── docker-compose.yml
 ```
 
@@ -168,15 +169,15 @@ cd backend && black app tests
 
 ---
 
-## 相关文档
+## 相关文档（本地，不入库）
 
-| 文档 | 说明 |
+| 路径 | 说明 |
 |------|------|
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 架构终稿、C4、数据流 |
-| [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) | 需求 vs 实现对照 |
-| [docs/UI_DESIGN.md](docs/UI_DESIGN.md) | 前端视觉与页面说明 |
-| [docs/DATA_NAMING_STANDARD.md](docs/DATA_NAMING_STANDARD.md) | 接口/表名/字段命名规范 |
-| [AGENTS.md](AGENTS.md) | 开发 Agent 指南 |
+| `docs/ARCHITECTURE.md` | 架构终稿、C4、数据流 |
+| `docs/IMPLEMENTATION_STATUS.md` | 需求 vs 实现对照 |
+| `docs/UI_DESIGN.md` | 前端视觉与页面说明 |
+| `docs/DATA_NAMING_STANDARD.md` | 接口/表名/字段命名规范 |
+| [AGENTS.md](AGENTS.md) | 开发 Agent 指南（入库） |
 
 ---
 

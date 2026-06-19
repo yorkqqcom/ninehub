@@ -2,25 +2,27 @@
 
 NineHub = **Catalog-driven 数据平台**：TIA 治理规格，Task/Workflow 编排采集，Query Engine 统一消费，`platform_jobs` 承载长任务可观测性。
 
-## 必读文档
+## 必读文档（本地，不入库）
+
+以下路径由 `.gitignore` 排除，仅在本机维护；clone 后需自行准备或从团队获取副本。
 
 | 文档 | 用途 |
 |------|------|
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 终稿架构、C4、数据流 |
-| [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) | 需求 vs 实现对照（路线图对齐） |
-| [docs/UI_DESIGN.md](docs/UI_DESIGN.md) | 前端壳层与页面 |
-| [docs/DATA_NAMING_STANDARD.md](docs/DATA_NAMING_STANDARD.md) | 接口/表名/字段名命名规范（多数据源） |
-| [docs/ARCHITECTURE.md#11-cursor-规则注册表终稿](docs/ARCHITECTURE.md#11-cursor-规则注册表终稿) | 16 条 `.cursor/rules/` |
+| `docs/ARCHITECTURE.md` | 终稿架构、C4、数据流 |
+| `docs/IMPLEMENTATION_STATUS.md` | 需求 vs 实现对照（路线图对齐） |
+| `docs/UI_DESIGN.md` | 前端壳层与页面 |
+| `docs/DATA_NAMING_STANDARD.md` | 接口/表名/字段名命名规范（多数据源） |
+| `.cursor/rules/*.mdc` | Cursor 规则（按域分包，见 `rules-registry.mdc`） |
 
 ## 仓库结构
 
 ```
 ninehub/
 ├── backend/app/          # FastAPI、Celery、catalog、sync
-├── backend/static/       # Vue SPA 构建产物（生产托管）
+├── backend/static/       # Vue SPA 构建产物（npm run build，不入库）
 ├── frontend/src/         # Vue 3 源码
-├── docs/                 # 架构与实施文档
-└── .cursor/rules/        # Cursor 规则（按域分包）
+├── docs/                 # 本地架构文档（.gitignore，不入库）
+└── .cursor/rules/        # 本地 Cursor 规则（.gitignore，不入库）
 ```
 
 ## 常用命令
