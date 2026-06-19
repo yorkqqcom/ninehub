@@ -1,0 +1,90 @@
+# =============================================================================
+# NineHub monorepo — Python/FastAPI backend + Vue 3/Vite frontend
+# =============================================================================
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# --- IDE / editors ---
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+
+# --- Environment & secrets ---
+.env
+.env.*
+!.env.example
+!.env.template
+backend/.env
+
+# Local Tushare doc sync credentials (see also backend/data/.gitignore)
+backend/data/tushare_doc_credentials.json
+backend/data/tushare_doc_storage.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+*.egg
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+build/
+dist/
+*.manifest
+*.spec
+
+# Testing & coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# --- Backend runtime artifacts ---
+backend/logs/
+*.log
+backend/exports/
+celerybeat-schedule
+celerybeat.pid
+
+# Vue SPA build output (frontend: npm run build → backend/static/)
+backend/static/
+
+# --- Frontend (Vue 3 + Vite) ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# --- Playwright (optional doc-sync extra) ---
+playwright-report/
+test-results/
+playwright/.cache/
+.blob_storage/
+
+# --- Misc ---
+*.bak
+*.tmp
+.cache/
