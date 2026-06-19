@@ -84,6 +84,9 @@ test-results/
 playwright/.cache/
 .blob_storage/
 
+# --- Project docs (local only, not versioned) ---
+docs/
+
 # --- Misc ---
 *.bak
 *.tmp
