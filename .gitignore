@@ -9,6 +9,7 @@ Desktop.ini
 ehthumbs.db
 
 # --- IDE / editors ---
+.cursor/
 .idea/
 *.iml
 *.ipr
