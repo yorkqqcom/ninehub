@@ -1,8 +1,33 @@
 # NineHub Backend
 
-FastAPI + Celery + PostgreSQL 驱动的 A 股数据平台后端。提供 REST API（`/api/v1`）、长任务调度（`platform_jobs`）、Catalog 查询引擎与 TIA 治理流水线。
+FastAPI + Celery + PostgreSQL 驱动的 **A 股 Catalog 数据平台**后端：REST API（`/api/v1`）、长任务调度（`platform_jobs`）、Catalog 查询引擎、TIA 治理流水线，以及 Vue SPA 前端（开发 `:5173`，生产托管于 `static/`）。
 
-> 全栈说明见仓库根目录 [README.md](../README.md)；架构终稿见本地 `docs/ARCHITECTURE.md`（不入库）。
+## 系统概览
+
+平台以 **Catalog + TIA L3** 扩展数据类型，用 **任务 / 工作流** 编排采集，用 **数据浏览器 / Catalog 查询** 统一消费，并配套 **质量监控** 与 **运维配置**。除登录与健康检查外，API 需 JWT；写操作需 `admin` 角色。
+
+![平台主界面](../pic/dashboard.png)
+
+| 模块 | 路由 | 功能简述 |
+|------|------|----------|
+| **概览** | `/` | Catalog / 任务 / 工作流 / TIA 规模 KPI，模块快捷入口 |
+| **数据浏览器** | `/data-browser` | 三选一提（范围 → 指标 → 时间），证券池 × 多指标宽表截面，模板 / 导出 / 分享 |
+| **数据查询** | `/browse` | L3 激活后的单事实表 Catalog 分页浏览 |
+| **采集任务** | `/tasks` | Catalog 驱动任务 CRUD、Cron、手动触发与执行日志 |
+| **工作流** | `/workflows` | Vue Flow DAG（gate / collect / quality），发布与 Cron 调度 |
+| **数据源** | `/sources` | Tushare / AkShare 连接配置与连通性校验 |
+| **TIA 工作台** | `/tia` | 接口扫描、提案审批、L3 激活、数据标准与官网覆盖 |
+| **质量监控** | `/quality` | 规则引擎、手动 / 定时质检与报告 |
+| **平台设置** | `/settings` | 全局同步起始日、用户管理 |
+
+**默认账号**（`init_db` 创建）：`admin` / `admin123456` · **OpenAPI**：<http://127.0.0.1:8888/docs>
+
+各模块 UI 截图见下文「操作线」；截图文件位于仓库根目录 `pic/`。更新截图：
+
+```bash
+python ../scripts/capture_ui_screenshots.py
+python ../scripts/capture_browser_screenshots.py
+```
 
 ---
 
@@ -348,15 +373,3 @@ black app tests
 python ../scripts/capture_ui_screenshots.py
 python ../scripts/capture_browser_screenshots.py   # 数据浏览器三步骤 + 结果
 ```
-
----
-
-## 相关文档（本地 `docs/` 不入库）
-
-| 路径 | 说明 |
-|------|------|
-| [../README.md](../README.md) | 全栈安装与功能清单 |
-| `../docs/ARCHITECTURE.md` | C4、数据流、进程职责 |
-| `../docs/IMPLEMENTATION_STATUS.md` | 需求实现矩阵 |
-| `../docs/DATA_NAMING_STANDARD.md` | 表名 / 字段命名 |
-| [../AGENTS.md](../AGENTS.md) | 开发约定与常用命令 |

@@ -2,6 +2,22 @@
 
 **NineHub** 是面向 A 股场景的 **Catalog-driven 数据管理平台**：以 Catalog 统一数据规格，通过任务与工作流编排采集，TIA 治理接口接入，Query Engine 统一查询，并配套数据质量监控与平台运维能力。
 
+![平台主界面](pic/dashboard.png)
+
+| 模块 | 路由 | 功能简述 |
+|------|------|----------|
+| **概览** | `/` | Catalog / 任务 / 工作流 / TIA 规模 KPI，模块快捷入口 |
+| **数据浏览器** | `/data-browser` | 三选一提（范围 → 指标 → 时间），证券池 × 多指标宽表截面，模板 / 导出 / 分享 |
+| **数据查询** | `/browse` | L3 激活后的单事实表 Catalog 分页浏览 |
+| **采集任务** | `/tasks` | Catalog 驱动任务 CRUD、Cron、手动触发与执行日志 |
+| **工作流** | `/workflows` | Vue Flow DAG（gate / collect / quality），发布与 Cron 调度 |
+| **数据源** | `/sources` | Tushare / AkShare 连接配置与连通性校验 |
+| **TIA 工作台** | `/tia` | 接口扫描、提案审批、L3 激活、数据标准与官网覆盖 |
+| **质量监控** | `/quality` | 规则引擎、手动 / 定时质检与报告 |
+| **平台设置** | `/settings` | 全局同步起始日、用户管理 |
+
+**默认账号**（`init_db` 创建）：`admin` / `admin123456` · **OpenAPI**：<http://127.0.0.1:8888/docs> · **后端操作线 / API 对照**：[backend/README.md](backend/README.md)
+
 ---
 
 ## 项目目标
@@ -14,18 +30,17 @@
 | 可运维可质检 | 数据源管理、执行日志、平台 Job 进度、质量规则与定时报告 |
 | 平台与内容分离 | 平台提供引擎与编排；具体 `data_type` 由 TIA L3 激活后动态扩展 |
 
-更完整的架构说明见本地 `docs/ARCHITECTURE.md`（该目录不入库，见 `.gitignore`）。
-
 ---
 
 ## 主要功能（UI）
 
-登录后通过左侧导航进入各模块。角色分为 **admin**（管理员）与 **normal**（普通用户）；标有「admin」的写操作仅管理员可见，后端同样校验。
+登录后通过左侧导航进入各模块。角色分为 **admin**（管理员）与 **normal**（普通用户）；写操作须 `admin`，后端独立校验。
 
 | 模块 | 路由 | 主要能力 | 权限 |
 |------|------|----------|------|
 | **概览** | `/` | KPI 统计、各模块快捷入口 | 已登录 |
-| **数据浏览** | `/browse` | 按 Catalog 类型分页浏览已激活事实表（L3 激活后出现） | 已登录 |
+| **数据浏览器** | `/data-browser` | 证券池 × 多指标宽表截面（三选一提），系统/用户模板、导出、分享 | 已登录 |
+| **数据查询** | `/browse` | 按 Catalog 类型分页浏览已激活事实表（L3 后出现） | 已登录 |
 | **采集任务** | `/tasks` | Catalog 驱动任务 CRUD、手动触发、执行日志 | admin 写；日志可读 |
 | **工作流** | `/workflows` | Vue Flow DAG 编辑、Cron 调度、运行历史与节点状态 | 编辑 admin；历史可读 |
 | **数据源** | `/sources` | Tushare / AkShare 配置与连通性校验 | admin |
@@ -33,9 +48,7 @@
 | **质量监控** | `/quality` | 规则配置、手动/异步触发质检、报告分页 | 触发 admin；报告可读 |
 | **平台设置** | `/settings` | 同步起始日、用户禁用等 | admin |
 
-**默认账号**（`init_db` 创建）：`admin` / `admin123456`
-
-API 文档（开发环境）：<http://127.0.0.1:8888/docs>
+各模块 UI 截图见 [backend/README.md](backend/README.md) 操作线章节；截图位于 `pic/`。
 
 ---
 
@@ -144,15 +157,11 @@ docker compose up -d
 
 ```
 ninehub/
-├── backend/
-│   ├── app/              # FastAPI、Celery、Catalog、Sync、Services
-│   ├── migrations/       # Alembic 迁移
-│   ├── scripts/          # init_db.py 等
-│   └── static/           # 前端构建产物（npm run build，不入库）
+├── backend/              # FastAPI、Celery、迁移与脚本（见 backend/README.md）
 ├── frontend/src/         # Vue 3 源码
-├── docs/                 # 本地架构文档（.gitignore，不入库）
-├── .cursor/rules/        # 本地 Cursor 规则（.gitignore，不入库）
-└── docker-compose.yml
+├── pic/                  # UI 截图（README 引用）
+├── docker-compose.yml
+└── AGENTS.md             # 开发 Agent 指南
 ```
 
 ---
@@ -165,19 +174,11 @@ cd backend && pytest tests -v -p no:pytest_postgresql
 
 # 代码格式化
 cd backend && black app tests
+
+# UI 截图（需 API :8888 + 前端 :5173）
+python scripts/capture_ui_screenshots.py
+python scripts/capture_browser_screenshots.py
 ```
-
----
-
-## 相关文档（本地，不入库）
-
-| 路径 | 说明 |
-|------|------|
-| `docs/ARCHITECTURE.md` | 架构终稿、C4、数据流 |
-| `docs/IMPLEMENTATION_STATUS.md` | 需求 vs 实现对照 |
-| `docs/UI_DESIGN.md` | 前端视觉与页面说明 |
-| `docs/DATA_NAMING_STANDARD.md` | 接口/表名/字段命名规范 |
-| [AGENTS.md](AGENTS.md) | 开发 Agent 指南（入库） |
 
 ---
 
