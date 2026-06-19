@@ -1,0 +1,233 @@
+# Browser indicator overrides — merges with catalog columns at runtime.
+# group/tags/pinyin 用于指标树策展；data_ready 由运行时表行数决定。
+
+overrides:
+  # --- 基础信息 ---
+  tushare_stock_basic.exchange:
+    label: 交易所
+    group: 基础信息
+    tags: [常用, 基础]
+    pinyin: jys
+  tushare_stock_basic.name:
+    label: 证券简称
+    group: 基础信息
+    tags: [常用, 基础]
+  tushare_stock_basic.industry:
+    label: 所属行业
+    group: 基础信息
+    tags: [基础, 行业]
+  tushare_stock_basic.market:
+    label: 市场板块
+    group: 基础信息
+    tags: [基础]
+  tushare_stock_basic.list_date:
+    label: 上市日期
+    group: 基础信息
+    tags: [基础]
+
+  # --- 常用行情 (daily) ---
+  tushare_daily.open:
+    label: 开盘价
+    unit: 元
+    group: 常用行情
+    tags: [常用, 行情]
+    pinyin: kpj
+    default_adjust: none
+  tushare_daily.close:
+    label: 收盘价
+    unit: 元
+    group: 常用行情
+    tags: [常用, 行情]
+    pinyin: spj
+    default_adjust: none
+  tushare_daily.high:
+    label: 最高价
+    unit: 元
+    group: 常用行情
+    tags: [常用, 行情]
+    pinyin: zgj
+    default_adjust: none
+  tushare_daily.low:
+    label: 最低价
+    unit: 元
+    group: 常用行情
+    tags: [常用, 行情]
+    pinyin: zdj
+    default_adjust: none
+  tushare_daily.vol:
+    label: 成交量
+    unit: 手
+    group: 常用行情
+    tags: [常用, 行情]
+    pinyin: cjl
+  tushare_daily.amount:
+    label: 成交额
+    unit: 千元
+    group: 常用行情
+    tags: [常用, 行情]
+    pinyin: cje
+  tushare_daily.pct_chg:
+    label: 涨跌幅
+    unit: "%"
+    group: 常用行情
+    tags: [常用, 行情, 涨跌停]
+    pinyin: zdf
+  tushare_daily.pre_close:
+    label: 昨收价
+    unit: 元
+    group: 常用行情
+    tags: [行情]
+    default_adjust: none
+
+  # --- 周期行情 (weekly / monthly，需 L3 激活) ---
+  tushare_weekly.close:
+    label: 周收盘价
+    unit: 元
+    group: 周期行情
+    tags: [周线, 行情]
+    default_adjust: none
+  tushare_weekly.pct_chg:
+    label: 周涨跌幅
+    unit: "%"
+    group: 周期行情
+    tags: [周线, 行情]
+  tushare_monthly.close:
+    label: 月收盘价
+    unit: 元
+    group: 周期行情
+    tags: [月线, 行情]
+    default_adjust: none
+  tushare_monthly.pct_chg:
+    label: 月涨跌幅
+    unit: "%"
+    group: 周期行情
+    tags: [月线, 行情]
+
+  # --- 估值指标 (daily_basic) ---
+  tushare_daily_basic.pe_ttm:
+    label: 市盈率TTM
+    unit: 倍
+    group: 估值指标
+    tags: [常用, 价值因子, 估值]
+  tushare_daily_basic.pb:
+    label: 市净率
+    unit: 倍
+    group: 估值指标
+    tags: [常用, 价值因子, 估值]
+  tushare_daily_basic.ps_ttm:
+    label: 市销率TTM
+    unit: 倍
+    group: 估值指标
+    tags: [价值因子]
+  tushare_daily_basic.total_mv:
+    label: 总市值
+    unit: 万元
+    group: 估值指标
+    tags: [常用, 价值因子]
+  tushare_daily_basic.circ_mv:
+    label: 流通市值
+    unit: 万元
+    group: 估值指标
+    tags: [价值因子]
+  tushare_daily_basic.turnover_rate:
+    label: 换手率
+    unit: "%"
+    group: 交易指标
+    tags: [常用, 交易]
+  tushare_daily_basic.volume_ratio:
+    label: 量比
+    unit: 倍
+    group: 交易指标
+    tags: [交易]
+
+  # --- 涨跌停 ---
+  tushare_stk_limit.up_limit:
+    label: 涨停价
+    unit: 元
+    group: 涨跌停
+    tags: [交易, 涨跌停]
+  tushare_stk_limit.down_limit:
+    label: 跌停价
+    unit: 元
+    group: 涨跌停
+    tags: [交易, 涨跌停]
+
+system_templates:
+  - id: wind_ohlc_demo
+    name: OHLC 演示
+    description: 全部 AB 股 + 交易所 + OHLC
+    payload:
+      universe:
+        type: preset
+        preset: all_ab
+      indicators:
+        - id: tushare_stock_basic.exchange
+        - id: tushare_stock_basic.name
+        - id: tushare_daily.open
+          adjust: none
+        - id: tushare_daily.close
+          adjust: none
+        - id: tushare_daily.high
+          adjust: none
+        - id: tushare_daily.low
+          adjust: none
+
+  - id: market_snapshot
+    name: 市场快照
+    description: 全部 A 股 · 简称 + 收盘 + 涨跌幅 + 估值
+    payload:
+      universe:
+        type: preset
+        preset: all_a
+      indicators:
+        - id: tushare_stock_basic.name
+        - id: tushare_daily.close
+          adjust: qfq
+        - id: tushare_daily.pct_chg
+        - id: tushare_daily_basic.pe_ttm
+        - id: tushare_daily_basic.pb
+        - id: tushare_daily_basic.total_mv
+
+  - id: valuation_screen
+    name: 估值筛选
+    description: 全部 A 股 · PE/PB/市值/换手
+    payload:
+      universe:
+        type: preset
+        preset: all_a
+      indicators:
+        - id: tushare_stock_basic.name
+        - id: tushare_stock_basic.industry
+        - id: tushare_daily_basic.pe_ttm
+        - id: tushare_daily_basic.pb
+        - id: tushare_daily_basic.total_mv
+        - id: tushare_daily_basic.turnover_rate
+
+  - id: limit_watch
+    name: 涨跌停监控
+    description: 全部 A 股 · 涨跌停价 + 收盘价
+    payload:
+      universe:
+        type: preset
+        preset: all_a
+      indicators:
+        - id: tushare_stock_basic.name
+        - id: tushare_daily.close
+          adjust: none
+        - id: tushare_stk_limit.up_limit
+        - id: tushare_stk_limit.down_limit
+        - id: tushare_daily.pct_chg
+
+  - id: margin_universe
+    name: 融资融券标的
+    description: 融资融券标的池 · 简称 + 收盘 + PE
+    payload:
+      universe:
+        type: preset
+        preset: margin:eligible
+      indicators:
+        - id: tushare_stock_basic.name
+        - id: tushare_daily.close
+          adjust: qfq
+        - id: tushare_daily_basic.pe_ttm
+        - id: tushare_daily_basic.turnover_rate
