@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     static_dir: str = "static"
     export_dir: str = "exports"
     export_retention_days: int = 30
+    browser_query_cache_ttl: int = 300
     quality_alert_webhook_url: Optional[str] = None
 
 

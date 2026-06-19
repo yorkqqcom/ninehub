@@ -7,6 +7,7 @@ from app.api.v1.endpoints import (
     catalog,
     platform,
     quality,
+    query_browser,
     sources,
     tasks,
     tia,
@@ -22,3 +23,6 @@ api_router.include_router(workflows.router, prefix="/workflows", tags=["workflow
 api_router.include_router(tia.router, prefix="/tia", tags=["tia"])
 api_router.include_router(quality.router, prefix="/quality", tags=["quality"])
 api_router.include_router(platform.router, prefix="/platform", tags=["platform"])
+api_router.include_router(
+    query_browser.router, prefix="/query/browser", tags=["query-browser"]
+)

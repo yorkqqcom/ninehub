@@ -51,6 +51,16 @@ class TradingCalendarService:
             return False, f"{target.isoformat()} 非交易日（法定节假日）"
         return True, f"{target.isoformat()} A股交易日"
 
+    def nearest_trading_day_on_or_before(self, day: date) -> tuple[date, bool]:
+        """Return the nearest A-share trading day on or before ``day``."""
+        cursor = day
+        for _ in range(366):
+            ok, _ = self.is_trading_day(cursor)
+            if ok:
+                return cursor, cursor != day
+            cursor = date.fromordinal(cursor.toordinal() - 1)
+        raise ValueError(f"no trading day found on or before {day.isoformat()}")
+
 
 def is_trading_day(day: date | None = None) -> tuple[bool, str]:
     """Module-level helper for gate nodes."""

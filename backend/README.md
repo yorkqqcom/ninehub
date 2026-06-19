@@ -48,7 +48,7 @@ celery -A app.tasks.celery_app beat --loglevel=info
 以下按 **首次部署后的典型运维路径** 排列，与 UI 侧栏及 `pic/` 截图一一对应。除登录与健康检查外，请求均须 `Authorization: Bearer <token>`；写操作须 `admin` 角色。
 
 ```
-登录 → 概览 → 数据源 → 平台设置 → TIA 治理 → 采集/工作流 → 数据浏览 → 质量监控
+登录 → 概览 → 数据源 → 平台设置 → TIA 治理 → 采集/工作流 → 数据浏览器 → 质量监控
 ```
 
 ### 0. 登录
@@ -182,9 +182,73 @@ L3 激活成功后：注册 SyncHandler、创建/迁移事实表、写入 Catalo
 
 ---
 
-### 7. 数据浏览（L3 之后）
+### 7. 数据浏览器（三选一提宽表）
 
-![数据浏览](../pic/browse.png)
+Wind 风格 **证券池 × 多指标截面宽表**：向导三步（选范围 → 选指标 → 选时间），支持系统/用户模板、CSV/XLSX 导出、分享链接与查询审计。路由 `/data-browser`；指标定义来自 `app/catalog/browser_indicators.yaml`，禁止前端硬编码业务字段。
+
+#### 7a. 选范围
+
+![数据浏览器 — 选范围](../pic/browser-step1-scope.png)
+
+| UI | API |
+|----|-----|
+| 预设维度（全 A/B/AB、交易所、申万、指数成分等） | `GET /api/v1/query/browser/meta` → `dimensions` |
+| 自定义代码列表 | `POST /api/v1/query/browser/universe/preview` |
+| 自选股证券池 CRUD | `GET/POST/PUT/DELETE /api/v1/query/browser/watchlists` |
+
+#### 7b. 选指标
+
+![数据浏览器 — 选指标](../pic/browser-step2-indicators.png)
+
+| UI | API |
+|----|-----|
+| 指标树 / 搜索（拼音、标签） | `GET /api/v1/query/browser/meta`、`GET .../meta/indicators?q=` |
+| 系统模板（如 OHLC 演示） | `meta.system_templates` |
+| 用户模板 CRUD | `GET/POST/PUT/DELETE /api/v1/query/browser/templates` |
+
+#### 7c. 选时间并提取
+
+![数据浏览器 — 选时间](../pic/browser-step3-time.png)
+
+| UI | API |
+|----|-----|
+| 单/多截面、财报对齐 | 请求体 `as_of_date` / `dates` / `financial_align` |
+| P0 就绪门禁（admin 顶栏） | `GET /api/v1/query/browser/readiness` |
+| 执行宽表查询 | `POST /api/v1/query/browser/execute` |
+| 同步/异步导出 | `POST /api/v1/query/browser/export` → `GET .../exports/{job_id}/download` |
+| 分享查询定义 | `POST /api/v1/query/browser/share` → `GET .../share/{token}` |
+| 查询审计 | `GET /api/v1/query/browser/audit` |
+
+#### 7d. 结果：表格与图表
+
+![数据浏览器 — 宽表结果](../pic/browser-result-table.png)
+
+![数据浏览器 — 图表视图](../pic/browser-result-chart.png)
+
+| UI | API |
+|----|-----|
+| 分页、排序、列统计 | `execute` 请求 `skip` / `limit` / `sort` |
+| 柱状/散点/折线（多截面） | 前端 ECharts；数据仍来自 `execute` |
+| 强制刷新（跳过缓存） | `execute` + `force_refresh=true` |
+
+**首次部署数据准备**（P0 门禁，admin 可读 readiness）：
+
+```bash
+cd backend
+python scripts/bootstrap_browser_p0.py      # L3 激活 daily / trade_cal / stock_basic 等
+python scripts/backfill_browser_daily.py    # 历史日线回填（可选）
+python scripts/check_browser_data_readiness.py
+```
+
+P1 申万/指数扩展（非门禁，见 readiness `warnings`）：`bootstrap_browser_shenwan.py`、`bootstrap_browser_index.py`。
+
+与旧版 Catalog 分页浏览（`/browse`，见下节）并存：数据浏览器面向 **多表 join 宽表**；`/browse` 面向 **单事实表 Catalog 分页**。
+
+---
+
+### 8. 数据查询（Catalog 事实表，L3 之后）
+
+![数据查询](../pic/browse.png)
 
 | UI | API |
 |----|-----|
@@ -195,7 +259,7 @@ L3 激活成功后：注册 SyncHandler、创建/迁移事实表、写入 Catalo
 
 ---
 
-### 8. 质量监控
+### 9. 质量监控
 
 ![质量监控](../pic/quality.png)
 
@@ -219,7 +283,8 @@ flowchart LR
   B --> C[平台设置]
   C --> D[TIA 扫描/审批/激活]
   D --> E[采集任务 / 工作流]
-  E --> F[数据浏览]
+  E --> F[数据浏览器]
+  E --> H[Catalog 数据查询]
   E --> G[质量监控]
   D --> G
 ```
@@ -231,7 +296,8 @@ flowchart LR
 | TIA | `endpoints/tia.py` + `services/tia/` | `tia_proposals`, `platform_jobs` |
 | 采集 | `endpoints/tasks.py` + `sync/` | `sync_tasks`, `task_runs` |
 | 工作流 | `endpoints/workflows.py` + `services/workflow/` | `workflows`, `workflow_runs`, `node_runs` |
-| 浏览 | `endpoints/catalog.py` + Query Engine | 动态事实表 |
+| 数据浏览器 | `endpoints/query_browser.py` + `services/query/` | `browser_templates`, `browser_watchlists`, `browser_query_audit` + 动态事实表 |
+| Catalog 查询 | `endpoints/catalog.py` + Query Engine | 动态事实表 |
 | 质检 | `endpoints/quality.py` | `quality_rules`, `quality_reports` |
 
 ---
@@ -241,8 +307,8 @@ flowchart LR
 ```
 backend/
 ├── app/
-│   ├── api/v1/endpoints/   # auth, catalog, sources, tasks, workflows, tia, quality, platform
-│   ├── catalog/            # registry, tushare_catalog, official_index
+│   ├── api/v1/endpoints/   # auth, catalog, query_browser, sources, tasks, workflows, tia, quality, platform
+│   ├── catalog/            # registry, browser_indicators.yaml, tushare_catalog, official_index
 │   ├── core/               # config, database, security, deps
 │   ├── models/             # SQLAlchemy 模型
 │   ├── services/           # 领域服务（按包拆分）
@@ -265,6 +331,7 @@ backend/
 | `SECRET_KEY` | JWT 签名密钥 |
 | `CELERY_BROKER_URL` / `CELERY_RESULT_BACKEND` | Redis |
 | `CELERY_INLINE_FALLBACK` | `true` 时 API 进程内同步执行部分任务（本地默认） |
+| `BROWSER_QUERY_CACHE_TTL` | 数据浏览器查询结果缓存秒数（默认 300） |
 
 ---
 
@@ -279,6 +346,7 @@ black app tests
 
 # UI 截图（需前端 dev + 本机 API 运行）
 python ../scripts/capture_ui_screenshots.py
+python ../scripts/capture_browser_screenshots.py   # 数据浏览器三步骤 + 结果
 ```
 
 ---

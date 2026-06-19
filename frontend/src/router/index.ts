@@ -23,6 +23,11 @@ const router = createRouter({
           component: () => import("@/pages/browse/DataBrowsePage.vue"),
         },
         {
+          path: "data-browser",
+          name: "data-browser",
+          component: () => import("@/pages/browser/DataBrowserPage.vue"),
+        },
+        {
           path: "tasks",
           name: "tasks",
           component: () => import("@/pages/tasks/TasksPage.vue"),
