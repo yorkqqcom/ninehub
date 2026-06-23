@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     celery_result_backend: str = "redis://localhost:6379/2"
     celery_inline_fallback: bool = True
 
+    sync_db_pool_size: int = 10
+    sync_db_max_overflow: int = 20
+
     tushare_token: Optional[str] = None
     tushare_account_points: int = 120
     tushare_max_calls_per_minute: Optional[int] = None

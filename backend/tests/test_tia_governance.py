@@ -132,7 +132,7 @@ async def test_activate_endpoint(client: AsyncClient, db_session) -> None:
     db_session.add(override)
     await db_session.commit()
 
-    with patch("app.api.v1.endpoints.tia.run_tia_activate_task.delay"):
+    with patch("app.api.v1.endpoints.tia.dispatch_tia_activate_jobs"):
         response = await client.post(f"/api/v1/tia/proposals/{proposal.id}/activate")
     assert response.status_code == 200
     assert response.json()["job_id"] >= 1

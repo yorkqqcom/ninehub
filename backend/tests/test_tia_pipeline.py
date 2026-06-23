@@ -148,7 +148,7 @@ async def test_approve_activate_endpoint(client: AsyncClient, db_session) -> Non
     mock_preflight = MagicMock(passed=True, blocking_errors=[])
     mock_preflight.to_activation_step.return_value = {"status": "success", "passed": True}
 
-    with patch("app.api.v1.endpoints.tia.run_tia_activate_task.delay"), patch(
+    with patch("app.api.v1.endpoints.tia.dispatch_tia_activate_jobs"), patch(
         "app.api.v1.endpoints.tia._run_preflight_sync", return_value=mock_preflight
     ):
         response = await client.post(f"/api/v1/tia/proposals/{proposal.id}/approve-activate")
@@ -189,9 +189,9 @@ async def test_batch_approve_activate(client: AsyncClient, db_session) -> None:
     mock_preflight = MagicMock(passed=True, blocking_errors=[])
     mock_preflight.to_activation_step.return_value = {"status": "success", "passed": True}
 
-    with patch("app.api.v1.endpoints.tia.run_tia_activate_task.delay"), patch(
-        "app.api.v1.endpoints.tia._run_preflight_sync", return_value=mock_preflight
-    ):
+    with patch("app.api.v1.endpoints.tia._run_preflight_sync", return_value=mock_preflight), patch(
+        "app.api.v1.endpoints.tia.dispatch_tia_activate_jobs"
+    ) as mock_dispatch:
         response = await client.post(
             "/api/v1/tia/proposals/batch-approve-activate",
             json={"proposal_ids": [p1.id, p2.id], "note": "batch activate"},
@@ -201,6 +201,8 @@ async def test_batch_approve_activate(client: AsyncClient, db_session) -> None:
     assert body["succeeded"] == 2
     assert body["failed"] == 0
     assert len(body["job_ids"]) == 2
+    mock_dispatch.assert_called_once()
+    assert len(mock_dispatch.call_args[0][0]) == 2
 
 
 @pytest.mark.asyncio
@@ -219,7 +221,7 @@ async def test_batch_activate_approved(client: AsyncClient, db_session) -> None:
     await db_session.refresh(p1)
     await db_session.refresh(p2)
 
-    with patch("app.api.v1.endpoints.tia.run_tia_activate_task.delay") as mock_delay:
+    with patch("app.api.v1.endpoints.tia.dispatch_tia_activate_jobs") as mock_dispatch:
         response = await client.post(
             "/api/v1/tia/proposals/batch-activate",
             json={"proposal_ids": [p1.id, p2.id]},
@@ -229,7 +231,8 @@ async def test_batch_activate_approved(client: AsyncClient, db_session) -> None:
     assert body["succeeded"] == 2
     assert body["failed"] == 0
     assert len(body["job_ids"]) == 2
-    assert mock_delay.call_count == 2
+    mock_dispatch.assert_called_once()
+    assert len(mock_dispatch.call_args[0][0]) == 2
 
 
 @pytest.mark.asyncio
@@ -239,7 +242,7 @@ async def test_batch_activate_rejects_pending(client: AsyncClient, db_session) -
     await db_session.commit()
     await db_session.refresh(p)
 
-    with patch("app.api.v1.endpoints.tia.run_tia_activate_task.delay"):
+    with patch("app.api.v1.endpoints.tia.dispatch_tia_activate_jobs"):
         response = await client.post(
             "/api/v1/tia/proposals/batch-activate",
             json={"proposal_ids": [p.id]},

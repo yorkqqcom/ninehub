@@ -1332,7 +1332,7 @@ function probeStatusLabel(status: string) {
           </li>
         </ul>
         <p v-if="batchOp.phase === 'running'" class="panel__hint">
-          可刷新页面或离开本页，进度会自动恢复（24 小时内）。
+          L3 按序后台执行（含 Preflight），可刷新页面或离开本页，进度 24 小时内自动恢复。
         </p>
       </template>
     </div>

@@ -63,3 +63,33 @@ def run_tia_activate_task(job_id: int) -> dict:
         return {"job_id": job_id, "status": "failed", "error": str(exc)}
     finally:
         session.close()
+
+
+@celery_app.task(name="ninehub.run_tia_batch_activate")
+def run_tia_batch_activate_task(job_ids: list[int]) -> dict:
+    """Run L3 activations sequentially to avoid exhausting the DB connection pool."""
+    service = TiaActivationService()
+    results: list[dict] = []
+    for job_id in job_ids:
+        session = SyncSessionLocal()
+        try:
+            service.execute_activation_sync(session, job_id)
+            results.append({"job_id": job_id, "status": "success"})
+        except Exception as exc:
+            results.append({"job_id": job_id, "status": "failed", "error": str(exc)})
+        finally:
+            session.close()
+    succeeded = sum(1 for item in results if item["status"] == "success")
+    return {"processed": len(results), "succeeded": succeeded, "results": results}
+
+
+def dispatch_tia_activate_jobs(job_ids: list[int]) -> None:
+    """Queue one or many L3 jobs; batches run sequentially in a single worker."""
+    from app.tasks.dispatch import dispatch_task
+
+    if not job_ids:
+        return
+    if len(job_ids) == 1:
+        dispatch_task(run_tia_activate_task, job_ids[0])
+        return
+    dispatch_task(run_tia_batch_activate_task, job_ids)

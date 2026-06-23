@@ -13,7 +13,13 @@ settings = get_settings()
 async_engine = create_async_engine(settings.database_url, echo=settings.debug, pool_pre_ping=True)
 AsyncSessionLocal = async_sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
 
-sync_engine = create_engine(settings.sync_database_url, echo=settings.debug, pool_pre_ping=True)
+sync_engine = create_engine(
+    settings.sync_database_url,
+    echo=settings.debug,
+    pool_pre_ping=True,
+    pool_size=settings.sync_db_pool_size,
+    max_overflow=settings.sync_db_max_overflow,
+)
 SyncSessionLocal = sessionmaker(bind=sync_engine, autocommit=False, autoflush=False)
 
 

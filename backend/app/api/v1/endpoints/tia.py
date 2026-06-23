@@ -58,7 +58,7 @@ from app.services.tia.schema_maintenance_service import TiaSchemaMaintenanceServ
 from app.services.tia.schema_repair_service import TiaSchemaRepairService
 from app.tasks.dispatch import dispatch_task
 from app.tasks.tia_tasks import (
-    run_tia_activate_task,
+    dispatch_tia_activate_jobs,
     run_tia_doc_pages_sync_task,
     run_tia_scan_task,
 )
@@ -476,8 +476,7 @@ async def batch_review_proposals(
                 )
                 job_ids.append(job_id)
         await session.commit()
-        for job_id in job_ids:
-            dispatch_task(run_tia_activate_task, job_id)
+        dispatch_tia_activate_jobs(job_ids)
         return TiaBatchReviewResponse(items=items, activate_job_ids=job_ids)
     except (NotFoundError, ValidationError) as exc:
         raise HTTPException(status_code=400, detail=exc.message) from exc
@@ -536,8 +535,7 @@ async def batch_approve_and_activate(
             )
             failed += 1
     await session.commit()
-    for job_id in job_ids:
-        dispatch_task(run_tia_activate_task, job_id)
+    dispatch_tia_activate_jobs(job_ids)
     return TiaBatchApproveActivateResponse(
         items=items,
         job_ids=job_ids,
@@ -584,8 +582,7 @@ async def batch_activate_proposals(
             items.append(TiaBatchActivateItem(proposal_id=pid, success=False, error=exc.message))
             failed += 1
     await session.commit()
-    for job_id in job_ids:
-        dispatch_task(run_tia_activate_task, job_id)
+    dispatch_tia_activate_jobs(job_ids)
     return TiaBatchActivateResponse(
         items=items,
         job_ids=job_ids,
@@ -660,7 +657,7 @@ async def approve_and_activate(
             force_schema=force_schema,
         )
         await session.commit()
-        dispatch_task(run_tia_activate_task, job_id)
+        dispatch_tia_activate_jobs([job_id])
         return TiaActivateResponse(job_id=job_id, message="Approved and L3 activation queued")
     except (NotFoundError, ValidationError) as exc:
         raise HTTPException(status_code=400, detail=exc.message) from exc
@@ -838,7 +835,7 @@ async def activate_proposal(
             force_schema=force_schema,
         )
         await session.commit()
-        dispatch_task(run_tia_activate_task, job_id)
+        dispatch_tia_activate_jobs([job_id])
         return TiaActivateResponse(job_id=job_id, message="L3 activation queued")
     except (NotFoundError, ValidationError) as exc:
         raise HTTPException(status_code=400, detail=exc.message) from exc
