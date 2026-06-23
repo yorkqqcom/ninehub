@@ -597,8 +597,8 @@ async def batch_activate_proposals(
 @router.post(
     "/proposals/batch-enable-browse",
     response_model=TiaBatchEnableBrowseResponse,
-    summary="批量开通数据浏览",
-    description="对已激活（applied）提案批量启用 catalog 数据浏览。",
+    summary="批量开通数据查询",
+    description="对已激活（applied）提案批量启用 catalog 数据查询。",
 )
 async def batch_enable_proposal_browse(
     body: TiaBatchEnableBrowse,
@@ -669,8 +669,8 @@ async def approve_and_activate(
 @router.post(
     "/proposals/{proposal_id}/enable-browse",
     response_model=TiaProposalResponse,
-    summary="启用数据浏览",
-    description="L3 已激活后，显式开启 catalog 数据浏览（非默认）。",
+    summary="启用数据查询",
+    description="L3 已激活后，显式开启 catalog 数据查询（非默认）。",
 )
 async def enable_proposal_browse(
     proposal_id: int,

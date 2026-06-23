@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { apiRequest } from "@/api/client";
-import type { DataTypeItem, NodeRun, PlatformJob, WorkflowRun } from "@/api/types";
+import type { DataTypeItem, NodeRun, PlatformJob, WorkflowCollectProfile, WorkflowRun } from "@/api/types";
 import WorkflowGraph, { type GraphEdge, type GraphNode } from "@/components/WorkflowGraph.vue";
+import WorkflowCollectProfilePanel from "@/components/WorkflowCollectProfilePanel.vue";
 import PageHeader from "@/components/PageHeader.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/ui";
@@ -59,6 +60,9 @@ const dataTypes = ref<DataTypeItem[]>([]);
 const sources = ref<DataSourceItem[]>([]);
 const validation = ref<ValidateResult | null>(null);
 const asyncRun = ref(true);
+const runBatchMode = ref<"daily" | "backfill">("daily");
+const collectProfile = ref<WorkflowCollectProfile | null>(null);
+const collectProfileLoading = ref(false);
 const busy = ref(false);
 const dirty = ref(false);
 let pollTimer: number | undefined;
@@ -76,6 +80,70 @@ const selectedNode = computed(() =>
 const needsDataType = computed(
   () => selectedNode.value?.node_type === "collect" || selectedNode.value?.node_type === "quality",
 );
+
+const activeNodeRun = computed(
+  () => nodeRuns.value.find((n) => n.node_id === activeNodeId.value) ?? null,
+);
+
+const showCollectProfile = computed(
+  () =>
+    selectedNode.value?.node_type === "collect" && Boolean(selectedNode.value?.data_type),
+);
+
+const collectProfileSubtitle = computed(() => {
+  if (!selectedNode.value?.data_type) return null;
+  return `${selectedNode.value.label || selectedNode.value.node_id} · ${selectedNode.value.data_type}`;
+});
+
+const resultDetailEntries = computed(() => {
+  const raw = activeNodeRun.value?.result_json;
+  if (!raw) return [];
+  const priority = [
+    "batch_mode",
+    "mode",
+    "collect_start_date",
+    "collect_end_date",
+    "stock_codes_used",
+    "stock_code_offset",
+    "api_calls",
+    "periods",
+    "trade_days",
+    "trade_date_fallback",
+  ];
+  const keys = Object.keys(raw).sort((a, b) => {
+    const ai = priority.indexOf(a);
+    const bi = priority.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+  return keys.map((key) => ({ key, value: raw[key] }));
+});
+
+watch(
+  () => [selectedNode.value?.node_type, selectedNode.value?.data_type] as const,
+  ([nodeType, dataType]) => {
+    if (nodeType === "collect" && dataType) {
+      void loadCollectProfile(dataType);
+    } else {
+      collectProfile.value = null;
+    }
+  },
+);
+
+async function loadCollectProfile(dataType: string) {
+  collectProfileLoading.value = true;
+  try {
+    collectProfile.value = await apiRequest<WorkflowCollectProfile>(
+      `/api/v1/workflows/collect-profile?data_type=${encodeURIComponent(dataType)}&batch_mode=daily`,
+    );
+  } catch {
+    collectProfile.value = null;
+  } finally {
+    collectProfileLoading.value = false;
+  }
+}
 
 onMounted(async () => {
   const [list, catalog, srcList] = await Promise.all([
@@ -155,6 +223,13 @@ async function selectRun(runId: number) {
   );
   nodeRuns.value = nodes.items;
   nodeStatuses.value = Object.fromEntries(nodes.items.map((n) => [n.node_id, n.status]));
+  if (nodes.items.length) {
+    const focus =
+      nodes.items.find((n) => n.status === "failed") ??
+      nodes.items.find((n) => n.node_type === "collect") ??
+      nodes.items[0];
+    activeNodeId.value = focus.node_id;
+  }
 
   if (run?.job_id) {
     job.value = await apiRequest<PlatformJob>(`/api/v1/platform/jobs/${run.job_id}`);
@@ -287,11 +362,21 @@ async function saveMeta() {
 
 async function triggerRun(skipGates = false) {
   if (!selectedId.value || !auth.isAdmin) return;
+  if (!skipGates && runBatchMode.value === "backfill") {
+    const ok = window.confirm(
+      "历史回填将从 sync_start_date 拉全区间，单节点可能超出 200 次 API 预算。\n\n"
+        + "大规模回填请优先使用 scripts/run_backfill_history.py。\n\n确定继续？",
+    );
+    if (!ok) return;
+  }
   busy.value = true;
   try {
     const params = new URLSearchParams();
     if (skipGates) params.set("skip_gates", "true");
-    else if (!asyncRun.value) params.set("async_queue", "false");
+    else {
+      if (!asyncRun.value) params.set("async_queue", "false");
+      if (runBatchMode.value === "backfill") params.set("batch_mode", "backfill");
+    }
     const q = params.toString() ? `?${params}` : "";
     const res = await apiRequest<{ run_id: number; job_id?: number; message: string }>(
       `/api/v1/workflows/${selectedId.value}/run${q}`,
@@ -431,6 +516,43 @@ function formatTime(iso?: string | null) {
   if (!iso) return "—";
   return new Date(iso).toLocaleString("zh-CN", { hour12: false });
 }
+
+function triggerTypeLabel(triggerType: string) {
+  if (triggerType === "cron") return "定时·日批";
+  if (triggerType === "manual") return "手动·日批";
+  if (triggerType === "backfill") return "历史回填";
+  if (triggerType === "debug") return "调试";
+  return triggerType;
+}
+
+function detailLabel(key: string) {
+  const labels: Record<string, string> = {
+    batch_mode: "批次",
+    collect_start_date: "起始日期",
+    collect_end_date: "结束日期",
+    stock_code_offset: "code 轮转偏移",
+    stock_codes_used: "本轮 codes",
+    api_calls: "API 调用",
+    mode: "采集模式",
+    periods: "报告期数",
+    trade_days: "交易日数",
+    trade_date_fallback: "回退交易日",
+    df_rows: "API 行数",
+  };
+  return labels[key] ?? key;
+}
+
+function detailValue(key: string, value: unknown) {
+  if (key === "batch_mode") {
+    if (value === "daily") return "daily（日批）";
+    if (value === "backfill") return "backfill（回填）";
+  }
+  return value;
+}
+
+function isBudgetError(message?: string | null) {
+  return Boolean(message && /exceeds limit/i.test(message));
+}
 </script>
 
 <template>
@@ -531,6 +653,16 @@ function formatTime(iso?: string | null) {
         <input v-model="asyncRun" type="checkbox" />
         <span>异步队列</span>
       </label>
+      <label v-if="auth.isAdmin" class="form-field">
+        <span>运行模式</span>
+        <select v-model="runBatchMode" class="input-w-sm">
+          <option value="daily">每日增量</option>
+          <option value="backfill">历史回填</option>
+        </select>
+      </label>
+      <span v-if="graph?.schedule_cron && isPublished" class="wf-cron-hint muted">
+        Cron 以日批执行
+      </span>
       <span v-if="isEditable" class="badge badge--muted">可拖拽编辑</span>
     </div>
 
@@ -590,7 +722,13 @@ function formatTime(iso?: string | null) {
 
       <div class="panel wf-side-panel">
         <div class="panel__header">
-          <span>{{ selectedNode && isEditable ? "节点属性" : "节点状态" }}</span>
+          <span>{{
+            selectedNode && isEditable
+              ? "节点属性"
+              : activeNodeRun
+                ? "运行明细"
+                : "节点状态"
+          }}</span>
         </div>
         <div class="panel__body">
           <template v-if="selectedNode && isEditable">
@@ -626,26 +764,68 @@ function formatTime(iso?: string | null) {
                 </select>
               </label>
             </div>
+            <WorkflowCollectProfilePanel
+              v-if="showCollectProfile"
+              :profile="collectProfile"
+              :loading="collectProfileLoading"
+              :subtitle="collectProfileSubtitle"
+            />
             <button type="button" class="btn btn--primary btn--sm" :disabled="busy" @click="saveNodeProps">
               保存节点
             </button>
           </template>
-          <div v-else-if="nodeRuns.length" class="wf-node-list">
-            <div
-              v-for="n in nodeRuns"
-              :key="n.id"
-              class="wf-node-item"
-              :class="{ active: activeNodeId === n.node_id }"
-              @click="activeNodeId = n.node_id"
-            >
-              <div>
-                <div class="wf-node-item__label">{{ n.label || n.node_id }}</div>
-                <div class="wf-node-item__type">{{ n.message || n.node_type }}</div>
+
+          <WorkflowCollectProfilePanel
+            v-if="showCollectProfile && !(selectedNode && isEditable)"
+            :profile="collectProfile"
+            :loading="collectProfileLoading"
+            :subtitle="collectProfileSubtitle"
+          />
+
+          <template v-if="nodeRuns.length">
+            <div v-if="activeNodeRun" class="wf-run-detail">
+              <div class="wf-run-detail__header">
+                <span class="wf-node-item__label">{{ activeNodeRun.label || activeNodeRun.node_id }}</span>
+                <span class="badge" :class="runStatusBadge(activeNodeRun.status)">
+                  {{ activeNodeRun.status }}
+                </span>
               </div>
-              <span class="badge" :class="runStatusBadge(n.status)">{{ n.status }}</span>
+              <p
+                v-if="activeNodeRun.message"
+                class="wf-run-detail__message"
+                :class="{ 'wf-run-detail__message--err': isBudgetError(activeNodeRun.message) }"
+              >
+                {{ activeNodeRun.message }}
+              </p>
+              <div v-if="activeNodeRun.result_json" class="kv-list kv-list--compact">
+                <div v-for="row in resultDetailEntries" :key="row.key" class="kv-row">
+                  <span class="kv-row__label">{{ detailLabel(row.key) }}</span>
+                  <span>{{ detailValue(row.key, row.value) }}</span>
+                </div>
+              </div>
+              <p v-else-if="activeNodeRun.node_type === 'collect'" class="muted">
+                无采集明细（gate/质检节点通常为空）
+              </p>
             </div>
-          </div>
-          <p v-else class="empty-state empty-state--compact">选择运行记录或节点</p>
+            <div class="wf-node-list">
+              <div
+                v-for="n in nodeRuns"
+                :key="n.id"
+                class="wf-node-item"
+                :class="{ active: activeNodeId === n.node_id }"
+                @click="activeNodeId = n.node_id"
+              >
+                <div>
+                  <div class="wf-node-item__label">{{ n.label || n.node_id }}</div>
+                  <div class="wf-node-item__type">{{ n.message || n.node_type }}</div>
+                </div>
+                <span class="badge" :class="runStatusBadge(n.status)">{{ n.status }}</span>
+              </div>
+            </div>
+          </template>
+          <p v-else-if="!showCollectProfile" class="empty-state empty-state--compact">
+            选择运行记录或节点
+          </p>
         </div>
       </div>
     </div>
@@ -691,7 +871,7 @@ function formatTime(iso?: string | null) {
               <td>
                 <span class="badge" :class="runStatusBadge(run.status)">{{ run.status }}</span>
               </td>
-              <td>{{ run.trigger_type }}</td>
+              <td>{{ triggerTypeLabel(run.trigger_type) }}</td>
               <td class="numeric">{{ run.job_id ?? "—" }}</td>
               <td>{{ formatTime(run.started_at) }}</td>
               <td>{{ formatTime(run.finished_at) }}</td>

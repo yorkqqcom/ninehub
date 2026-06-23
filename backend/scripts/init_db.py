@@ -93,6 +93,12 @@ DATABASE_URL=postgresql+asyncpg://{PROJECT_USER}:{PROJECT_PASSWORD}@{PG_HOST}:{P
 SYNC_DATABASE_URL=postgresql+psycopg2://{PROJECT_USER}:{PROJECT_PASSWORD}@{PG_HOST}:{PG_PORT}/{PROJECT_DB}
 SECRET_KEY=local-dev-secret-change-in-production
 DEBUG=true
+CELERY_INLINE_FALLBACK=true
+
+# Tushare（推荐在 UI「数据源」配置 token + account_points；以下为脚本/Worker 回退）
+# 2000 积分档 → 200 次/分钟，覆盖 A 股日批工作流与 run_backfill_history.py
+# TUSHARE_TOKEN=
+# TUSHARE_ACCOUNT_POINTS=2000
 """
     env_path.write_text(content, encoding="utf-8")
     print(f"Written {env_path}")

@@ -7,6 +7,17 @@ from typing import Any, Optional
 from app.core.config import get_settings
 
 
+# Per-interface caps from Tushare doc pages (stricter than account tier).
+API_INTERFACE_LIMITS: dict[str, int] = {
+    "stk_holdertrade": 100,
+}
+
+
+def api_max_calls_per_minute(api_name: str) -> int | None:
+    """Return per-interface calls/min cap, or None when only account tier applies."""
+    return API_INTERFACE_LIMITS.get(api_name)
+
+
 def points_to_max_calls_per_minute(account_points: int) -> int:
     """Map Tushare account tier to per-minute API call cap (doc_id=290)."""
     if account_points >= 5000:

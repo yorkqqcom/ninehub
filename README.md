@@ -99,6 +99,18 @@ python scripts/init_db.py
 4. 创建管理员 `admin / admin123456`
 5. 引导 TIA 文档积分缓存与默认提案种子
 
+### 2.1 2000 积分 A 股采集（Tushare）
+
+多数 A 股接口需 **≥2000 积分**（200 次/分钟）。`init_db` 完成后按以下顺序配置（详见 [backend/README.md — 2000 积分 A 股采集部署](backend/README.md#2000-积分-a-股采集部署)）：
+
+1. **数据源**：Token + `account_points: 2000`（UI「数据源」；勿仅用 `.env` 默认 120）
+2. **平台设置**：`sync_start_date`（如 `2020-01-01`）
+3. **TIA L3 激活**：扫描 → 审批 → 激活事实表（P0：`bootstrap_browser_p0.py`）
+4. **工作流与采集配置**：`python scripts/setup_collect_workflows.py --migrate --backfill-plan`（32 个 API override + 5 条 DAG / 31 节点；`--migrate` 可省略若 `init_db` 已最新）
+5. **历史回填**：`python scripts/run_backfill_history.py --list` 后按 tier 或 `--all` 执行
+
+工作流日批 API 预算 **200 次/节点**；`stk_holdertrade` 接口独立限速 100 次/分钟，大规模历史须 `--from-chunk` 续跑。
+
 ### 3. 启动后端 API
 
 ```bash
@@ -149,7 +161,7 @@ celery -A app.tasks.celery_app beat --loglevel=info
 docker compose up -d
 ```
 
-首次启动后仍需在 API 容器内执行迁移与种子（或在本机对容器数据库运行 `init_db.py`）。Docker 环境数据库账号为 `ninehub/ninehub`。
+首次启动后仍需在 API 容器内执行迁移与种子（或在本机对容器数据库运行 `init_db.py`）。Docker Compose 数据库账号为 `ninehub/ninehub`；本机 `init_db.py` 写入 `.env` 的密码为 `ninehub_dev`（见脚本顶部 `PROJECT_PASSWORD`）。
 
 ---
 
@@ -172,6 +184,12 @@ ninehub/
 # 后端测试
 cd backend && pytest tests -v -p no:pytest_postgresql
 
+# 2000 积分采集链路（L3 激活后）
+cd backend
+python scripts/setup_collect_workflows.py --check-only
+python scripts/setup_collect_workflows.py --migrate --backfill-plan
+python scripts/run_backfill_history.py --list  # 历史回填计划
+
 # 代码格式化
 cd backend && black app tests
 
@@ -184,6 +202,6 @@ python scripts/capture_browser_screenshots.py
 
 ## 注意事项
 
-- **Tushare Token**：在「数据源」页配置后方可采集 Tushare 接口；请妥善保管 Token，勿提交到版本库。
+- **Tushare Token**：在「数据源」页配置 Token 与 **account_points**（2000 积分 A 股链路须填 `2000`）后方可采集；请妥善保管 Token，勿提交到版本库。
 - **生产部署**：务必修改 `SECRET_KEY`、数据库密码，并将 `DEBUG=false`、`CELERY_INLINE_FALLBACK=false`。
 - **RBAC**：前端菜单按角色隐藏，但所有写接口后端均独立校验，不可仅依赖前端权限。

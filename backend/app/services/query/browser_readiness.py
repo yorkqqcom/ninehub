@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.catalog.registry import get_data_type_entry
 from app.schemas.query_browser import BrowserReadinessItem, BrowserReadinessResponse
+from app.services.platform.service import PlatformService
 from app.services.tia.override_service import TiaOverrideService
 
 P0_TYPES: tuple[tuple[str, str], ...] = (
@@ -22,8 +25,37 @@ P1_TYPES: tuple[tuple[str, str, int, str], ...] = (
     ("tushare_index_weight", "指数成分", 200, "bootstrap_browser_index.py"),
 )
 
-BACKFILL_SCRIPT = "backfill_browser_daily.py"
+BACKFILL_SCRIPT = "run_backfill_history.py --data-type tushare_daily"
 STOCK_BASIC_RESYNC_SCRIPT = "resync_stock_basic.py"
+MIN_DAILY_TRADING_DAYS = 20
+MIN_DAILY_ROWS_PER_STOCK = 10
+MIN_DAILY_MARKET_COVERAGE = 0.8
+
+
+async def _daily_full_market_day_ratio(
+    session: AsyncSession, table_name: str, stock_basic_count: int
+) -> tuple[int, int] | None:
+    if not stock_basic_count:
+        return None
+    min_rows = max(1, int(stock_basic_count * MIN_DAILY_MARKET_COVERAGE))
+    try:
+        row = (
+            await session.execute(
+                text(
+                    f"""
+SELECT COUNT(*) AS total_days,
+       COUNT(*) FILTER (WHERE cnt >= :min_rows) AS full_days
+FROM (
+  SELECT COUNT(*) AS cnt FROM "{table_name}" GROUP BY trade_date
+) t
+"""
+                ),
+                {"min_rows": min_rows},
+            )
+        ).one()
+        return int(row.full_days or 0), int(row.total_days or 0)
+    except Exception:
+        return None
 
 
 async def _table_row_count(session: AsyncSession, table_name: str) -> int | None:
@@ -32,6 +64,63 @@ async def _table_row_count(session: AsyncSession, table_name: str) -> int | None
         return int(result.scalar_one())
     except Exception:
         return None
+
+
+async def _daily_coverage_stats(
+    session: AsyncSession, table_name: str
+) -> tuple[date | None, date | None, int] | None:
+    try:
+        row = (
+            await session.execute(
+                text(
+                    f'SELECT MIN(trade_date) AS mn, MAX(trade_date) AS mx, '
+                    f'COUNT(DISTINCT trade_date) AS nd FROM "{table_name}"'
+                )
+            )
+        ).one()
+    except Exception:
+        return None
+    min_d = row.mn.date() if row.mn is not None and hasattr(row.mn, "date") else row.mn
+    max_d = row.mx.date() if row.mx is not None and hasattr(row.mx, "date") else row.mx
+    return min_d, max_d, int(row.nd or 0)
+
+
+async def _validate_daily_coverage(
+    session: AsyncSession,
+    *,
+    table_name: str,
+    row_count: int,
+    stock_basic_count: int | None,
+) -> tuple[bool, str | None]:
+    stats = await _daily_coverage_stats(session, table_name)
+    if stats is None:
+        return False, "无法读取 trade_date 统计"
+    min_d, _max_d, distinct_days = stats
+    sync_start = date.fromisoformat(
+        await PlatformService().resolve_sync_start_date(session, "tushare_daily")
+    )
+    issues: list[str] = []
+    if distinct_days < MIN_DAILY_TRADING_DAYS:
+        issues.append(f"仅覆盖 {distinct_days} 个交易日")
+    if min_d and min_d > sync_start + timedelta(days=30):
+        issues.append(f"最早日期 {min_d} 晚于 sync_start {sync_start}")
+    if stock_basic_count and row_count < stock_basic_count * MIN_DAILY_ROWS_PER_STOCK:
+        issues.append(
+            f"行数 {row_count} 偏低（预期约 {stock_basic_count} 股 × 多个交易日）"
+        )
+    coverage = await _daily_full_market_day_ratio(
+        session, table_name, stock_basic_count or 0
+    )
+    if coverage is not None:
+        full_days, total_days = coverage
+        if total_days and full_days < total_days * MIN_DAILY_MARKET_COVERAGE:
+            issues.append(
+                f"仅 {full_days}/{total_days} 个交易日达到全市场覆盖"
+                f"（每日需 ≥ {int((stock_basic_count or 0) * MIN_DAILY_MARKET_COVERAGE)} 行）"
+            )
+    if not issues:
+        return True, None
+    return False, "；".join(issues)
 
 
 class BrowserReadinessService:
@@ -66,12 +155,24 @@ class BrowserReadinessService:
                 elif row_count == 0:
                     message = "表无数据"
                     errors.append(f"表无数据: {table_name}")
+                elif data_type == "tushare_daily":
+                    daily_count = row_count
+                    coverage_ok, coverage_msg = await _validate_daily_coverage(
+                        session,
+                        table_name=table_name,
+                        row_count=row_count,
+                        stock_basic_count=stock_basic_count,
+                    )
+                    if coverage_ok:
+                        ok = True
+                    else:
+                        message = coverage_msg
+                        script = BACKFILL_SCRIPT
+                        errors.append(f"日线行情: {coverage_msg}")
                 else:
                     ok = True
                     if data_type == "tushare_stock_basic":
                         stock_basic_count = row_count
-                    elif data_type == "tushare_daily":
-                        daily_count = row_count
 
             items.append(
                 BrowserReadinessItem(
@@ -90,13 +191,14 @@ class BrowserReadinessService:
         if (
             stock_basic_count
             and daily_count is not None
-            and daily_count < stock_basic_count * 0.5
+            and daily_count < stock_basic_count * MIN_DAILY_ROWS_PER_STOCK
         ):
             msg = (
-                f"daily 覆盖率偏低（{daily_count}/{stock_basic_count}），"
+                f"daily 历史覆盖不足（{daily_count} 行 / {stock_basic_count} 股），"
                 f"请运行 python scripts/{BACKFILL_SCRIPT}"
             )
-            warnings.append(msg)
+            if msg not in warnings and msg not in errors:
+                warnings.append(msg)
 
         sb_entry = get_data_type_entry("tushare_stock_basic")
         if sb_entry and sb_entry.table_name and stock_basic_count:

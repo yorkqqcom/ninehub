@@ -94,9 +94,9 @@ export const NAV_GROUPS: NavGroup[] = [
       {
         name: "tia",
         to: "/tia",
-        label: "TIA 工作台",
+        label: "提案治理",
         icon: "shield",
-        desc: "提案治理 · L3 流水线",
+        desc: "扫描 · 审批 · L3 激活流水线",
         adminOnly: true,
       },
       {
@@ -105,6 +105,14 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "数据标准",
         icon: "standards",
         desc: "命名规范与 Schema 覆盖",
+        adminOnly: true,
+      },
+      {
+        name: "tia-coverage",
+        to: "/tia/coverage",
+        label: "官网覆盖",
+        icon: "shield",
+        desc: "本地 catalog 与官方索引对照",
         adminOnly: true,
       },
       {

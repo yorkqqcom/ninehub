@@ -53,12 +53,6 @@ export function isNavActive(
   if (item.children?.length) {
     return item.children.some((child) => isNavActive(route, child));
   }
-  if (item.name === "standards") {
-    return route.name === "standards";
-  }
-  if (item.name === "tia") {
-    return route.name === "tia";
-  }
   return route.name === item.name;
 }
 

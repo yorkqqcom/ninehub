@@ -10,7 +10,11 @@ from sqlalchemy import select
 from app.core.database import AsyncSessionLocal
 from app.models.tia_override import TiaOverride
 from app.services.tia.collect_pattern import enrich_schema_collect
-from app.services.workflow.collect_batch import DAILY_BATCH_MODE_OVERRIDES, DAILY_MAX_API_CALLS, DAILY_MAX_CODES
+from app.services.workflow.collect_batch import (
+    DAILY_BATCH_MODE_OVERRIDES,
+    DAILY_MAX_API_CALLS,
+    resolve_daily_max_codes,
+)
 from app.sync.tia_collect.params import SNAPSHOT_FULL_MARKET_PARAMS
 
 WORKFLOW_APIS = list(DAILY_BATCH_MODE_OVERRIDES.keys())
@@ -37,7 +41,7 @@ async def apply(*, dry_run: bool = False) -> None:
                 schema = enrich_schema_collect(schema, api)
             collect = dict(schema.get("collect") or {})
             collect["mode"] = DAILY_BATCH_MODE_OVERRIDES[api]
-            collect["max_codes_per_run"] = DAILY_MAX_CODES
+            collect["max_codes_per_run"] = resolve_daily_max_codes(api, collect["mode"])
             collect["max_api_calls_per_run"] = DAILY_MAX_API_CALLS
             collect["batch_mode_default"] = "daily"
             schema["collect"] = collect
@@ -47,7 +51,7 @@ async def apply(*, dry_run: bool = False) -> None:
                 payload = schema
             row.override_json = payload
             updated += 1
-            print(f"OK {api} mode={collect['mode']}")
+            print(f"OK {api} mode={collect['mode']} max_codes={collect['max_codes_per_run']}")
         if dry_run:
             await session.rollback()
             print(f"Dry run: would update {updated} overrides")

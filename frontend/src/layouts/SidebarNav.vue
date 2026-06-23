@@ -27,20 +27,21 @@ const navItems = computed(() => {
   const dataItems: NavItem[] = [{ to: "/quality", label: "质量监控", name: "quality" }];
 
   if (hasBrowseTypes.value) {
-
-    dataItems.unshift({ to: "/browse", label: "数据浏览", name: "browse" });
-
+    dataItems.unshift(
+      { to: "/data-browser", label: "数据浏览器", name: "data-browser" },
+      { to: "/browse", label: "数据查询", name: "browse" },
+    );
   }
 
   return [
 
-    { section: "平台", items: [{ to: "/", label: "概览", name: "dashboard" }] },
+    { section: "九汇平台", items: [{ to: "/", label: "概览", name: "dashboard" }] },
 
-    { section: "数据", items: dataItems },
+    { section: "数据查询", items: dataItems },
 
     {
 
-      section: "采集",
+      section: "数据采集",
 
       items: [
 
@@ -56,13 +57,15 @@ const navItems = computed(() => {
 
     {
 
-      section: "治理",
+      section: "数据治理",
 
       items: [
 
-        { to: "/tia", label: "TIA 工作台", name: "tia", adminOnly: true },
+        { to: "/tia", label: "提案治理", name: "tia", adminOnly: true },
 
-        { to: "/tia?tab=standards", label: "数据标准", name: "standards", adminOnly: true },
+        { to: "/standards", label: "数据标准", name: "standards", adminOnly: true },
+
+        { to: "/tia/coverage", label: "官网覆盖", name: "tia-coverage", adminOnly: true },
 
       ],
 
@@ -70,7 +73,7 @@ const navItems = computed(() => {
 
     {
 
-      section: "系统",
+      section: "系统管理",
 
       items: [{ to: "/settings", label: "平台设置", name: "settings", adminOnly: true }],
 
@@ -127,13 +130,6 @@ function visible(item: NavItem) {
 
 
 function isActive(name: string) {
-  const tab = route.query.tab;
-  if (name === "standards") {
-    return route.name === "tia" && tab === "standards";
-  }
-  if (name === "tia") {
-    return route.name === "tia" && tab !== "standards";
-  }
   return route.name === name;
 }
 

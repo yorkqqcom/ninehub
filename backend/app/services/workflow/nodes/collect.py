@@ -18,6 +18,7 @@ from app.services.tushare.source_quota import resolve_max_calls_per_minute
 from app.services.workflow.collect_batch import (
     extract_node_detail_json,
     resolve_batch_mode,
+    resolve_run_batch_mode,
     resolve_workflow_collect_dates,
 )
 from app.services.workflow.nodes.base import NodeExecutionContext, NodeResult

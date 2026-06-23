@@ -122,7 +122,7 @@
   margin: 0;
 }
 
-/* 双栏布局 — 数据浏览等 */
+/* 双栏布局 — 数据查询等 */
 .page-split {
   display: grid;
   gap: var(--space-lg);

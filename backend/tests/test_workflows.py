@@ -81,6 +81,13 @@ async def test_workflow_runs_and_nodes(client: AsyncClient, db_session) -> None:
                 label="日线采集",
                 status="success",
                 message="ok",
+                result_json={
+                    "batch_mode": "daily",
+                    "collect_start_date": "2026-06-10",
+                    "collect_end_date": "2026-06-10",
+                    "stock_code_offset": 200,
+                    "api_calls": 1,
+                },
             ),
         ]
     )
@@ -97,6 +104,37 @@ async def test_workflow_runs_and_nodes(client: AsyncClient, db_session) -> None:
     nodes_data = nodes_resp.json()
     assert nodes_data["total"] == 2
     assert {n["node_type"] for n in nodes_data["items"]} == {"gate", "collect"}
+    collect_node = next(n for n in nodes_data["items"] if n["node_type"] == "collect")
+    assert collect_node["result_json"]["batch_mode"] == "daily"
+    assert collect_node["result_json"]["stock_code_offset"] == 200
+
+
+@pytest.mark.asyncio
+async def test_workflow_collect_profile(client: AsyncClient) -> None:
+    resp = await client.get(
+        "/api/v1/workflows/collect-profile",
+        params={"data_type": TEST_DATA_TYPE, "batch_mode": "daily"},
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["api_name"] == "income"
+    assert data["collect_mode"] == "period"
+    assert data["max_codes_effective"] == 100
+    assert data["recent_periods"] == 2
+
+
+@pytest.mark.asyncio
+async def test_workflow_run_backfill_trigger(client: AsyncClient, db_session) -> None:
+    workflow = await _seed_graph(db_session, status="published")
+    await db_session.commit()
+
+    resp = await client.post(
+        f"/api/v1/workflows/{workflow.id}/run?batch_mode=backfill&async_queue=false"
+    )
+    assert resp.status_code == 200
+    run = await db_session.get(WorkflowRun, resp.json()["run_id"])
+    assert run is not None
+    assert run.trigger_type == "backfill"
 
 
 @pytest.mark.asyncio

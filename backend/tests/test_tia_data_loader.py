@@ -104,9 +104,20 @@ def test_stock_company_long_text_column_types() -> None:
     assert _infer_column_type("introduction") == "text"
     assert _infer_column_type("main_business") == "text"
     assert _infer_column_type("business_scope") == "text"
+    assert _infer_column_type("holder_name") == "text"
+    assert _infer_column_type("change_reason") == "text"
 
     schema = build_canonical_schema("stock_company")
     types = {c["key"]: c["type"] for c in schema["columns"]}
     assert types["introduction"] == "text"
     assert types["main_business"] == "text"
     assert types["business_scope"] == "text"
+
+    holdertrade = build_canonical_schema("stk_holdertrade")
+    ht_types = {c["key"]: c["type"] for c in holdertrade["columns"]}
+    assert ht_types["holder_name"] == "text"
+
+    forecast = build_canonical_schema("forecast")
+    fc_types = {c["key"]: c["type"] for c in forecast["columns"]}
+    assert fc_types["change_reason"] == "text"
+    assert fc_types["summary"] == "text"

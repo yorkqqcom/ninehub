@@ -1,0 +1,36 @@
+/* Vue Flow 主题桥接 — 覆盖 theme-default.css 的 :root 硬编码 */
+html[data-theme="dark"],
+html[data-theme="light"] {
+  --vf-node-bg: var(--color-surface);
+  --vf-node-text: var(--color-text);
+  --vf-connection-path: var(--color-border-strong);
+  --vf-handle: var(--color-primary);
+}
+
+html[data-theme="dark"] .vue-flow__node-default,
+html[data-theme="light"] .vue-flow__node-default,
+html[data-theme="dark"] .vue-flow__node-input,
+html[data-theme="light"] .vue-flow__node-input,
+html[data-theme="dark"] .vue-flow__node-output,
+html[data-theme="light"] .vue-flow__node-output {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+html[data-theme="dark"] .vue-flow__edge-path,
+html[data-theme="light"] .vue-flow__edge-path,
+html[data-theme="dark"] .vue-flow__connection-path,
+html[data-theme="light"] .vue-flow__connection-path {
+  stroke: var(--color-border-strong);
+}
+
+html[data-theme="dark"] .vue-flow__handle,
+html[data-theme="light"] .vue-flow__handle {
+  background: var(--color-primary);
+  border-color: var(--color-surface-elevated);
+}
+
+html[data-theme="dark"] .vue-flow__background pattern circle,
+html[data-theme="light"] .vue-flow__background pattern circle {
+  fill: var(--color-border);
+}

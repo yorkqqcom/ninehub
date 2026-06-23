@@ -35,6 +35,8 @@ API_UNIQUE_KEY_OVERRIDES: dict[str, list[str]] = {
     "moneyflow": ["stock_code", "trade_date"],
     "adj_factor": ["stock_code", "trade_date"],
     "margin_secs": ["stock_code", "trade_date", "exchange"],
+    "stk_managers": ["stock_code", "title", "begin_date"],
+    "stk_rewards": ["stock_code", "end_date", "title"],
 }
 
 # 浏览/筛选常用列 → 非唯一索引（加速 DataBrowse 按代码/日期过滤）

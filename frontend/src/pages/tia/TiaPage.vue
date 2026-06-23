@@ -4,19 +4,9 @@ import { useRouter, useRoute } from "vue-router";
 import { apiRequest, getToken, getApiBase, ApiError } from "@/api/client";
 import type { PlatformJob } from "@/api/types";
 import PageHeader from "@/components/PageHeader.vue";
-import DataStandardsPanel from "@/components/tia/DataStandardsPanel.vue";
 import SchemaMaintenanceDrawer from "@/components/tia/SchemaMaintenanceDrawer.vue";
-import CatalogCoveragePanel from "@/components/tia/CatalogCoveragePanel.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/ui";
-
-type WorkbenchTab = "proposals" | "standards" | "coverage";
-
-const WORKBENCH_TABS: { key: WorkbenchTab; label: string }[] = [
-  { key: "proposals", label: "提案治理" },
-  { key: "standards", label: "数据标准" },
-  { key: "coverage", label: "官网覆盖" },
-];
 
 const ui = useUiStore();
 const auth = useAuthStore();
@@ -47,66 +37,19 @@ const scanInProgress = ref(false);
 const jobPollStuck = ref(false);
 let jobPollCount = 0;
 const activateJobId = ref<number | null>(null);
-const activeTab = ref<WorkbenchTab>("proposals");
 let pollTimer: number | undefined;
 
-function setWorkbenchTab(tab: WorkbenchTab) {
-  activeTab.value = tab;
-  const query: Record<string, string | string[]> = { ...route.query, tab };
-  if (tab !== "proposals") {
-    delete query.proposal;
-  }
-  if (tab !== "standards") {
-    delete query.api;
-  }
-  router.replace({ query });
-  if (tab === "proposals" && proposals.value.length === 0) {
-    void loadProposals();
-  }
-}
-
-function openProposalFromStandards(proposalId: number) {
-  activeTab.value = "proposals";
-  expandedProposalId.value = proposalId;
-  router.replace({ query: { tab: "proposals", proposal: String(proposalId) } });
-  nextTick(() => {
-    proposalsPanelRef.value?.scrollIntoView({ behavior: "smooth" });
-  });
-}
-
-function openStandardsTab(apiName: string) {
-  activeTab.value = "standards";
-  router.replace({ query: { tab: "standards", api: apiName } });
-}
-
-const standardsInitialApi = computed(() => {
-  const api = route.query.api;
-  return typeof api === "string" && api.trim() ? api.trim() : null;
-});
-
-function openSchemaMaintenanceFromStandards(proposalId: number, apiName: string) {
-  activeTab.value = "proposals";
-  openSchemaMaintenance(proposalId, apiName);
-  router.replace({ query: { tab: "proposals", proposal: String(proposalId) } });
+function openStandards(apiName: string) {
+  void router.push({ name: "standards", query: { api: apiName } });
 }
 
 onMounted(() => {
   loadPointsPrefs();
-  const tabQ = route.query.tab;
-  if (tabQ === "standards" || tabQ === "coverage") {
-    activeTab.value = tabQ;
-  } else if (tabQ === "builtin") {
-    activeTab.value = "proposals";
-    router.replace({ query: { ...route.query, tab: "proposals" } });
-  }
-  if (activeTab.value === "proposals") {
-    void loadProposals();
-  }
+  void loadProposals();
   const proposalQ = route.query.proposal;
   if (proposalQ) {
     const pid = Number(proposalQ);
     if (!Number.isNaN(pid)) {
-      activeTab.value = "proposals";
       expandedProposalId.value = pid;
       nextTick(() => {
         proposalsPanelRef.value?.scrollIntoView({ behavior: "smooth" });
@@ -446,7 +389,7 @@ const ACTIVATION_STEP_LABELS: Record<string, string> = {
   create_sync_task: "创建采集任务",
   setup_quality: "配置质检规则",
   trigger_initial_collect: "首跑采集",
-  register_browse: "启用数据浏览",
+  register_browse: "启用数据查询",
 };
 
 function activationStepLabel(step: string) {
@@ -691,7 +634,7 @@ async function batchEnableBrowse() {
       data.succeeded ? "info" : "error",
     );
   } else {
-    ui.showMessage(`已批量开通数据浏览 ${data.succeeded} 条`, "success");
+    ui.showMessage(`已批量开通数据查询 ${data.succeeded} 条`, "success");
   }
   await loadProposals();
 }
@@ -753,7 +696,7 @@ function browseData(dataType: string) {
 
 async function enableBrowse(id: number) {
   await apiRequest(`/api/v1/tia/proposals/${id}/enable-browse`, { method: "POST" });
-  ui.showMessage("已启用数据浏览", "success");
+  ui.showMessage("已启用数据查询", "success");
   await loadProposals();
 }
 
@@ -987,31 +930,14 @@ function probeStatusLabel(status: string) {
 </script>
 
 <template>
-  <PageHeader title="TIA 治理工作台" description="提案治理 · Schema 对照 · 官网覆盖">
+  <PageHeader title="提案治理" description="扫描 · 审批 · L3 激活流水线">
     <template #actions>
-      <template v-if="activeTab === 'proposals'">
-        <button type="button" class="btn btn--secondary" @click="runAudit">积分审计</button>
-        <button type="button" class="btn btn--primary" :disabled="scanInProgress" @click="startScan">
-          {{ scanInProgress ? "扫描中…" : "开始扫描" }}
-        </button>
-      </template>
+      <button type="button" class="btn btn--secondary" @click="runAudit">积分审计</button>
+      <button type="button" class="btn btn--primary" :disabled="scanInProgress" @click="startScan">
+        {{ scanInProgress ? "扫描中…" : "开始扫描" }}
+      </button>
     </template>
   </PageHeader>
-
-  <nav class="workbench-tabs" aria-label="TIA 工作台">
-    <button
-      v-for="tab in WORKBENCH_TABS"
-      :key="tab.key"
-      type="button"
-      class="workbench-tab"
-      :class="{ active: activeTab === tab.key }"
-      @click="setWorkbenchTab(tab.key)"
-    >
-      {{ tab.label }}
-    </button>
-  </nav>
-
-  <template v-if="activeTab === 'proposals'">
 
   <div v-if="auditResult" class="panel">
     <div class="panel__header">
@@ -1543,7 +1469,7 @@ function probeStatusLabel(status: string) {
           class="btn btn--secondary btn--sm"
           @click="batchEnableBrowse()"
         >
-          批量开通浏览 ({{ selectedBrowseIds.length }})
+          批量开通查询 ({{ selectedBrowseIds.length }})
         </button>
       </div>
       <div v-if="selectedCount" class="proposal-selection-bar">
@@ -1561,7 +1487,7 @@ function probeStatusLabel(status: string) {
           可 L3 {{ selectedL3Ids.length }}
         </span>
         <span v-if="selectedBrowseIds.length" class="badge badge--muted">
-          可开通浏览 {{ selectedBrowseIds.length }}
+          可开通查询 {{ selectedBrowseIds.length }}
         </span>
         <span v-if="showSelectAllFilteredHint" class="proposal-selection-hint">
           筛选共 {{ proposalTotal }} 条，可
@@ -1698,7 +1624,7 @@ function probeStatusLabel(status: string) {
                   <button
                     type="button"
                     class="btn btn--ghost btn--sm"
-                    @click="openStandardsTab(String(p.api_name))"
+                    @click="openStandards(String(p.api_name))"
                   >
                     标准
                   </button>
@@ -1752,7 +1678,7 @@ function probeStatusLabel(status: string) {
                       class="btn btn--ghost btn--sm"
                       @click="enableBrowse(p.id as number)"
                     >
-                      启用浏览
+                      启用查询
                     </button>
                     <button
                       v-if="p.browse_enabled && p.data_type"
@@ -1760,7 +1686,7 @@ function probeStatusLabel(status: string) {
                       class="btn btn--ghost btn--sm"
                       @click="browseData(String(p.data_type))"
                     >
-                      浏览
+                      查询
                     </button>
                     <button
                       type="button"
@@ -2004,19 +1930,6 @@ function probeStatusLabel(status: string) {
       </div>
     </div>
   </div>
-  </template>
-
-  <template v-else-if="activeTab === 'standards'">
-    <DataStandardsPanel
-      :initial-api="standardsInitialApi"
-      :on-open-proposal="openProposalFromStandards"
-      :on-open-schema-maintenance="openSchemaMaintenanceFromStandards"
-    />
-  </template>
-
-  <template v-else-if="activeTab === 'coverage'">
-    <CatalogCoveragePanel />
-  </template>
 
   <SchemaMaintenanceDrawer
     :proposal-id="schemaMaintenanceProposalId"
@@ -2027,32 +1940,10 @@ function probeStatusLabel(status: string) {
 </template>
 
 <style scoped>
-.workbench-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-bottom: var(--space-md);
-}
-
-.workbench-tab {
-  padding: 0.4rem 0.85rem;
-  border: 1px solid var(--color-border, #ddd);
-  border-radius: 6px;
-  background: transparent;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.workbench-tab.active {
-  background: var(--color-primary, #2563eb);
-  color: #fff;
-  border-color: transparent;
-}
-
 .doc-auth-panel {
   margin-top: var(--space-md);
   padding-top: var(--space-md);
-  border-top: 1px solid var(--color-border, #e5e7eb);
+  border-top: 1px solid var(--color-border);
 }
 
 .doc-auth-panel__header {
@@ -2143,7 +2034,7 @@ function probeStatusLabel(status: string) {
 .proposal-points-error {
   flex: 1 1 100%;
   font-size: 0.75rem;
-  color: var(--color-danger, #dc2626);
+  color: var(--color-err-text);
 }
 
 .proposal-points-display:hover .proposal-points-edit-btn {
@@ -2170,12 +2061,12 @@ function probeStatusLabel(status: string) {
   margin-top: var(--space-sm);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
-  background: var(--color-surface-muted, #f4f4f5);
+  background: var(--color-surface-muted);
   font-size: var(--font-size-sm);
 }
 
 .proposal-selection-hint {
-  color: var(--color-text-muted, #666);
+  color: var(--color-text-muted);
 }
 
 .proposal-select-th {
@@ -2229,8 +2120,8 @@ function probeStatusLabel(status: string) {
   max-width: 100%;
   overflow-x: auto;
   font-size: 0.75rem;
-  background: var(--color-surface, #fff);
-  border: 1px solid var(--color-border, #e4e4e7);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   white-space: pre-wrap;
 }
@@ -2244,7 +2135,7 @@ function probeStatusLabel(status: string) {
 .mini-table th,
 .mini-table td {
   padding: 0.25rem 0.5rem;
-  border: 1px solid var(--color-border, #e4e4e7);
+  border: 1px solid var(--color-border);
   text-align: left;
 }
 
@@ -2257,8 +2148,8 @@ function probeStatusLabel(status: string) {
 .tag-list .tag {
   font-size: 0.7rem;
   padding: 0.1rem 0.35rem;
-  background: var(--color-surface, #fff);
-  border: 1px solid var(--color-border, #e4e4e7);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 3px;
 }
 </style>

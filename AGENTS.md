@@ -31,6 +31,7 @@ ninehub/
 # 后端
 cd backend && pip install -e ".[dev]"
 python scripts/init_db.py          # PG 用户/库/迁移/seed admin
+python scripts/setup_collect_workflows.py --check-only  # L3 激活后：工作流采集预检
 uvicorn app.main:app --host 127.0.0.1 --port 8888 --reload
 pytest tests -v -p no:pytest_postgresql
 

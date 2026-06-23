@@ -12,6 +12,7 @@ from app.schemas.common import MessageResponse
 from app.schemas.workflow import (
     NodeRunListResponse,
     WorkflowCloneResponse,
+    WorkflowCollectProfileResponse,
     WorkflowCreate,
     WorkflowCreateResponse,
     WorkflowGraphResponse,
@@ -42,6 +43,29 @@ async def list_workflows(
     _: Annotated[User, Depends(get_current_user)],
 ) -> WorkflowListResponse:
     return await _workflow_service.list_workflows(session)
+
+
+@router.get(
+    "/collect-profile",
+    response_model=WorkflowCollectProfileResponse,
+    summary="工作流采集策略（只读）",
+    description="返回平台对 daily/backfill 生效的 collect mode 与 API 预算，供工作流/TIA 界面展示。",
+)
+async def get_workflow_collect_profile(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    _: Annotated[User, Depends(get_current_user)],
+    data_type: str = Query(..., description="catalog data_type，如 tushare_income"),
+    batch_mode: str = Query(
+        "daily",
+        pattern="^(daily|backfill)$",
+        description="daily=日批增量；backfill=历史全区间",
+    ),
+) -> WorkflowCollectProfileResponse:
+    return await _workflow_service.get_collect_profile(
+        session,
+        data_type=data_type,
+        batch_mode=batch_mode,
+    )
 
 
 @router.post(

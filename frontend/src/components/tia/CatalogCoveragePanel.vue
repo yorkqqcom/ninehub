@@ -51,7 +51,7 @@ async function loadCoverage() {
 onMounted(() => void loadCoverage());
 
 function openStandard(api: string) {
-  void router.push({ path: "/tia", query: { tab: "standards", api } });
+  void router.push({ name: "standards", query: { api } });
 }
 </script>
 
@@ -174,7 +174,7 @@ function openStandard(api: string) {
 .coverage-block__title {
   font-size: 0.85rem;
   margin: 0 0 0.5rem;
-  color: var(--color-text-muted, #888);
+  color: var(--color-text-muted);
 }
 
 .coverage-list li {

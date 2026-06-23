@@ -17,6 +17,14 @@ from app.sync.handlers import CollectResult, SyncContext
 from app.sync.tia_collect.config import CollectConfig
 
 
+def concat_collect_frames(frames: list[pd.DataFrame]) -> pd.DataFrame | None:
+    """Merge API response frames, skipping empty or all-NA chunks (pandas 2.x)."""
+    valid = [frame for frame in frames if not frame.empty and not frame.isna().all().all()]
+    if not valid:
+        return None
+    return pd.concat(valid, ignore_index=True)
+
+
 @dataclass
 class StrategyContext:
     api_name: str
@@ -47,13 +55,21 @@ class StrategyContext:
         return dict(self.extra.get("collect_params") or {})
 
     def resolve_base_collect_params(self) -> dict[str, Any]:
-        from app.sync.tia_collect.params import resolve_collect_params
+        from app.sync.tia_collect.params import (
+            resolve_collect_params,
+            strip_iteration_probe_filters,
+        )
 
-        return resolve_collect_params(
+        params = resolve_collect_params(
             self.api_name,
             self.schema,
             **self.collect_param_overrides,
         )
+        if self.profile.mode in ("ts_code", "date_range", "period"):
+            params = strip_iteration_probe_filters(params, mode=self.profile.mode)
+        elif self.profile.mode == "exchange_date_range" and self.api_name != "trade_cal":
+            params = strip_iteration_probe_filters(params, mode=self.profile.mode)
+        return params
 
 
 @dataclass
@@ -89,7 +105,9 @@ class CollectStrategy(ABC):
         rows = 0
         df_rows = len(df)
         if ctx.session is not None:
-            rows = ctx.loader.upsert_dataframe(ctx.session, ctx.table_name, ctx.schema, df)
+            schema = dict(ctx.schema)
+            schema.setdefault("api_name", ctx.api_name)
+            rows = ctx.loader.upsert_dataframe(ctx.session, ctx.table_name, schema, df)
         message = f"TIA {ctx.api_name}: upserted {rows} rows"
         if df_rows > 0 and rows == 0:
             message = (

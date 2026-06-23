@@ -174,7 +174,7 @@ function formatParams(params: Record<string, unknown> | undefined) {
               <td>
                 <RouterLink
                   v-if="task.proposal_id"
-                  :to="{ name: 'tia', query: { tab: 'proposals', proposal: String(task.proposal_id) } }"
+                  :to="{ name: 'tia', query: { proposal: String(task.proposal_id) } }"
                   class="table-link"
                 >
                   #{{ task.proposal_id }}

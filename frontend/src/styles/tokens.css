@@ -28,10 +28,11 @@
   --topbar-h: 40px;
   --bp-md: 768px;
 
-  /* A 股涨跌色：涨红跌绿 */
+  /* A 股涨跌色（涨红跌绿）；主题覆盖见 theme-dark.css / theme-light.css */
   --color-rise: #ef4444;
   --color-fall: #22c55e;
   --color-flat: #64748b;
+  /* 主题令牌（--color-on-primary / overlay / info-* / wf-* / shadow-* / topbar-*）定义于 theme-*.css */
 
   --transition-fast: 120ms ease;
 }

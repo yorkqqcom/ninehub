@@ -10,6 +10,7 @@ from app.schemas.workflow import (
     NodeRunListResponse,
     NodeRunResponse,
     WorkflowCloneResponse,
+    WorkflowCollectProfileResponse,
     WorkflowCreate,
     WorkflowCreateResponse,
     WorkflowGraphResponse,
@@ -91,6 +92,49 @@ class WorkflowService:
         nodes = sorted(run.node_runs, key=lambda n: n.id)
         items = [NodeRunResponse.model_validate(n) for n in nodes]
         return NodeRunListResponse(items=items, total=len(items))
+
+    async def get_collect_profile(
+        self,
+        session: AsyncSession,
+        *,
+        data_type: str,
+        batch_mode: str = "daily",
+    ) -> WorkflowCollectProfileResponse:
+        from app.catalog.registry import get_data_type_entry
+        from app.core.exceptions import NotFoundError
+        from app.services.tia.constants import resolve_canonical_data_type
+        from app.services.tia.override_service import TiaOverrideService
+        from app.services.workflow.collect_profile import build_workflow_collect_profile
+        from app.sync.handlers import get_handler
+
+        canonical = resolve_canonical_data_type(data_type)
+        entry = get_data_type_entry(canonical) or get_data_type_entry(data_type)
+        if entry is None:
+            raise NotFoundError(f"data_type 未注册: {data_type}")
+
+        response_data_type = entry.data_type
+        api_name = canonical[len("tushare_") :] if canonical.startswith("tushare_") else canonical
+        if canonical.startswith("tia_"):
+            api_name = canonical[len("tia_") :]
+        elif response_data_type.startswith("tushare_"):
+            api_name = response_data_type[len("tushare_") :]
+        elif response_data_type.startswith("tia_"):
+            api_name = response_data_type[len("tia_") :]
+
+        schema: dict = {}
+        try:
+            override = await TiaOverrideService().get_by_api(session, api_name)
+            TiaOverrideService().bootstrap_override(override)
+            payload = override.override_json or {}
+            raw = payload.get("schema") or payload
+            schema = dict(raw) if isinstance(raw, dict) else {}
+        except NotFoundError:
+            handler = get_handler(canonical)
+            if handler is not None:
+                schema = dict(getattr(handler, "schema") or {})
+
+        profile = build_workflow_collect_profile(api_name, schema, batch_mode=batch_mode)
+        return WorkflowCollectProfileResponse(data_type=response_data_type, **profile)
 
     async def get_run(
         self,

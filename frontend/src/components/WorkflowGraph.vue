@@ -270,12 +270,18 @@ function removeActiveEdge() {
   border-radius: var(--radius-sm);
   border: 2px solid var(--color-border-strong);
   background: var(--color-surface);
+  color: var(--color-text);
   font-size: var(--font-size-sm);
   line-height: 1.35;
   white-space: pre-line;
   min-width: 88px;
   text-align: center;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+:deep(.vue-flow__node-default) {
+  color: var(--color-text);
+  background-color: var(--color-surface);
 }
 
 :deep(.wf-node--gate) {
@@ -287,7 +293,7 @@ function removeActiveEdge() {
 }
 
 :deep(.wf-node--quality) {
-  border-color: #8b5cf6;
+  border-color: var(--color-wf-quality);
 }
 
 :deep(.wf-node--active) {
@@ -306,11 +312,13 @@ function removeActiveEdge() {
 :deep(.wf-node--status-success) {
   border-color: var(--color-fall);
   background: var(--color-ok-bg);
+  color: var(--color-ok-text);
 }
 
 :deep(.wf-node--status-failed) {
   border-color: var(--color-rise);
   background: var(--color-err-bg);
+  color: var(--color-err-text);
 }
 
 :deep(.wf-node--status-skipped) {
@@ -321,10 +329,10 @@ function removeActiveEdge() {
 @keyframes wf-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 0 0 var(--color-wf-pulse);
   }
   50% {
-    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 6px transparent;
   }
 }
 </style>

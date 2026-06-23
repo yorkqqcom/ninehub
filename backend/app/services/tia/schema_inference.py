@@ -36,8 +36,10 @@ _TEXT_FIELDS = frozenset(
         "desc",
         "description",
         "reason",
+        "change_reason",
         "content",
         "summary",
+        "holder_name",
     }
 )
 

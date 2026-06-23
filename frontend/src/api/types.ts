@@ -117,6 +117,24 @@ export interface NodeRun {
   label?: string | null;
   status: string;
   message?: string | null;
+  result_json?: Record<string, unknown> | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+}
+
+export interface WorkflowCollectProfile {
+  data_type: string;
+  api_name: string;
+  batch_mode: string;
+  collect_mode: string;
+  max_codes_stored?: number | null;
+  max_codes_effective: number;
+  max_api_calls_per_run: number;
+  rotation_enabled: boolean;
+  rotation_codes_per_run?: number | null;
+  recent_periods?: number | null;
+  publish_lag_days?: number | null;
+  notes: string[];
 }
 
 export interface PlatformJob {

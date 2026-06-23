@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.exceptions import NotFoundError, ValidationError
 from app.models.workflow import NodeRun, WorkflowEdge, WorkflowNode, WorkflowRun
 from app.services.workflow.nodes.base import NodeExecutionContext
+from app.services.workflow.collect_batch import resolve_run_batch_mode
 from app.services.workflow.dag import DagEngine
 from app.services.workflow.nodes.registry import get_node_handler
 from app.services.workflow.validator import WorkflowValidator
@@ -280,6 +281,7 @@ class WorkflowExecutor:
             workflow_run_id=run_id,
             node_id=node_id,
             trigger_type=run.trigger_type,
+            batch_mode=resolve_run_batch_mode(run.trigger_type),
         )
         try:
 
@@ -323,6 +325,7 @@ class WorkflowExecutor:
             workflow_run_id=run.id,
             node_id=node.node_id,
             trigger_type=run.trigger_type,
+            batch_mode=resolve_run_batch_mode(run.trigger_type),
         )
         try:
             result = handler.execute(session, node, skip_gates=skip_gates, context=ctx)

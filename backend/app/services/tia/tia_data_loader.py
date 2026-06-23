@@ -13,6 +13,14 @@ from sqlalchemy.orm import Session
 
 from app.core.exceptions import ValidationError
 from app.services.catalog.canonical_standard import apply_dataframe_field_mappings
+from app.services.tia.unique_key_registry import API_UNIQUE_KEY_OVERRIDES
+
+
+def _resolve_unique_keys(schema: dict[str, Any]) -> list[str]:
+    api_name = schema.get("api_name")
+    if api_name and api_name in API_UNIQUE_KEY_OVERRIDES:
+        return list(API_UNIQUE_KEY_OVERRIDES[api_name])
+    return list(schema.get("unique_keys") or [])
 
 
 def _normalize_value(value: Any, col_type: str) -> Any:
@@ -55,7 +63,7 @@ class TiaDataLoader:
             return 0
         session.rollback()
         df = apply_dataframe_field_mappings(df, schema)
-        unique_keys = schema.get("unique_keys") or []
+        unique_keys = _resolve_unique_keys(schema)
         col_meta = {c["key"]: c for c in schema.get("columns", [])}
         if not unique_keys:
             raise ValidationError("Schema unique_keys required for upsert")

@@ -9,7 +9,7 @@
 
 .wf-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: var(--space-lg);
   min-height: 320px;
   flex: 1;
@@ -116,6 +116,34 @@
 }
 
 .wf-btn-danger:not(:disabled) {
+  color: var(--color-rise);
+}
+
+.wf-cron-hint {
+  font-size: var(--font-size-sm);
+}
+
+.wf-run-detail {
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.wf-run-detail__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.wf-run-detail__message {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--font-size-sm);
+  word-break: break-word;
+}
+
+.wf-run-detail__message--err {
   color: var(--color-rise);
 }
 

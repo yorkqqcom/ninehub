@@ -8,7 +8,12 @@ import pandas as pd
 
 from app.catalog.tia_probe_registry import last_trading_day
 from app.services.trading_calendar.service import CN_HOLIDAYS
-from app.sync.tia_collect.base import CollectStrategy, StrategyContext, StrategyResult
+from app.sync.tia_collect.base import (
+    CollectStrategy,
+    StrategyContext,
+    StrategyResult,
+    concat_collect_frames,
+)
 
 
 def _trading_days_in_range(start: date, end: date) -> list[date]:
@@ -28,6 +33,38 @@ def _trading_day_before(ref: date) -> date:
     while cursor.weekday() >= 5 or cursor in CN_HOLIDAYS:
         cursor -= timedelta(days=1)
     return cursor
+
+
+TRADE_DATE_PAGE_SIZE = 5000
+
+
+def _fetch_market_for_trade_date(
+    ctx: StrategyContext,
+    base_params: dict,
+    trade_date_str: str,
+) -> tuple[pd.DataFrame | None, int]:
+    """Paginate Tushare trade_date queries (full market can exceed one page)."""
+    drop_keys = ("ts_code", "start_date", "end_date", "period", "limit", "offset")
+    frames: list[pd.DataFrame] = []
+    api_calls = 0
+    offset = 0
+    while True:
+        params = {k: v for k, v in base_params.items() if k not in drop_keys}
+        params["trade_date"] = trade_date_str
+        params["offset"] = offset
+        params["limit"] = TRADE_DATE_PAGE_SIZE
+        df = ctx.collector._call_pro(ctx.api_name, **params)  # noqa: SLF001
+        api_calls += 1
+        if df is None or df.empty:
+            break
+        frames.append(df)
+        if len(df) < TRADE_DATE_PAGE_SIZE:
+            break
+        offset += TRADE_DATE_PAGE_SIZE
+    if not frames:
+        return None, api_calls
+    merged = concat_collect_frames(frames)
+    return merged, api_calls
 
 
 class TradeDateStrategy(CollectStrategy):
@@ -56,19 +93,19 @@ class TradeDateStrategy(CollectStrategy):
         trade_days: list[date],
     ) -> StrategyResult:
         base_params = ctx.resolve_base_collect_params()
-        drop_keys = ("ts_code", "start_date", "end_date", "period", "limit")
+        drop_keys = ("ts_code", "start_date", "end_date", "period", "limit", "offset")
 
         frames: list[pd.DataFrame] = []
         api_calls = 0
         for td in trade_days:
-            params = {k: v for k, v in base_params.items() if k not in drop_keys}
-            params["trade_date"] = td.strftime("%Y%m%d")
-            df = ctx.collector._call_pro(ctx.api_name, **params)  # noqa: SLF001
-            api_calls += 1
-            if df is not None and not df.empty:
-                frames.append(df)
+            merged, calls = _fetch_market_for_trade_date(
+                ctx, base_params, td.strftime("%Y%m%d")
+            )
+            api_calls += calls
+            if merged is not None and not merged.empty:
+                frames.append(merged)
 
-        merged = pd.concat(frames, ignore_index=True) if frames else None
+        merged = concat_collect_frames(frames)
         result = self._upsert(ctx, merged, api_calls=api_calls)
         result.detail_json["trade_days"] = len(trade_days)
         return result

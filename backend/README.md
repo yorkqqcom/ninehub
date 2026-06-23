@@ -49,6 +49,8 @@ python scripts/init_db.py
 
 脚本将创建库用户 `ninehub`、写入 `.env`、执行 Alembic 迁移、种子管理员 `admin / admin123456`，并引导 TIA 文档积分缓存与默认提案。
 
+**2000 积分 A 股采集**（L3 激活后）见下文 [§2000 积分 A 股采集部署](#2000-积分-a-股采集部署)。
+
 ### 启动服务
 
 ```bash
@@ -132,7 +134,7 @@ celery -A app.tasks.celery_app beat --loglevel=info
 
 ### 4. TIA 治理（Catalog 扩展核心）
 
-TIA 将外部接口治理为平台可运行的 `data_type`：**扫描提案 → 审批 → L3 激活 → 开通浏览**。
+TIA 将外部接口治理为平台可运行的 `data_type`：**扫描提案 → 审批 → L3 激活 → 开通查询**。
 
 #### 4a. 提案治理
 
@@ -147,10 +149,10 @@ TIA 将外部接口治理为平台可运行的 `data_type`：**扫描提案 → 
 | 批准 / 拒绝 | `PATCH /api/v1/tia/proposals/{id}` |
 | 批准并激活（L3） | `POST /api/v1/tia/proposals/{id}/approve-activate` |
 | L3 激活 / 重试 | `POST /api/v1/tia/proposals/{id}/activate` |
-| 开通数据浏览 | `POST /api/v1/tia/proposals/{id}/enable-browse` |
+| 开通数据查询 | `POST /api/v1/tia/proposals/{id}/enable-browse` |
 | L2 脚手架下载 | `GET /api/v1/tia/proposals/{id}/scaffold` |
 
-L3 激活成功后：注册 SyncHandler、创建/迁移事实表、写入 Catalog；侧栏「数据浏览」在 `browse_enabled=true` 后出现。
+L3 激活成功后：注册 SyncHandler、创建/迁移事实表、写入 Catalog；侧栏「数据查询」在 `browse_enabled=true` 后出现。
 
 #### 4b. 数据标准
 
@@ -201,7 +203,10 @@ L3 激活成功后：注册 SyncHandler、创建/迁移事实表、写入 Catalo
 | DAG 校验 | `GET /api/v1/workflows/{id}/validate` |
 | 发布 / 取消发布 | `POST .../publish`、`POST .../unpublish` |
 | 运行 / 调试 | `POST /api/v1/workflows/{id}/run` |
+| 采集策略（只读） | `GET /api/v1/workflows/collect-profile?data_type=&batch_mode=daily` |
 | 运行历史 / 节点状态 | `GET .../runs`、`GET /api/v1/workflows/runs/{run_id}/nodes` |
+
+L3 激活后种子 5 条 published DAG：`python scripts/setup_collect_workflows.py`（或 `seed_tia_workflows.py`）。Collect Profile 展示平台对 `daily` / `backfill` 生效的 mode 与 API 预算。
 
 节点类型：`gate` | `collect` | `quality`（见 `services/workflow/nodes/registry.py`）。`published` 工作流支持 Cron（如 `0 8 * * 1-5` 工作日盘前）。
 
@@ -277,7 +282,7 @@ P1 申万/指数扩展（非门禁，见 readiness `warnings`）：`bootstrap_br
 
 | UI | API |
 |----|-----|
-| 可浏览表清单 | `GET /api/v1/catalog/data-types`（`browse_enabled=true`） |
+| 可查询表清单 | `GET /api/v1/catalog/data-types`（`browse_enabled=true`） |
 | 分页查询事实表 | `GET /api/v1/catalog/data/{data_type}?skip=&limit=&...` |
 
 列定义来自 Catalog，禁止前端硬编码业务字段。
@@ -340,7 +345,7 @@ backend/
 │   ├── sync/               # SyncHandler, SyncExecutor, DataLoader
 │   └── tasks/              # Celery 任务定义
 ├── migrations/             # Alembic
-├── scripts/                # init_db.py 等
+├── scripts/                # init_db.py, setup_collect_workflows.py, run_backfill_history.py 等
 ├── static/                 # 前端构建产物（生产）
 └── tests/
 ```
@@ -357,6 +362,122 @@ backend/
 | `CELERY_BROKER_URL` / `CELERY_RESULT_BACKEND` | Redis |
 | `CELERY_INLINE_FALLBACK` | `true` 时 API 进程内同步执行部分任务（本地默认） |
 | `BROWSER_QUERY_CACHE_TTL` | 数据浏览器查询结果缓存秒数（默认 300） |
+| `TUSHARE_TOKEN` | 脚本回退用 Token（优先读「数据源」配置） |
+| `TUSHARE_ACCOUNT_POINTS` | 脚本回退用积分档（默认 120；2000 积分 A 股链路须设为 2000） |
+
+---
+
+## 建表与迁移
+
+| 层级 | 机制 | 说明 |
+|------|------|------|
+| 平台表 | Alembic `migrations/versions/` | `init_db.py` 执行 `alembic upgrade head`（当前 head：`015_holder_name_text`） |
+| 事实表 | TIA L3 `run_migration` | `migration_service.ensure_table` 按 `schema.columns` + `unique_key_registry` 动态建表 |
+| 存量修复 | Alembic 013–015 | 已激活表的约束/列宽补丁（见下表） |
+
+`unique_key_registry.py` 是 L3 建表、upsert、Preflight 的唯一键单一来源。新激活接口走 registry；已上线表通过 Alembic 补丁对齐：
+
+| 迁移 | 表 | 变更 |
+|------|-----|------|
+| `013_manager_rewards_unique_keys` | `tushare_stk_managers` | 唯一键 `(stock_code, title, begin_date)` |
+| `013_manager_rewards_unique_keys` | `tushare_stk_rewards` | 唯一键 `(stock_code, end_date, title)` |
+| `014_managers_null_end` | `tushare_stk_managers` | `end_date` 允许 NULL（在任管理层） |
+| `015_holder_name_text` | `tushare_stk_holdertrade` | `holder_name` 扩为 TEXT |
+
+新装环境：`init_db` 已含 `alembic upgrade head`（含 013–015）。若在旧版本上做过 L3 激活，再执行 `setup_collect_workflows.py --migrate` 或 `alembic upgrade head` 即可补丁。`schema_inference` 已将 `holder_name` 推断为 `text` 类型。
+
+---
+
+## 2000 积分 A 股采集部署
+
+Tushare **2000 积分**档对应 **200 次/分钟**（见 `source_quota.points_to_max_calls_per_minute`）。工作流日批节点预算 `DAILY_MAX_API_CALLS=200`（`collect_batch.py`），与账号档位一致。多数 A 股接口 `min_points=2000`（doc 页 / `tushare_doc_pages_cache.json`）。
+
+### 1. 数据源
+
+在「数据源」创建 Tushare 连接，**必须**填写：
+
+- `token`：Pro Token
+- `account_points`：`2000`
+
+工作流发布校验（E-04）与 Preflight 均读取该积分；勿仅依赖 `.env` 默认 120。
+
+### 2. 平台起始日
+
+「平台设置」→ `sync_start_date`（如 `2020-01-01`）。历史回填与增量采集均以此为下界。
+
+### 3. TIA 治理 → L3 激活
+
+按操作线完成扫描、审批、L3 激活。P0 数据浏览器门禁：
+
+```bash
+python scripts/bootstrap_browser_p0.py      # trade_cal / stock_basic / daily 等
+python scripts/check_browser_data_readiness.py
+```
+
+P1 扩展（申万/指数，各需 ≥2000 积分）：`bootstrap_browser_shenwan.py`、`bootstrap_browser_index.py`。
+
+### 4. 工作流采集配置
+
+L3 激活并创建 `tia_overrides` 后：
+
+- **`apply_workflow_daily_batch.py`**：为 **32** 个 API 写入日批 collect 参数（`DAILY_BATCH_MODE_OVERRIDES`，含 `daily` / `stock_basic` 等）
+- **`seed_tia_workflows.py`**：种子 **5 条 published DAG、31 个 collect 节点**（不含 `tushare_daily`；日线由 P0 `bootstrap_browser_p0.py` 或回填 tier 1 覆盖）
+
+一键编排（预检 + 上述两步 + 可选迁移）：
+
+```bash
+# 推荐：一键预检 + 写入 override + 种子 5 条 DAG
+python scripts/setup_collect_workflows.py --migrate --backfill-plan
+
+python scripts/setup_collect_workflows.py --check-only   # 仅预检（积分 / override 数量）
+python scripts/setup_collect_workflows.py --dry-run      # 预览 override 变更
+python scripts/setup_collect_workflows.py --replace-workflows  # 重建 01–05 工作流
+```
+
+或分步执行：
+
+```bash
+python scripts/apply_workflow_daily_batch.py          # 写入 mode / max_codes / max_api_calls
+python scripts/apply_workflow_daily_batch.py --dry-run  # 预览
+python scripts/seed_tia_workflows.py           # 已存在则跳过
+python scripts/seed_tia_workflows.py --replace # 重建
+```
+
+工作流 UI 可查看 **Collect Profile**（`GET /api/v1/workflows/collect-profile?data_type=tushare_income&batch_mode=daily`）核对生效策略。
+
+要点（`collect_batch.DAILY_BATCH_MODE_OVERRIDES`）：
+
+- 全市场日频（`daily`、`margin`、`top_list` 等）→ `trade_date` 模式
+- 财报类 → `period`（日批最近 2 个报告期）
+- 股东/质押等 → `ts_code` 或 `date_range`，每轮轮换 ≤200 代码
+- `stk_holdertrade` 接口独立限速 **100 次/分钟**，轮换 chunk 100 代码
+
+### 5. 历史数据回填
+
+工作流 `batch_mode=backfill` 单次运行受 200 次 API 预算限制；全量历史请用分 chunk 脚本：
+
+```bash
+python scripts/run_backfill_history.py --list              # 估算 tier / chunk 数
+python scripts/run_backfill_history.py --tier 0            # 日历 + 代码表 + 申万/指数
+python scripts/run_backfill_history.py --tier 1            # 日频行情
+python scripts/run_backfill_history.py --data-type tushare_stk_holdertrade --from-chunk 21
+python scripts/run_backfill_history.py --all --dry-run
+```
+
+| 参数 | 默认 | 说明 |
+|------|------|------|
+| chunk 预算 | 200 | 与 `DAILY_MAX_API_CALLS` 一致 |
+| `--chunk-days` | 100 | 每 chunk 交易日数（`trade_date` 策略） |
+| `--from-chunk` | 1 | 续跑（如 holdertrade 第 21 轮 ≈ 偏移 2000 代码） |
+| `--truncate` | off | 清表后全量重载（保留 tier-0 代码表） |
+
+进度写入 `logs/backfill_history.log` 与 `platform_jobs`（job_type=`history_backfill`）。
+
+### 6. 日常运维
+
+- **日增**：Celery Beat 按工作流 Cron（如 `0 18 * * 1-5`）触发；或 UI 手动运行
+- **质检**：Beat 每日 18:00 `run_quality_check`
+- **Schema 漂移**：TIA 工作台 → Schema 维护；必要时 `alembic upgrade head`
 
 ---
 
@@ -368,6 +489,11 @@ pytest tests -v -p no:pytest_postgresql
 
 # 格式化
 black app tests
+
+# 2000 积分采集 / 工作流 / 回填
+python scripts/setup_collect_workflows.py --check-only
+python scripts/setup_collect_workflows.py --migrate --backfill-plan
+python scripts/run_backfill_history.py --list
 
 # UI 截图（需前端 dev + 本机 API 运行）
 python ../scripts/capture_ui_screenshots.py

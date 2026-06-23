@@ -29,7 +29,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm), 0 12px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm), var(--color-shadow-elevated);
 }
 
 .login-brand {
@@ -46,8 +46,8 @@
   justify-content: center;
   font-size: var(--font-size-md);
   font-weight: 700;
-  color: #fff;
-  background: linear-gradient(135deg, var(--color-primary), #2563eb);
+  color: var(--color-on-primary);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-gradient-end));
   border-radius: var(--radius-md);
 }
 

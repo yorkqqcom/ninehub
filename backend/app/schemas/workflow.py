@@ -1,9 +1,9 @@
 """Workflow schemas."""
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class WorkflowRunResponse(BaseModel):
@@ -134,10 +134,26 @@ class NodeRunResponse(BaseModel):
     label: Optional[str] = None
     status: str
     message: Optional[str] = None
+    result_json: Optional[dict[str, Any]] = None
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
+
+
+class WorkflowCollectProfileResponse(BaseModel):
+    data_type: str
+    api_name: str
+    batch_mode: str
+    collect_mode: str
+    max_codes_stored: Optional[int] = None
+    max_codes_effective: int
+    max_api_calls_per_run: int
+    rotation_enabled: bool = False
+    rotation_codes_per_run: Optional[int] = None
+    recent_periods: Optional[int] = None
+    publish_lag_days: Optional[int] = None
+    notes: List[str] = Field(default_factory=list)
 
 
 class NodeRunListResponse(BaseModel):

@@ -66,7 +66,13 @@ const allModules = [
 
 
 
-  { name: "数据浏览", path: "/browse", desc: "L3 激活事实表分页查询", browseOnly: true },
+  {
+    name: "数据浏览器",
+    path: "/data-browser?tpl=wind_ohlc_demo",
+    desc: "证券池 × 多指标宽表截面（三选一提）",
+    browseOnly: true,
+  },
+  { name: "数据查询", path: "/browse", desc: "L3 激活事实表分页查询", browseOnly: true },
 
 
 
@@ -78,7 +84,7 @@ const allModules = [
 
 
 
-  { name: "TIA 工作台", path: "/tia", desc: "提案治理 · L3 流水线", adminOnly: true },
+  { name: "提案治理", path: "/tia", desc: "扫描 · 审批 · L3 激活流水线", adminOnly: true },
 
 
 

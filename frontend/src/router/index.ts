@@ -43,6 +43,28 @@ const router = createRouter({
           name: "tia",
           component: () => import("@/pages/tia/TiaPage.vue"),
           meta: { adminOnly: true },
+          beforeEnter: (to) => {
+            const tab = to.query.tab;
+            if (tab === "standards") {
+              const { tab: _tab, ...rest } = to.query;
+              return { name: "standards", query: rest };
+            }
+            if (tab === "coverage") {
+              const { tab: _tab, ...rest } = to.query;
+              return { name: "tia-coverage", query: rest };
+            }
+            if (tab === "builtin" || tab === "proposals") {
+              const { tab: _tab, ...rest } = to.query;
+              return { name: "tia", query: rest, replace: true };
+            }
+            return true;
+          },
+        },
+        {
+          path: "tia/coverage",
+          name: "tia-coverage",
+          component: () => import("@/pages/tia/TiaCoveragePage.vue"),
+          meta: { adminOnly: true },
         },
         { path: "quality", name: "quality", component: () => import("@/pages/quality/QualityPage.vue") },
         {
@@ -52,7 +74,9 @@ const router = createRouter({
         },
         {
           path: "standards",
-          redirect: (to) => ({ name: "tia", query: { ...to.query, tab: "standards" } }),
+          name: "standards",
+          component: () => import("@/pages/standards/StandardsPage.vue"),
+          meta: { adminOnly: true },
         },
         {
           path: "settings",

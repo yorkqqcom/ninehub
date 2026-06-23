@@ -10,7 +10,7 @@ Usage:
   python scripts/run_backfill_history.py --data-type tushare_daily
   python scripts/run_backfill_history.py --tier 2
   python scripts/run_backfill_history.py --all --dry-run
-  python scripts/run_backfill_history.py --tier 1 --truncate --chunk-days 100
+  python scripts/run_backfill_history.py --data-type tushare_stk_holdertrade --from-chunk 21
 
 ``--truncate`` empties each target table before backfill (full reload from sync_start_date).
 Keep tier-0 tables (especially stock_basic) when only re-running tier 1+.
@@ -57,12 +57,13 @@ from app.services.workflow.collect_batch import (
     DAILY_BATCH_MODE_OVERRIDES,
     DAILY_MAX_API_CALLS,
     DAILY_ROTATION_CODES,
+    resolve_rotation_codes,
     resolve_workflow_collect_config,
     resolve_workflow_sync_profile,
 )
 from app.sync.executor import SyncExecutor
 from app.sync.handlers import SyncContext
-from app.sync.tia_collect.period import _periods_in_range
+from app.sync.tia_collect.period import PERIOD_MARKET_APIS, _periods_in_range
 from app.sync.tia_collect.stock_codes import resolve_stock_codes
 from app.sync.tia_collect.trade_date import _trading_days_in_range
 
@@ -94,6 +95,52 @@ _USE_FAST_UPSERT = False
 
 def _upsert_extra() -> dict:
     return FAST_UPSERT_EXTRA if _USE_FAST_UPSERT else CONSERVATIVE_UPSERT_EXTRA
+
+
+def _collect_run_failed(msg: str) -> bool:
+    text = msg or ""
+    lower = text.lower()
+    return (
+        "failed" in lower
+        or "retryerror" in lower
+        or "exceeds limit" in lower
+        or "未配置" in text
+    )
+
+
+def _stock_code_total(session: Session) -> int:
+    codes, _ = resolve_stock_codes(
+        session, {"stock_codes_table": "tushare_stock_basic"}, max_codes=10_000
+    )
+    return len(codes)
+
+
+def _schema_capped(schema: dict, *, max_codes_per_run: int) -> dict:
+    schema_run = dict(schema)
+    collect = dict(schema_run.get("collect") or {})
+    collect["max_codes_per_run"] = max_codes_per_run
+    collect["max_api_calls_per_run"] = API_BUDGET
+    schema_run["collect"] = collect
+    return schema_run
+
+
+def _finish_rotation_chunk(*, calls: int, msg: str) -> None:
+    """Raise on API/strategy failure; caller breaks loop only on natural zero-call end."""
+    if _collect_run_failed(msg):
+        raise RuntimeError(msg or "collect failed")
+    if calls == 0:
+        raise RuntimeError(msg or "collect returned 0 api calls")
+
+
+def _chunk_start_offset(from_chunk: int, per_chunk: int) -> int:
+    """Map 1-based chunk index to unit offset (stock codes or day index)."""
+    return max(0, (max(1, from_chunk) - 1) * per_chunk)
+
+
+def _handle_chunk_failure(data_type: str, chunks_done: int, exc: RuntimeError) -> tuple[int, bool]:
+    log = _logger()
+    log.log(f"[{data_type}] chunk {chunks_done} 失败，已保留前序进度: {exc}")
+    return chunks_done, False
 
 
 def _chunk_budget() -> int:
@@ -388,6 +435,42 @@ def _effective_mode(api_name: str, schema: dict) -> str:
     return profile.mode
 
 
+def _generic_backfill_span(
+    session: Session,
+    table_name: str,
+    global_start: date,
+    end: date,
+) -> tuple[date, date, str]:
+    """Gap before existing table min (snapshot / period / ts_code / date_range)."""
+    min_d = _table_min_date(session, table_name)
+    if min_d and min_d > global_start:
+        gap_end = min_d - timedelta(days=1)
+        return global_start, gap_end, f"resume gap {global_start}..{gap_end} (table min={min_d})"
+    if min_d and min_d <= global_start:
+        return end + timedelta(days=1), end, f"already covers {global_start} (min={min_d})"
+    return global_start, end, f"full {global_start}..{end}"
+
+
+def _period_rotation_plan(
+    session: Session,
+    *,
+    span_start: date,
+    span_end: date,
+    api_name: str,
+) -> tuple[int, int, int]:
+    """Return (period_count, codes_per_run, rotation_chunks)."""
+    period_count = len(_periods_in_range(span_start, span_end))
+    if api_name in PERIOD_MARKET_APIS:
+        chunks = max(1, (period_count + API_BUDGET - 1) // API_BUDGET)
+        return period_count, period_count, chunks
+    codes, _ = resolve_stock_codes(
+        session, {"stock_codes_table": "tushare_stock_basic"}, max_codes=10_000
+    )
+    codes_per_run = max(1, API_BUDGET // max(period_count, 1))
+    rotations = max(1, (len(codes) + codes_per_run - 1) // codes_per_run)
+    return period_count, codes_per_run, rotations
+
+
 def estimate_chunks(
     session: Session,
     data_type: str,
@@ -408,37 +491,36 @@ def estimate_chunks(
         chunks = max(1, (days + _chunk_budget() - 1) // _chunk_budget())
         return ChunkPlan(data_type, api_name, mode, chunks, f"{note}; {days} trading days")
 
-    min_d = _table_min_date(session, table_name)
-    if min_d and min_d > global_start:
-        gap_end = min_d - timedelta(days=1)
-        span_start, span_end = global_start, gap_end
-        note = f"resume gap {span_start}..{span_end} (table min={min_d})"
-    elif min_d and min_d <= global_start:
-        return ChunkPlan(data_type, api_name, mode, 0, f"already covers {global_start} (min={min_d})")
-    else:
-        span_start, span_end = global_start, end
-        note = f"full {span_start}..{span_end}"
-
+    span_start, span_end, note = _generic_backfill_span(session, table_name, global_start, end)
     if span_start > span_end:
+        if "already covers" in note:
+            return ChunkPlan(data_type, api_name, mode, 0, note)
         return ChunkPlan(data_type, api_name, mode, 0, f"up to date ({note})")
 
     if mode in ("ts_code", "date_range"):
         codes, _ = resolve_stock_codes(session, {"stock_codes_table": "tushare_stock_basic"}, max_codes=10_000)
-        per_run = DAILY_ROTATION_CODES
+        per_run = resolve_rotation_codes(api_name)
         chunks = max(1, (len(codes) + per_run - 1) // per_run)
         return ChunkPlan(data_type, api_name, mode, chunks, f"{note}; ~{len(codes)} codes × {chunks} rotations")
 
     if mode == "period":
-        periods = len(_periods_in_range(span_start, span_end))
-        codes, _ = resolve_stock_codes(session, {"stock_codes_table": "tushare_stock_basic"}, max_codes=10_000)
-        codes_per_run = max(1, API_BUDGET // max(periods, 1))
-        rotations = max(1, (len(codes) + codes_per_run - 1) // codes_per_run)
+        period_count, codes_per_run, rotations = _period_rotation_plan(
+            session, span_start=span_start, span_end=span_end, api_name=api_name
+        )
+        if api_name in PERIOD_MARKET_APIS:
+            return ChunkPlan(
+                data_type,
+                api_name,
+                mode,
+                rotations,
+                f"{note}; {period_count} periods, market-wide",
+            )
         return ChunkPlan(
             data_type,
             api_name,
             mode,
             rotations,
-            f"{note}; {periods} periods, {codes_per_run} codes/run",
+            f"{note}; {period_count} periods, {codes_per_run} codes/run",
         )
 
     if mode == "snapshot":
@@ -520,7 +602,9 @@ def _run_collect(
     provider, token, source_config, source_id = _resolve_source(session)
     require_tushare_token({"token": token})
     profile = resolve_workflow_sync_profile(api_name, schema, batch_mode="backfill")
-    config = resolve_workflow_collect_config(schema, profile, batch_mode="backfill")
+    config = resolve_workflow_collect_config(
+        schema, profile, batch_mode="backfill", api_name=api_name
+    )
 
     extra = {
                 "session": session,
@@ -565,8 +649,9 @@ def backfill_one(
     *,
     dry_run: bool,
     max_chunks: int | None,
+    from_chunk: int = 1,
     log_file: IO[str] | None = None,
-) -> int:
+) -> tuple[int, bool]:
     log = _logger()
     schema, table_name = _load_schema(session, data_type)
     mode = _effective_mode(api_name, schema)
@@ -575,34 +660,40 @@ def backfill_one(
     plan = estimate_chunks(session, data_type, api_name, schema, global_start=global_start, end=end, table_name=table_name)
     if plan.chunks == 0:
         log.log(f"[{data_type}] 跳过 — {plan.note}")
-        return 0
+        return 0, True
     if dry_run:
         log.log(f"[{data_type}] dry-run mode={mode} chunks={plan.chunks} — {plan.note}")
-        return 0
+        return 0, True
 
     before_range = _table_date_range(session, table_name)
     before_rows = _table_row_count(session, table_name)
-    chunks_done = 0
+    from_chunk = max(1, from_chunk)
+    chunks_done = from_chunk - 1
+    session_chunks = 0
     total_chunks = plan.chunks
     if max_chunks is not None:
-        total_chunks = min(total_chunks, max_chunks)
+        total_chunks = min(total_chunks, (from_chunk - 1) + max_chunks)
+    if from_chunk > 1:
+        log.log(f"[{data_type}] 从 chunk {from_chunk} 续跑（跳过前 {from_chunk - 1} 个 chunk）")
 
     if mode == "trade_date":
         span_start, span_end, _ = _trade_date_backfill_span(session, table_name, global_start, end)
         if span_start > span_end:
             log.log(f"[{data_type}] 已达目标区间")
-            return 0
+            return 0, True
         all_days = _trading_days_in_range(span_start, span_end)
         total_chunks = min((len(all_days) + _chunk_budget() - 1) // _chunk_budget(), total_chunks)
         if max_chunks is not None:
             total_chunks = min(total_chunks, max_chunks)
         budget = _chunk_budget()
-        for i in range(0, len(all_days), budget):
-            if max_chunks is not None and chunks_done >= max_chunks:
+        start_idx = _chunk_start_offset(from_chunk, budget)
+        for i in range(start_idx, len(all_days), budget):
+            if max_chunks is not None and session_chunks >= max_chunks:
                 break
             chunk_days = all_days[i : i + budget]
             start, chunk_end = chunk_days[0], chunk_days[-1]
             chunks_done += 1
+            session_chunks += 1
             t0 = log.chunk_begin(
                 data_type,
                 chunks_done,
@@ -623,56 +714,26 @@ def backfill_one(
             log.chunk_end(
                 data_type, chunks_done, total_chunks, started=t0, rows=rows, calls=calls, extra=msg[:60]
             )
+            try:
+                _finish_rotation_chunk(calls=calls, msg=msg)
+            except RuntimeError as exc:
+                return _handle_chunk_failure(data_type, chunks_done, exc)
     elif mode in ("ts_code", "date_range"):
-        offset = 0
-        while True:
-            if max_chunks is not None and chunks_done >= max_chunks:
+        total_codes = _stock_code_total(session)
+        rotation_codes = resolve_rotation_codes(api_name)
+        offset = _chunk_start_offset(from_chunk, rotation_codes)
+        schema_run = _schema_capped(schema, max_codes_per_run=rotation_codes)
+        while offset < total_codes:
+            if max_chunks is not None and session_chunks >= max_chunks:
                 break
             chunks_done += 1
+            session_chunks += 1
             t0 = log.chunk_begin(
                 data_type,
                 chunks_done,
                 total_chunks,
                 label="rotation",
                 detail=f"offset={offset}",
-            )
-            rows, calls, msg = _run_collect(
-                session,
-                data_type=data_type,
-                api_name=api_name,
-                schema=schema,
-                table_name=table_name,
-                start=global_start,
-                end=end,
-                stock_code_offset=offset,
-                log_file=log_file,
-            )
-            log.chunk_end(
-                data_type, chunks_done, total_chunks, started=t0, rows=rows, calls=calls, extra=msg[:60]
-            )
-            if calls == 0:
-                break
-            offset += DAILY_ROTATION_CODES
-            if offset >= 6000:
-                break
-    elif mode == "period":
-        periods = _periods_in_range(global_start, end)
-        codes_per_run = max(1, API_BUDGET // max(len(periods), 1))
-        offset = 0
-        while offset < 6000:
-            if max_chunks is not None and chunks_done >= max_chunks:
-                break
-            chunks_done += 1
-            schema_run = dict(schema)
-            collect = dict(schema_run.get("collect") or {})
-            collect["max_codes_per_run"] = codes_per_run
-            schema_run["collect"] = collect
-            t0 = log.chunk_begin(
-                data_type,
-                chunks_done,
-                total_chunks,
-                label="period",
-                detail=f"offset={offset} codes/run={codes_per_run}",
             )
             rows, calls, msg = _run_collect(
                 session,
@@ -686,12 +747,87 @@ def backfill_one(
                 log_file=log_file,
             )
             log.chunk_end(
-                data_type, chunks_done, total_chunks, started=t0, rows=rows, calls=calls
+                data_type, chunks_done, total_chunks, started=t0, rows=rows, calls=calls, extra=msg[:60]
             )
+            try:
+                _finish_rotation_chunk(calls=calls, msg=msg)
+            except RuntimeError as exc:
+                return _handle_chunk_failure(data_type, chunks_done, exc)
             if calls == 0:
                 break
-            offset += codes_per_run
+            offset += rotation_codes
+    elif mode == "period":
+        span_start, span_end, span_note = _generic_backfill_span(
+            session, table_name, global_start, end
+        )
+        if span_start > span_end:
+            log.log(f"[{data_type}] 已达目标区间 — {span_note}")
+            return 0, True
+        period_count, codes_per_run, total_chunks = _period_rotation_plan(
+            session, span_start=span_start, span_end=span_end, api_name=api_name
+        )
+        if max_chunks is not None:
+            total_chunks = min(total_chunks, (from_chunk - 1) + max_chunks)
+        if api_name in PERIOD_MARKET_APIS:
+            if from_chunk > 1:
+                log.log(f"[{data_type}] market period 模式仅 1 个 chunk，from_chunk={from_chunk} 已忽略")
+            t0 = log.chunk_begin(data_type, 1, total_chunks, label="period", detail="market-wide by end_date")
+            rows, calls, msg = _run_collect(
+                session,
+                data_type=data_type,
+                api_name=api_name,
+                schema=schema,
+                table_name=table_name,
+                start=span_start,
+                end=span_end,
+                log_file=log_file,
+            )
+            chunks_done = 1
+            log.chunk_end(data_type, 1, total_chunks, started=t0, rows=rows, calls=calls, extra=msg[:60])
+            try:
+                _finish_rotation_chunk(calls=calls, msg=msg)
+            except RuntimeError as exc:
+                return _handle_chunk_failure(data_type, chunks_done, exc)
+        else:
+            offset = _chunk_start_offset(from_chunk, codes_per_run)
+            total_codes = _stock_code_total(session)
+            while offset < total_codes and chunks_done < total_chunks:
+                if max_chunks is not None and session_chunks >= max_chunks:
+                    break
+                chunks_done += 1
+                session_chunks += 1
+                schema_run = _schema_capped(schema, max_codes_per_run=codes_per_run)
+                t0 = log.chunk_begin(
+                    data_type,
+                    chunks_done,
+                    total_chunks,
+                    label="period",
+                    detail=f"offset={offset} codes/run={codes_per_run}",
+                )
+                rows, calls, msg = _run_collect(
+                    session,
+                    data_type=data_type,
+                    api_name=api_name,
+                    schema=schema_run,
+                    table_name=table_name,
+                    start=span_start,
+                    end=span_end,
+                    stock_code_offset=offset,
+                    log_file=log_file,
+                )
+                log.chunk_end(
+                    data_type, chunks_done, total_chunks, started=t0, rows=rows, calls=calls
+                )
+                try:
+                    _finish_rotation_chunk(calls=calls, msg=msg)
+                except RuntimeError as exc:
+                    return _handle_chunk_failure(data_type, chunks_done, exc)
+                if calls == 0:
+                    break
+                offset += codes_per_run
     else:
+        if from_chunk > 1:
+            log.log(f"[{data_type}] snapshot 模式仅 1 个 chunk，from_chunk={from_chunk} 已忽略")
         t0 = log.chunk_begin(data_type, 1, 1, label="snapshot", detail=str(global_start))
         rows, calls, msg = _run_collect(
             session,
@@ -705,6 +841,10 @@ def backfill_one(
         )
         chunks_done = 1
         log.chunk_end(data_type, 1, 1, started=t0, rows=rows, calls=calls, extra=msg[:60])
+        try:
+            _finish_rotation_chunk(calls=calls, msg=msg)
+        except RuntimeError as exc:
+            return _handle_chunk_failure(data_type, chunks_done, exc)
 
     after_range = _table_date_range(session, table_name)
     after_rows = _table_row_count(session, table_name)
@@ -712,7 +852,13 @@ def backfill_one(
         f"[{data_type}] 表 {table_name}: rows {before_rows} -> {after_rows}, "
         f"dates {before_range} -> {after_range}"
     )
-    return 0
+    completed = max_chunks is not None or chunks_done >= total_chunks
+    if not completed:
+        log.log(
+            f"[{data_type}] 未完成: chunks {chunks_done}/{total_chunks} "
+            f"（可重新运行同一 data_type 续跑）"
+        )
+    return chunks_done, completed
 
 
 def list_plan(session: Session) -> None:
@@ -762,6 +908,13 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="Plan only, no API calls")
     parser.add_argument("--max-chunks", type=int, default=None, help="Limit chunks per data_type")
     parser.add_argument(
+        "--from-chunk",
+        type=int,
+        default=1,
+        metavar="N",
+        help="Start from chunk N (1-based; skip earlier rotations or day batches)",
+    )
+    parser.add_argument(
         "--chunk-days",
         type=int,
         default=DEFAULT_CHUNK_DAYS,
@@ -784,6 +937,9 @@ def main() -> int:
         help="TRUNCATE each target table before backfill (clean full reload)",
     )
     args = parser.parse_args()
+    if args.from_chunk < 1:
+        print("--from-chunk must be >= 1")
+        return 1
     _CHUNK_DAYS = max(1, min(args.chunk_days, API_BUDGET))
     _USE_FAST_UPSERT = bool(args.fast_upsert)
 
@@ -858,6 +1014,7 @@ def main() -> int:
         f"total_chunks≈{total_units}"
         f"{' (dry-run)' if args.dry_run else ''}"
         f"{' truncate=on' if args.truncate else ''}"
+        + (f" from_chunk={args.from_chunk}" if args.from_chunk > 1 else "")
         + (f" log={log_path}" if log_path else "")
         + (f" job_id={job.id}" if job else "")
     )
@@ -881,15 +1038,18 @@ def main() -> int:
                 session, data_type, api_name, schema, global_start=gs, end=date.today(), table_name=table_name
             )
             log.table_begin(idx, len(unique_targets), data_type, plan)
-            backfill_one(
+            chunks_done, completed = backfill_one(
                 session,
                 data_type,
                 api_name,
                 dry_run=args.dry_run,
                 max_chunks=args.max_chunks,
+                from_chunk=args.from_chunk,
                 log_file=log_handle,
             )
-            log.table_end(data_type, plan.chunks, ok=True)
+            log.table_end(data_type, chunks_done, ok=completed)
+            if not completed:
+                rc = 1
         except SystemExit as exc:
             log.log(f"SKIP {data_type}: {exc}")
             log.table_end(data_type, 0, ok=False)

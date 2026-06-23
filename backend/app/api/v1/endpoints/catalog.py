@@ -35,7 +35,7 @@ _coverage = CatalogCoverageService()
     summary="数据类型列表",
     description=(
         "从 catalog registry 读取 data_type 列表，供任务 UI 与调度动态联动(D-07)。"
-        "browse_only=true 时仅返回已激活且可浏览类型，支持 q 搜索与 include_stats 行数统计。"
+        "browse_only=true 时仅返回已激活且可查询类型，支持 q 搜索与 include_stats 行数统计。"
     ),
 )
 async def list_data_types(
@@ -44,7 +44,7 @@ async def list_data_types(
     domain: Optional[str] = Query(None, description="按业务域筛选"),
     browse_only: bool = Query(False, description="仅返回 browse_enabled 且已激活类型"),
     q: Optional[str] = Query(None, description="搜索 data_type / label / table_name"),
-    include_stats: bool = Query(False, description="为可浏览表附加 row_count（较慢）"),
+    include_stats: bool = Query(False, description="为可查询表附加 row_count（较慢）"),
 ) -> DataTypeListResponse:
     return await _catalog.list_data_types(
         session,

@@ -4,20 +4,28 @@ from __future__ import annotations
 
 import threading
 import time
-from collections import deque
+from collections import defaultdict, deque
 from datetime import date
 from typing import Any, List, Optional
 
 import pandas as pd
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import RetryCallState, retry, stop_after_attempt
+
+
+def _tushare_retry_wait(retry_state: RetryCallState) -> float:
+    exc = retry_state.outcome.exception() if retry_state.outcome and retry_state.outcome.failed else None
+    if exc is not None and _is_api_rate_limited(exc):
+        return 61.0
+    return min(8.0, 2 ** max(retry_state.attempt_number - 1, 0))
 
 from app.core.config import get_settings
 from app.services.collectors.base import BaseCollector
-from app.services.tushare.source_quota import points_to_max_calls_per_minute
+from app.services.tushare.source_quota import api_max_calls_per_minute, points_to_max_calls_per_minute
 
 
 _lock = threading.Lock()
 _call_times: deque[float] = deque()
+_api_call_times: dict[str, deque[float]] = defaultdict(deque)
 
 
 def max_calls_per_minute(limit_override: int | None = None) -> int:
@@ -29,18 +37,40 @@ def max_calls_per_minute(limit_override: int | None = None) -> int:
     return points_to_max_calls_per_minute(settings.tushare_account_points)
 
 
-def wait_before_pro_call(limit_override: int | None = None) -> None:
-    """Sliding-window limiter shared by all TushareCollector instances."""
-    limit = max_calls_per_minute(limit_override)
-    with _lock:
+def _drain_window(times: deque[float], limit: int) -> None:
+    now = time.monotonic()
+    while times and times[0] < now - 60:
+        times.popleft()
+    if len(times) >= limit:
+        sleep_until = times[0] + 60.0 - now
+        if sleep_until > 0:
+            time.sleep(sleep_until)
         now = time.monotonic()
-        while _call_times and _call_times[0] < now - 60:
-            _call_times.popleft()
-        if len(_call_times) >= limit:
-            sleep_until = _call_times[0] + 60 - now
-            if sleep_until > 0:
-                time.sleep(sleep_until)
-        _call_times.append(time.monotonic())
+        while times and times[0] < now - 60:
+            times.popleft()
+
+
+def wait_before_pro_call(
+    limit_override: int | None = None,
+    *,
+    api_name: str | None = None,
+) -> None:
+    """Sliding-window limiter: account tier cap plus optional per-interface cap."""
+    account_limit = max_calls_per_minute(limit_override)
+    api_limit = api_max_calls_per_minute(api_name) if api_name else None
+    with _lock:
+        _drain_window(_call_times, account_limit)
+        if api_name and api_limit is not None:
+            _drain_window(_api_call_times[api_name], api_limit)
+        stamp = time.monotonic()
+        _call_times.append(stamp)
+        if api_name and api_limit is not None:
+            _api_call_times[api_name].append(stamp)
+
+
+def _is_api_rate_limited(exc: BaseException) -> bool:
+    msg = str(exc)
+    return "频率超限" in msg or "频次超限" in msg
 
 
 class TushareCollector(BaseCollector):
@@ -54,9 +84,9 @@ class TushareCollector(BaseCollector):
         self._token = token or get_settings().tushare_token
         self._max_calls_per_minute = max_calls_per_minute
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8))
+    @retry(stop=stop_after_attempt(5), wait=_tushare_retry_wait, reraise=True)
     def _call_pro(self, api_name: str, **params: Any) -> pd.DataFrame:
-        wait_before_pro_call(self._max_calls_per_minute)
+        wait_before_pro_call(self._max_calls_per_minute, api_name=api_name)
         if not self._token:
             raise ValueError("Tushare token not configured")
         import tushare as ts

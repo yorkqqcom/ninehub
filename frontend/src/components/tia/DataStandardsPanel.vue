@@ -240,7 +240,7 @@ function openProposal(proposalId: number) {
     props.onOpenProposal(proposalId);
     return;
   }
-  void router.push({ path: "/tia", query: { tab: "proposals", proposal: String(proposalId) } });
+  void router.push({ name: "tia", query: { proposal: String(proposalId) } });
 }
 
 function openSchemaMaintenance(item: DataStandardSummaryItem | DataStandardDetail) {
@@ -572,7 +572,7 @@ function schemaStageClass(stage: string) {
                   class="btn btn--ghost btn--sm"
                   @click="browseActivated(s)"
                 >
-                  浏览
+                  查询
                 </button>
               </td>
             </tr>
@@ -630,7 +630,7 @@ function schemaStageClass(stage: string) {
                       class="btn btn--ghost btn--sm"
                       @click="browseActivated(detail)"
                     >
-                      数据浏览
+                      数据查询
                     </button>
                     <RouterLink
                       v-if="qualitySuggestions?.suggestions.length"
@@ -732,27 +732,6 @@ function schemaStageClass(stage: string) {
   gap: 0.75rem;
 }
 
-.filter-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.filter-tab {
-  padding: 0.25rem 0.6rem;
-  border: 1px solid var(--color-border, #ddd);
-  border-radius: 4px;
-  background: transparent;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.filter-tab.active {
-  background: var(--color-primary, #2563eb);
-  color: #fff;
-  border-color: transparent;
-}
-
 .filter-controls {
   display: flex;
   flex-wrap: wrap;
@@ -770,7 +749,7 @@ function schemaStageClass(stage: string) {
 }
 
 .row-selected {
-  background: var(--color-surface-muted, rgba(59, 130, 246, 0.08));
+  background: var(--color-surface-muted);
 }
 
 .coverage {
@@ -778,19 +757,19 @@ function schemaStageClass(stage: string) {
 }
 
 .coverage--full {
-  color: var(--color-success, #16a34a);
+  color: var(--color-ok-text);
 }
 
 .coverage--partial {
-  color: var(--color-warning, #d97706);
+  color: var(--color-warn-text);
 }
 
 .coverage--gap {
-  color: var(--color-danger, #dc2626);
+  color: var(--color-err-text);
 }
 
 .gap-count {
-  color: var(--color-danger, #dc2626);
+  color: var(--color-err-text);
   font-weight: 600;
 }
 
@@ -815,21 +794,21 @@ function schemaStageClass(stage: string) {
 .mini-table th,
 .mini-table td {
   padding: 0.25rem 0.5rem;
-  border-bottom: 1px solid var(--color-border, #eee);
+  border-bottom: 1px solid var(--color-border);
   text-align: left;
 }
 
 .badge--warn {
-  background: var(--color-warning-bg, rgba(217, 119, 6, 0.15));
-  color: var(--color-warning, #d97706);
+  background: var(--color-warn-bg);
+  color: var(--color-warn-text);
 }
 
 .warn-text {
-  color: var(--color-warning, #d97706);
+  color: var(--color-warn-text);
 }
 
 .muted {
-  color: var(--color-text-muted, #888);
+  color: var(--color-text-muted);
   font-size: 0.85rem;
 }
 </style>

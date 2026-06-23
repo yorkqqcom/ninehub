@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { apiRequest } from "@/api/client";
-import type { SchemaApplyResult, SchemaPlan } from "@/api/types";
+import WorkflowCollectProfilePanel from "@/components/WorkflowCollectProfilePanel.vue";
+import type { SchemaApplyResult, SchemaPlan, WorkflowCollectProfile } from "@/api/types";
 import { useUiStore } from "@/stores/ui";
 
 const props = defineProps<{
@@ -19,17 +20,29 @@ const open = computed(() => props.proposalId != null);
 const loading = ref(false);
 const applying = ref(false);
 const plan = ref<SchemaPlan | null>(null);
+const workflowProfile = ref<WorkflowCollectProfile | null>(null);
 const confirmRisk = ref(false);
 
 async function loadPlan() {
   if (props.proposalId == null) return;
   loading.value = true;
   plan.value = null;
+  workflowProfile.value = null;
   confirmRisk.value = false;
   try {
     plan.value = await apiRequest<SchemaPlan>(
       `/api/v1/tia/proposals/${props.proposalId}/schema-plan`,
     );
+    const api = props.apiName || plan.value.api_name;
+    if (api) {
+      try {
+        workflowProfile.value = await apiRequest<WorkflowCollectProfile>(
+          `/api/v1/workflows/collect-profile?data_type=tushare_${encodeURIComponent(api)}&batch_mode=daily`,
+        );
+      } catch {
+        workflowProfile.value = null;
+      }
+    }
   } catch (e) {
     ui.showMessage(e instanceof Error ? e.message : "加载 Schema 计划失败", "error");
     emit("close");
@@ -116,6 +129,12 @@ function copySnippet() {
             <div v-if="!plan.has_drift" class="schema-drawer__banner schema-drawer__banner--ok">
               当前 Schema 与 catalog/registry 一致，无需变更。
             </div>
+
+            <WorkflowCollectProfilePanel
+              v-if="workflowProfile"
+              :profile="workflowProfile"
+              :subtitle="`${apiName || plan?.api_name || ''} · 工作流日批`"
+            />
 
             <section v-if="plan.columns_drift" class="schema-drawer__section">
               <h3 class="schema-drawer__section-title">列与映射</h3>
@@ -229,7 +248,7 @@ function copySnippet() {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--color-overlay);
   display: flex;
   justify-content: flex-end;
 }
@@ -240,7 +259,7 @@ function copySnippet() {
   display: flex;
   flex-direction: column;
   border-radius: 0;
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--color-shadow-drawer);
 }
 
 .schema-drawer__header {
@@ -288,7 +307,7 @@ function copySnippet() {
 }
 
 .schema-drawer__banner--warn {
-  background: color-mix(in srgb, var(--color-warn, #b8860b) 12%, transparent);
+  background: var(--color-warn-bg);
   border: 1px solid var(--color-border);
 }
 
@@ -297,7 +316,7 @@ function copySnippet() {
   padding: var(--space-sm);
   font-size: var(--font-size-sm);
   overflow-x: auto;
-  background: var(--color-bg);
+  background: var(--color-surface-muted);
   border-radius: var(--radius-sm);
 }
 
@@ -309,7 +328,7 @@ function copySnippet() {
 }
 
 .schema-drawer__warnings--err {
-  color: var(--color-danger, #c0392b);
+  color: var(--color-err-text);
 }
 
 .schema-drawer__confirm {

@@ -301,13 +301,13 @@ watch(domainFilter, () => {
 
 <template>
   <PageHeader
-    title="数据浏览"
+    title="数据查询"
     description="Catalog 驱动 · 多表域导航 · 动态列与筛选"
   />
 
   <div v-if="browseSummary" class="stat-strip browse-kpi">
     <div class="stat-card">
-      <span class="stat-card__label">可浏览表</span>
+      <span class="stat-card__label">可查询表</span>
       <span class="stat-card__value numeric">{{ browseSummary.total }}</span>
     </div>
     <div class="stat-card">
@@ -353,7 +353,7 @@ watch(domainFilter, () => {
         </div>
 
         <section v-if="recentTypeItems.length" class="browse-sidebar__section">
-          <h3 class="browse-sidebar__section-title">最近浏览</h3>
+          <h3 class="browse-sidebar__section-title">最近查询</h3>
           <ul class="browse-type-list">
             <li
               v-for="t in recentTypeItems"
@@ -374,7 +374,7 @@ watch(domainFilter, () => {
           </h3>
           <p v-if="loadingTypes" class="muted">加载表清单…</p>
           <p v-else-if="!filteredTypes.length" class="muted">
-            暂无匹配表。请先在 TIA 完成 L3 激活并启用浏览。
+            暂无匹配表。请先在 TIA 完成 L3 激活并启用数据查询。
           </p>
           <ul v-else class="browse-type-list">
             <li
@@ -588,28 +588,6 @@ watch(domainFilter, () => {
 
 .browse-type-item__count {
   color: var(--color-text-secondary);
-}
-
-.filter-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.filter-tab {
-  padding: 2px 8px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: transparent;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-}
-
-.filter-tab.active {
-  background: var(--color-primary);
-  color: var(--color-surface);
-  border-color: transparent;
 }
 
 .browse-toolbar {

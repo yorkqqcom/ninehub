@@ -1,5 +1,6 @@
 """TIA collect strategy unit tests."""
 
+import warnings
 from datetime import date
 from unittest.mock import MagicMock, patch
 
@@ -10,9 +11,10 @@ from sqlalchemy.orm import sessionmaker
 
 from app.models.base import Base
 from app.services.tia.sync_profiles import resolve_sync_profile
+from app.services.workflow.collect_batch import resolve_workflow_sync_profile
 from app.services.tia.tia_data_loader import TiaDataLoader
 from app.sync.handlers import SyncContext
-from app.sync.tia_collect.base import StrategyContext
+from app.sync.tia_collect.base import StrategyContext, concat_collect_frames
 from app.sync.tia_collect.config import resolve_collect_config
 from app.sync.tia_collect.date_range import DateRangeStrategy
 from app.sync.tia_collect.exchange_date_range import ExchangeDateRangeStrategy
@@ -21,6 +23,7 @@ from app.sync.tia_collect.router import get_collect_strategy
 from app.sync.tia_collect.snapshot import SnapshotStrategy
 from app.sync.tia_collect.trade_date import TradeDateStrategy
 from app.sync.tia_collect.ts_code import TsCodeStrategy
+from app.sync.tia_collect.params import resolve_collect_params, strip_iteration_probe_filters
 from app.sync.tia_handler import TushareApiHandler
 
 
@@ -87,6 +90,30 @@ def test_date_range_strategy_multiple_codes() -> None:
     session.close()
 
 
+def test_date_range_strategy_drops_stale_trade_date() -> None:
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    session = sessionmaker(bind=engine)()
+    ctx = _strategy_ctx("daily", "date_range", session=session)
+    ctx.collector._call_pro.return_value = pd.DataFrame(
+        {"ts_code": ["000001.SZ"], "trade_date": ["20240102"], "close": [1.0]}
+    )
+
+    with patch.object(
+        StrategyContext,
+        "resolve_base_collect_params",
+        return_value={"trade_date": "20260617", "start_date": "20240102"},
+    ):
+        with patch.object(TiaDataLoader, "upsert_dataframe", return_value=1):
+            DateRangeStrategy().collect(ctx)
+
+    call_kwargs = ctx.collector._call_pro.call_args.kwargs
+    assert "trade_date" not in call_kwargs
+    assert call_kwargs["start_date"] == "20240102"
+    assert call_kwargs["end_date"] == "20240105"
+    session.close()
+
+
 def test_trade_date_strategy() -> None:
     ctx = _strategy_ctx("top_inst", "trade_date")
     ctx.collector._call_pro.return_value = pd.DataFrame(
@@ -95,6 +122,35 @@ def test_trade_date_strategy() -> None:
     with patch.object(TiaDataLoader, "upsert_dataframe", return_value=1):
         result = TradeDateStrategy().collect(ctx)
     assert result.api_calls >= 1
+
+
+def test_trade_date_strategy_paginates_full_market() -> None:
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    session = sessionmaker(bind=engine)()
+    ctx = _strategy_ctx("daily", "trade_date", session=session)
+    ctx.sync_ctx.start_date = date(2024, 1, 2)
+    ctx.sync_ctx.end_date = date(2024, 1, 2)
+
+    page1 = pd.DataFrame(
+        {
+            "ts_code": [f"{i:06d}.SZ" for i in range(5000)],
+            "trade_date": ["20240102"] * 5000,
+            "close": [1.0] * 5000,
+        }
+    )
+    page2 = pd.DataFrame(
+        {"ts_code": ["999999.SZ"], "trade_date": ["20240102"], "close": [2.0]}
+    )
+    ctx.collector._call_pro.side_effect = [page1, page2]
+
+    with patch.object(TiaDataLoader, "upsert_dataframe", return_value=5001) as mock_upsert:
+        result = TradeDateStrategy().collect(ctx)
+
+    assert result.api_calls == 2
+    assert result.detail_json["df_rows"] == 5001
+    assert mock_upsert.called
+    session.close()
 
 
 def test_period_strategy() -> None:
@@ -107,6 +163,59 @@ def test_period_strategy() -> None:
     with patch.object(TiaDataLoader, "upsert_dataframe", return_value=1):
         result = PeriodStrategy().collect(ctx)
     assert result.api_calls == 8  # 2 codes x 4 quarters of 2023
+
+
+@patch.object(TiaDataLoader, "upsert_dataframe", return_value=1)
+def test_income_period_strips_probe_ann_date_window(mock_upsert) -> None:
+    ctx = _strategy_ctx("income", "period")
+    ctx.profile = resolve_workflow_sync_profile("income", ctx.schema, batch_mode="backfill")
+    ctx.sync_ctx.start_date = date(2024, 3, 31)
+    ctx.sync_ctx.end_date = date(2024, 3, 31)
+    ctx.schema["probe_params"] = {
+        "ts_code": "000001.SZ",
+        "period": "20231231",
+        "ann_date": "20240131",
+        "start_date": "20240102",
+        "end_date": "20240105",
+        "f_ann_date": "20260616",
+    }
+    ctx.collector._call_pro.return_value = pd.DataFrame(
+        {"ts_code": ["000001.SZ"], "end_date": ["20240331"], "revenue": [1.0]}
+    )
+    PeriodStrategy().collect(ctx)
+    call_kwargs = ctx.collector._call_pro.call_args_list[0].kwargs
+    assert call_kwargs["period"] == "20240331"
+    assert call_kwargs["ts_code"] == "000001.SZ"
+    assert "start_date" not in call_kwargs
+    assert "end_date" not in call_kwargs
+    assert "ann_date" not in call_kwargs
+    assert "f_ann_date" not in call_kwargs
+
+
+def test_concat_collect_frames_skips_all_na_without_warning() -> None:
+    valid = pd.DataFrame({"a": [1], "b": [2.0]})
+    all_na = pd.DataFrame({"a": [pd.NA], "b": [pd.NA]})
+    with warnings.catch_warnings(record=True) as record:
+        warnings.simplefilter("always")
+        merged = concat_collect_frames([valid, all_na, pd.DataFrame()])
+    assert not any(issubclass(w.category, FutureWarning) for w in record)
+    assert merged is not None
+    assert len(merged) == 1
+    assert merged.iloc[0]["a"] == 1
+
+
+def test_period_strategy_all_na_responses_no_warning() -> None:
+    ctx = _strategy_ctx("balancesheet", "period")
+    ctx.sync_ctx.start_date = date(2023, 12, 31)
+    ctx.sync_ctx.end_date = date(2023, 12, 31)
+    ctx.collector._call_pro.return_value = pd.DataFrame({"a": [pd.NA], "b": [pd.NA]})
+    with patch.object(TiaDataLoader, "upsert_dataframe", return_value=0):
+        with warnings.catch_warnings(record=True) as record:
+            warnings.simplefilter("always")
+            result = PeriodStrategy().collect(ctx)
+    assert not any(issubclass(w.category, FutureWarning) for w in record)
+    assert result.api_calls == 8
+    assert result.rows_upserted == 0
 
 
 def test_share_float_ts_code_profile() -> None:
@@ -159,6 +268,102 @@ def test_api_call_budget_raises() -> None:
     )
     with pytest.raises(Exception, match="exceeds limit"):
         DateRangeStrategy().collect(ctx)
+
+
+@patch.object(TiaDataLoader, "upsert_dataframe", return_value=1)
+def test_date_range_strategy_passes_sync_window_and_strips_ann_date(mock_upsert) -> None:
+    ctx = _strategy_ctx("top10_holders", "date_range")
+    ctx.profile = resolve_workflow_sync_profile("top10_holders", ctx.schema, batch_mode="backfill")
+    ctx.schema["probe_params"] = {
+        "ts_code": "000001.SZ",
+        "ann_date": "20240131",
+        "start_date": "20240102",
+        "end_date": "20240105",
+        "period": "20231231",
+    }
+    ctx.collector._call_pro.return_value = pd.DataFrame({"ts_code": ["000001.SZ"]})
+    DateRangeStrategy().collect(ctx)
+    call_kwargs = ctx.collector._call_pro.call_args_list[0].kwargs
+    assert call_kwargs["start_date"] == "20240102"
+    assert call_kwargs["end_date"] == "20240105"
+    assert "ann_date" not in call_kwargs
+    assert "period" not in call_kwargs
+
+
+@patch.object(TiaDataLoader, "upsert_dataframe", return_value=1)
+def test_ts_code_strategy_strips_exchange_probe_filter(mock_upsert) -> None:
+    ctx = _strategy_ctx("stock_company", "ts_code")
+    ctx.profile = resolve_workflow_sync_profile("stock_company", ctx.schema, batch_mode="backfill")
+    ctx.schema["probe_params"] = {"ts_code": "000001.SZ", "exchange": "SSE"}
+    ctx.collector._call_pro.return_value = pd.DataFrame({"ts_code": ["000001.SZ"]})
+    TsCodeStrategy().collect(ctx)
+    call_kwargs = ctx.collector._call_pro.call_args_list[0].kwargs
+    assert "exchange" not in call_kwargs
+    assert call_kwargs["ts_code"] == "000001.SZ"
+
+
+def test_stock_company_resolve_collect_params_strips_sse() -> None:
+    schema = {"probe_params": {"ts_code": "000001.SZ", "exchange": "SSE"}}
+    params = strip_iteration_probe_filters(
+        resolve_collect_params("stock_company", schema),
+        mode="ts_code",
+    )
+    assert "exchange" not in params
+    assert "ts_code" not in params
+
+
+def test_stk_rewards_ts_code_strips_probe_end_date() -> None:
+    schema = {"probe_params": {"ts_code": "000001.SZ", "end_date": "20240105"}}
+    params = strip_iteration_probe_filters(
+        resolve_collect_params("stk_rewards", schema),
+        mode="ts_code",
+    )
+    assert "end_date" not in params
+
+
+def test_disclosure_date_strips_probe_disclosure_filters() -> None:
+    schema = {
+        "probe_params": {
+            "ts_code": "000001.SZ",
+            "ann_date": "20240131",
+            "end_date": "20240105",
+            "pre_date": "20260616",
+            "actual_date": "20260616",
+        }
+    }
+    params = strip_iteration_probe_filters(
+        resolve_collect_params("disclosure_date", schema),
+        mode="period",
+    )
+    assert "pre_date" not in params
+    assert "actual_date" not in params
+    assert "ann_date" not in params
+    assert "end_date" not in params
+
+
+@patch.object(TiaDataLoader, "upsert_dataframe", return_value=5)
+def test_disclosure_date_period_strategy_market_wide_by_end_date(mock_upsert) -> None:
+    ctx = _strategy_ctx("disclosure_date", "period")
+    ctx.profile = resolve_workflow_sync_profile("disclosure_date", ctx.schema, batch_mode="backfill")
+    ctx.sync_ctx.start_date = date(2024, 1, 1)
+    ctx.sync_ctx.end_date = date(2024, 6, 30)
+    ctx.sync_ctx.batch_mode = "backfill"
+    ctx.schema["probe_params"] = {
+        "ts_code": "000001.SZ",
+        "pre_date": "20260616",
+        "actual_date": "20260616",
+    }
+    ctx.collector._call_pro.return_value = pd.DataFrame(
+        {"ts_code": ["000001.SZ"], "end_date": ["20240331"]}
+    )
+    result = PeriodStrategy().collect(ctx)
+    assert ctx.collector._call_pro.call_count >= 1
+    first = ctx.collector._call_pro.call_args_list[0].kwargs
+    assert "ts_code" not in first
+    assert first["end_date"] == "20240331"
+    assert "pre_date" not in first
+    assert result.api_calls == ctx.collector._call_pro.call_count
+    assert result.detail_json["stock_codes_used"] == 0
 
 
 @patch.object(TiaDataLoader, "upsert_dataframe", return_value=10)

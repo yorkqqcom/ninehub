@@ -49,9 +49,12 @@ class TushareApiHandler(SyncHandler):
                 self.api_name, self.schema, batch_mode=batch_mode
             )
             schema = extra.get("workflow_schema") or self.schema
-            config = resolve_workflow_collect_config(schema, profile, batch_mode=batch_mode)
+            config = resolve_workflow_collect_config(
+                schema, profile, batch_mode=batch_mode, api_name=self.api_name
+            )
         else:
             profile = resolve_sync_profile(self.api_name, self.schema)
+            schema = self.schema
             config = resolve_collect_config(self.schema, profile)
         strategy = get_collect_strategy(profile.mode)
 
@@ -64,7 +67,7 @@ class TushareApiHandler(SyncHandler):
             st_ctx = StrategyContext(
                 api_name=self.api_name,
                 data_type=self.data_type,
-                schema=self.schema,
+                schema=schema,
                 table_name=table_name,
                 sync_ctx=ctx,
                 collector=collector,
@@ -79,6 +82,12 @@ class TushareApiHandler(SyncHandler):
         except ValueError as exc:
             return CollectResult(message=str(exc))
         except Exception as exc:
+            from tenacity import RetryError
+
+            if isinstance(exc, RetryError) and exc.last_attempt is not None:
+                root = exc.last_attempt.exception()
+                if root is not None:
+                    return CollectResult(message=f"Tushare {self.api_name} failed: {root}")
             return CollectResult(message=f"Tushare {self.api_name} failed: {exc}")
 
         return CollectResult(

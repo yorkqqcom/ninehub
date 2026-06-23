@@ -35,7 +35,7 @@
 .top-bar__sep {
   width: 1px;
   height: 16px;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--color-topbar-sep);
 }
 
 .top-bar__meta {
@@ -43,7 +43,7 @@
   align-items: center;
   gap: var(--space-md);
   font-size: var(--font-size-md);
-  color: rgba(241, 245, 249, 0.75);
+  color: var(--color-topbar-meta);
 }
 
 .top-bar__meta-item {
@@ -56,7 +56,7 @@
   font-size: var(--font-size-md);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-strong);
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--color-topbar-btn-bg);
   color: var(--color-topbar-text);
   cursor: pointer;
   text-decoration: none;
@@ -66,20 +66,20 @@
 }
 
 .top-bar__btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--color-topbar-btn-hover);
 }
 
 .top-bar__user {
   font-size: var(--font-size-md);
-  color: rgba(241, 245, 249, 0.85);
+  color: var(--color-topbar-user);
 }
 
 .top-bar__role {
   font-size: var(--font-size-sm);
   padding: 1px 6px;
   border-radius: var(--radius-sm);
-  background: rgba(59, 130, 246, 0.2);
-  color: #93c5fd;
+  background: var(--color-topbar-role-bg);
+  color: var(--color-nav-active-text);
 }
 
 /* 健康状态徽章 */
@@ -102,7 +102,7 @@
 }
 
 .health-ok {
-  background: rgba(34, 197, 94, 0.2);
+  background: color-mix(in srgb, var(--color-fall) 20%, transparent);
   color: var(--color-fall);
 }
 
@@ -111,7 +111,7 @@
 }
 
 .health-bad {
-  background: rgba(239, 68, 68, 0.15);
+  background: color-mix(in srgb, var(--color-rise) 15%, transparent);
   color: var(--color-rise);
 }
 
@@ -263,6 +263,74 @@
   box-shadow: 0 0 0 3px var(--color-primary-muted);
 }
 
+/* 通用表单控件（toolbar / 筛选栏等，非 .form-field 包裹） */
+.input,
+input.input,
+select.input {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-input);
+  background: var(--color-surface);
+  color: var(--color-text);
+  transition: border-color var(--transition-fast);
+}
+
+.input--sm {
+  height: 28px;
+  font-size: var(--font-size-sm);
+}
+
+.input--inline {
+  width: auto;
+}
+
+.input:focus,
+input.input:focus,
+select.input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-muted);
+}
+
+select.input option {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* 筛选标签 */
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.filter-tab {
+  padding: 2px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.filter-tab:hover:not(.active) {
+  background: var(--color-row-hover);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.filter-tab.active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: transparent;
+}
+
 /* 按钮 */
 .btn {
   height: 32px;
@@ -284,7 +352,7 @@
 
 .btn--primary {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border-color: var(--color-primary);
 }
 
