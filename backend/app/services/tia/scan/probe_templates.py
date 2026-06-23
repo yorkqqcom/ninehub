@@ -8,6 +8,7 @@ from typing import Any
 API_PROBE_OVERRIDES: dict[str, str] = {
     "trade_cal": "trade_cal",
     "top_inst": "top_inst_detail",
+    "stock_basic": "list_basic",
 }
 
 PROBE_TEMPLATES: dict[str, dict[str, Any]] = {

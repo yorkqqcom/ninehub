@@ -29,8 +29,8 @@ def resolve_stock_codes(
             try:
                 rows = session.execute(
                     text(
-                        f"SELECT DISTINCT {column} FROM {table_name} "
-                        f"WHERE {column} IS NOT NULL ORDER BY {column}"
+                        f'SELECT DISTINCT "{column}" FROM "{table_name}" '
+                        f'WHERE "{column}" IS NOT NULL ORDER BY "{column}"'
                     ),
                 ).scalars().all()
                 if rows:
@@ -43,6 +43,7 @@ def resolve_stock_codes(
                     next_offset = (offset + len(selected)) % len(all_codes)
                     return selected, next_offset
             except Exception:
+                session.rollback()
                 continue
 
     return DEFAULT_STOCK_CODES[:max_codes], 0

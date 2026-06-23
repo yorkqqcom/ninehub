@@ -869,13 +869,18 @@ def list_plan(session: Session) -> None:
     for tier, data_type, api_name in BACKFILL_PLAN:
         try:
             schema, table_name = _load_schema(session, data_type)
+            gs = _global_start(session, data_type)
+            plan = estimate_chunks(
+                session, data_type, api_name, schema, global_start=gs, end=end, table_name=table_name
+            )
+            total_chunks += plan.chunks
+            print(f"{tier:<5} {data_type:<32} {plan.mode:<14} {plan.chunks:<7} {plan.note}")
         except SystemExit:
+            session.rollback()
             print(f"{tier:<5} {data_type:<32} {'—':<14} {'—':<7} NOT ACTIVATED")
-            continue
-        gs = _global_start(session, data_type)
-        plan = estimate_chunks(session, data_type, api_name, schema, global_start=gs, end=end, table_name=table_name)
-        total_chunks += plan.chunks
-        print(f"{tier:<5} {data_type:<32} {plan.mode:<14} {plan.chunks:<7} {plan.note}")
+        except Exception as exc:
+            session.rollback()
+            print(f"{tier:<5} {data_type:<32} {'—':<14} {'—':<7} ERROR: {str(exc)[:80]}")
     print("-" * 90)
     print(f"Estimated total chunks (if all gaps): ~{total_chunks}")
 

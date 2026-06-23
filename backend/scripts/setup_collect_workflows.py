@@ -38,10 +38,11 @@ WORKFLOW_APIS = list(DAILY_BATCH_MODE_OVERRIDES.keys())
 
 def _load_script_module(filename: str):
     path = BACKEND_ROOT / "scripts" / filename
-    name = path.stem
+    name = f"_ninehub_script_{path.stem}"
     spec = importlib.util.spec_from_file_location(name, path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
+    sys.modules[name] = mod
     spec.loader.exec_module(mod)
     return mod
 
@@ -102,7 +103,10 @@ def _print_backfill_plan(session: Session) -> None:
 
     mod = _load_script_module("run_backfill_history.py")
     TiaOverrideService().load_all_into_registry_sync(session)
-    mod.list_plan(session)
+    try:
+        mod.list_plan(session)
+    finally:
+        session.rollback()
 
 
 async def _apply_and_seed(*, dry_run: bool, replace_workflows: bool) -> None:

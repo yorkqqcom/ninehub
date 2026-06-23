@@ -379,18 +379,29 @@ class TiaPreflightTestService:
 
         # 4. api_budget
         try:
+            from app.services.tia.collect_pattern import estimate_calls_per_run
+
             pattern_key = pattern_meta.get("pattern") or "generic"
-            est = estimate_calls_for_pattern(pattern_key) or 1
+            est_full = estimate_calls_for_pattern(pattern_key) or 1
+            est_run = estimate_calls_per_run(
+                pattern_key,
+                max_codes_per_run=profile.max_codes_per_run,
+                max_api_calls_per_run=profile.max_api_calls_per_run,
+            )
             budget = profile.max_api_calls_per_run
-            if est > budget:
-                msg = f"预估全量 {est} 次 > 预算 {budget}"
+            if est_run > budget:
+                msg = f"预估单次 {est_run} 次 > 预算 {budget}"
                 checks.append(
                     PreflightCheck(
                         key="api_budget",
                         label=_CHECK_LABELS["api_budget"],
                         status="fail",
                         message=msg,
-                        detail={"estimated": est, "budget": budget},
+                        detail={
+                            "estimated_per_run": est_run,
+                            "estimated_full_sync": est_full,
+                            "budget": budget,
+                        },
                     )
                 )
                 blocking.append(f"{api_name}: {msg}")
@@ -400,8 +411,15 @@ class TiaPreflightTestService:
                         key="api_budget",
                         label=_CHECK_LABELS["api_budget"],
                         status="pass",
-                        message=f"预估 {est} 次 ≤ 预算 {budget}",
-                        detail={"estimated": est, "budget": budget},
+                        message=(
+                            f"单次 {est_run} 次 ≤ 预算 {budget}"
+                            + (f"（全量约 {est_full} 次，分 chunk 回填）" if est_full > est_run else "")
+                        ),
+                        detail={
+                            "estimated_per_run": est_run,
+                            "estimated_full_sync": est_full,
+                            "budget": budget,
+                        },
                     )
                 )
         except Exception as exc:
@@ -812,15 +830,22 @@ class TiaPreflightTestService:
 
         # 11. collect_params_parity — preflight probe vs runtime collect base params
         try:
-            from app.sync.tia_collect.params import resolve_collect_params, sanitize_collect_params
+            from app.sync.tia_collect.params import (
+                SNAPSHOT_FULL_MARKET_PARAMS,
+                resolve_collect_params,
+                sanitize_collect_params,
+            )
 
             if probe_spec and schema:
-                preflight_base = sanitize_collect_params(
-                    resolve_probe_params(dict(probe_spec.get("params") or {}))
-                )
                 runtime_base = sanitize_collect_params(
                     resolve_collect_params(api_name, schema)
                 )
+                if api_name in SNAPSHOT_FULL_MARKET_PARAMS:
+                    preflight_base = runtime_base
+                else:
+                    preflight_base = sanitize_collect_params(
+                        resolve_probe_params(dict(probe_spec.get("params") or {}))
+                    )
                 iter_keys = frozenset(
                     {"ts_code", "start_date", "end_date", "trade_date", "period"}
                 )

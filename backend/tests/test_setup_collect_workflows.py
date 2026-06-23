@@ -21,3 +21,9 @@ def test_workflow_apis_match_daily_batch_overrides() -> None:
 
 def test_min_account_points_default_2000() -> None:
     assert _mod.MIN_ACCOUNT_POINTS == 2000
+
+
+def test_load_script_module_registers_sys_modules_for_dataclasses() -> None:
+    mod = _mod._load_script_module("run_backfill_history.py")
+    assert hasattr(mod, "list_plan")
+    assert hasattr(mod, "ChunkPlan")

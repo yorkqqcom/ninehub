@@ -211,6 +211,22 @@ def estimate_calls_for_pattern(
     return None
 
 
+def estimate_calls_per_run(
+    pattern_key: str,
+    *,
+    max_codes_per_run: int = 50,
+    max_api_calls_per_run: int = 200,
+) -> int:
+    """Single collect run estimate for L3 preflight (not full-history backfill)."""
+    if pattern_key in ("exchange_date_range", "list_basic", "list_limit", "generic"):
+        return 1
+    if pattern_key == "trade_date":
+        return 1
+    if pattern_key in ("ts_code_date_range", "ts_code", "period_financial", "index_daily"):
+        return min(max_codes_per_run, max_api_calls_per_run)
+    return 1
+
+
 def resolve_collect_pattern(
     api_name: str,
     official_entry: Any | None = None,
@@ -359,7 +375,10 @@ def resolve_probe_params_for_api(api_name: str, schema: dict[str, Any]) -> dict[
     """Shared probe param resolution for collect strategies."""
     from app.catalog.tia_probe_registry import api_probe_meta, resolve_probe_params
     from app.services.tia.scan.probe_templates import API_PROBE_OVERRIDES, PROBE_TEMPLATES
-    from app.sync.tia_collect.params import sanitize_collect_params
+    from app.sync.tia_collect.params import SNAPSHOT_FULL_MARKET_PARAMS, sanitize_collect_params
+
+    if api_name in SNAPSHOT_FULL_MARKET_PARAMS:
+        return dict(SNAPSHOT_FULL_MARKET_PARAMS[api_name])
 
     probe_params = dict(schema.get("probe_params") or {})
     if probe_params:

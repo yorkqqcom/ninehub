@@ -102,8 +102,31 @@ def test_preflight_fails_without_token_when_no_doc_fields() -> None:
 def test_trade_cal_api_budget_not_1663() -> None:
     result = TiaPreflightTestService().run(None, "trade_cal", live_probe=False)
     budget = next(c for c in result.checks if c.key == "api_budget")
-    assert budget.detail.get("estimated", 999) <= 200
+    assert budget.detail.get("estimated_per_run", 999) <= 200
     assert budget.status == "pass"
+
+
+def test_stock_basic_preflight_collect_params_parity() -> None:
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    session = sessionmaker(bind=engine)()
+    result = TiaPreflightTestService().run(session, "stock_basic", live_probe=False)
+    session.close()
+    assert result.passed is True
+    parity = next(c for c in result.checks if c.key == "collect_params_parity")
+    assert parity.status == "pass"
+
+
+def test_margin_secs_preflight_api_budget_per_run() -> None:
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    session = sessionmaker(bind=engine)()
+    result = TiaPreflightTestService().run(session, "margin_secs", live_probe=False)
+    session.close()
+    budget = next(c for c in result.checks if c.key == "api_budget")
+    assert budget.status == "pass"
+    assert budget.detail.get("estimated_per_run") == 1
+    assert (budget.detail.get("estimated_full_sync") or 0) > 200
 
 
 def test_run_preflight_or_raise_blocks_on_failure() -> None:
