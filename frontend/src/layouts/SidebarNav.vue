@@ -23,64 +23,43 @@ type NavItem = { to: string; label: string; name: string; adminOnly?: boolean };
 
 
 const navItems = computed(() => {
-
-  const dataItems: NavItem[] = [{ to: "/quality", label: "质量监控", name: "quality" }];
-
+  const dataItems: NavItem[] = [];
   if (hasBrowseTypes.value) {
-    dataItems.unshift(
+    dataItems.push(
       { to: "/data-browser", label: "数据浏览器", name: "data-browser" },
       { to: "/browse", label: "数据查询", name: "browse" },
     );
   }
 
-  return [
-
+  const groups = [
     { section: "九汇平台", items: [{ to: "/", label: "概览", name: "dashboard" }] },
-
-    { section: "数据查询", items: dataItems },
-
+    ...(dataItems.length
+      ? [{ section: "数据查询", items: dataItems }]
+      : []),
     {
-
       section: "数据采集",
-
       items: [
-
         { to: "/tasks", label: "采集任务", name: "tasks", adminOnly: true },
-
         { to: "/workflows", label: "工作流", name: "workflows" },
-
         { to: "/sources", label: "数据源", name: "sources", adminOnly: true },
-
       ],
-
     },
-
     {
-
       section: "数据治理",
-
       items: [
-
         { to: "/tia", label: "提案治理", name: "tia", adminOnly: true },
-
         { to: "/standards", label: "数据标准", name: "standards", adminOnly: true },
-
         { to: "/tia/coverage", label: "官网覆盖", name: "tia-coverage", adminOnly: true },
-
+        { to: "/quality", label: "质量监控", name: "quality" },
       ],
-
     },
-
     {
-
       section: "系统管理",
-
       items: [{ to: "/settings", label: "平台设置", name: "settings", adminOnly: true }],
-
     },
-
   ];
 
+  return groups;
 });
 
 

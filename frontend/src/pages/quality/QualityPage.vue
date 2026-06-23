@@ -194,7 +194,7 @@ function statusBadge(status: string) {
 </script>
 
 <template>
-  <PageHeader title="数据质量" description="质检报告与规则引擎">
+  <PageHeader title="质量监控" description="质检报告与规则引擎">
     <template v-if="auth.isAdmin" #actions>
       <label class="form-field form-field--inline">
         <input v-model="asyncMode" type="checkbox" />

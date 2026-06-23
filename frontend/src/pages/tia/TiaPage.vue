@@ -5,6 +5,11 @@ import { apiRequest, getToken, getApiBase, ApiError } from "@/api/client";
 import type { PlatformJob } from "@/api/types";
 import PageHeader from "@/components/PageHeader.vue";
 import SchemaMaintenanceDrawer from "@/components/tia/SchemaMaintenanceDrawer.vue";
+import {
+  BATCH_GOVERNANCE_MAX,
+  batchKindLabel,
+  useTiaBatchGovernance,
+} from "@/composables/useTiaBatchGovernance";
 import { useAuthStore } from "@/stores/auth";
 import { useUiStore } from "@/stores/ui";
 
@@ -39,6 +44,20 @@ let jobPollCount = 0;
 const activateJobId = ref<number | null>(null);
 let pollTimer: number | undefined;
 
+const {
+  batchOp,
+  batchBusy,
+  batchProgressPct,
+  batchSummary,
+  restoreBatch,
+  dismissBatchPanel,
+  retryBatchFailed,
+  runBatchApprove,
+  runBatchActivateL3,
+  runBatchEnableBrowse,
+  runSingleL3Job,
+} = useTiaBatchGovernance(() => loadProposals());
+
 function openStandards(apiName: string) {
   void router.push({ name: "standards", query: { api: apiName } });
 }
@@ -46,6 +65,7 @@ function openStandards(apiName: string) {
 onMounted(() => {
   loadPointsPrefs();
   void loadProposals();
+  restoreBatch();
   const proposalQ = route.query.proposal;
   if (proposalQ) {
     const pid = Number(proposalQ);
@@ -324,6 +344,22 @@ const pageSomeSelected = computed(() =>
 
 const selectedCount = computed(() => selectedProposalIds.value.length);
 
+const batchSelectionOverLimit = computed(() => selectedCount.value > BATCH_GOVERNANCE_MAX);
+
+function buildProposalMeta(ids: number[]) {
+  const map = new Map<number, string>();
+  for (const id of ids) {
+    const p = proposals.value.find((row) => row.id === id);
+    map.set(id, String(p?.api_name ?? `#${id}`));
+  }
+  return map;
+}
+
+function clearSelectionForIds(ids: number[]) {
+  selectedProposalIds.value = selectedProposalIds.value.filter((id) => !ids.includes(id));
+  if (selectedProposalIds.value.length === 0) selectionScope.value = "none";
+}
+
 const showSelectAllFilteredHint = computed(
   () =>
     selectedCount.value > 0 &&
@@ -558,116 +594,23 @@ function preflightCheckLabel(status: string) {
 
 async function batchApprove(autoActivate = false) {
   const ids = selectedPendingIds.value;
-  if (!ids.length) return;
-  if (autoActivate) {
-    await batchApproveActivate();
-    return;
-  }
-  const data = await apiRequest<{ items: unknown[] }>(
-    "/api/v1/tia/proposals/batch-review",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        proposal_ids: ids,
-        status: "approved",
-        note: "batch approved via UI",
-        auto_activate: false,
-      }),
-    },
-  );
-  selectedProposalIds.value = selectedProposalIds.value.filter((id) => !ids.includes(id));
-  if (selectedProposalIds.value.length === 0) selectionScope.value = "none";
-  ui.showMessage(`已批准 ${data.items.length} 条`, "success");
-  await loadProposals();
-}
-
-async function batchApproveActivate() {
-  const ids = selectedPendingIds.value;
-  if (!ids.length) return;
-  const data = await apiRequest<{
-    succeeded: number;
-    failed: number;
-    job_ids: number[];
-    items: Array<{ proposal_id: number; success: boolean; error?: string }>;
-  }>("/api/v1/tia/proposals/batch-approve-activate", {
-    method: "POST",
-    body: JSON.stringify({
-      proposal_ids: ids,
-      note: "batch approve-activate via UI",
-    }),
-  });
-  selectedProposalIds.value = selectedProposalIds.value.filter((id) => !ids.includes(id));
-  if (selectedProposalIds.value.length === 0) selectionScope.value = "none";
-  if (data.failed) {
-    const errs = data.items
-      .filter((i) => !i.success)
-      .map((i) => `#${i.proposal_id}: ${i.error ?? "失败"}`)
-      .join("；");
-    ui.showMessage(`成功 ${data.succeeded}，失败 ${data.failed}：${errs}`, data.succeeded ? "info" : "error");
-  } else {
-    ui.showMessage(`已批准并激活 ${data.succeeded} 条（含 Preflight）`, "success");
-  }
-  if (data.job_ids.length) {
-    activateJobId.value = data.job_ids[0] ?? null;
-    if (pollTimer) window.clearInterval(pollTimer);
-    pollTimer = window.setInterval(() => void pollJob(data.job_ids[0]!), 1500);
-  }
-  await loadProposals();
+  if (!ids.length || batchBusy.value) return;
+  const ok = await runBatchApprove(ids, buildProposalMeta(ids), autoActivate);
+  if (ok) clearSelectionForIds(ids);
 }
 
 async function batchEnableBrowse() {
   const ids = selectedBrowseIds.value;
-  if (!ids.length) return;
-  const data = await apiRequest<{
-    succeeded: number;
-    failed: number;
-    errors: Array<{ proposal_id: number; error: string }>;
-  }>("/api/v1/tia/proposals/batch-enable-browse", {
-    method: "POST",
-    body: JSON.stringify({ proposal_ids: ids }),
-  });
-  selectedProposalIds.value = selectedProposalIds.value.filter((id) => !ids.includes(id));
-  if (selectedProposalIds.value.length === 0) selectionScope.value = "none";
-  if (data.failed) {
-    ui.showMessage(
-      `开通 ${data.succeeded} 条，跳过 ${data.failed} 条`,
-      data.succeeded ? "info" : "error",
-    );
-  } else {
-    ui.showMessage(`已批量开通数据查询 ${data.succeeded} 条`, "success");
-  }
-  await loadProposals();
+  if (!ids.length || batchBusy.value) return;
+  const ok = await runBatchEnableBrowse(ids, buildProposalMeta(ids));
+  if (ok) clearSelectionForIds(ids);
 }
 
 async function batchActivateL3() {
   const ids = selectedL3Ids.value;
-  if (!ids.length) return;
-  const data = await apiRequest<{
-    succeeded: number;
-    failed: number;
-    job_ids: number[];
-    items: Array<{ proposal_id: number; success: boolean; error?: string }>;
-  }>("/api/v1/tia/proposals/batch-activate", {
-    method: "POST",
-    body: JSON.stringify({ proposal_ids: ids }),
-  });
-  selectedProposalIds.value = selectedProposalIds.value.filter((id) => !ids.includes(id));
-  if (selectedProposalIds.value.length === 0) selectionScope.value = "none";
-  if (data.failed) {
-    const errs = data.items
-      .filter((i) => !i.success)
-      .map((i) => `#${i.proposal_id}: ${i.error ?? "失败"}`)
-      .join("；");
-    ui.showMessage(`L3 排队 ${data.succeeded} 条，失败 ${data.failed}：${errs}`, data.succeeded ? "info" : "error");
-  } else {
-    ui.showMessage(`已排队 ${data.succeeded} 个 L3 激活任务（后台异步执行）`, "success");
-  }
-  if (data.job_ids.length) {
-    activateJobId.value = data.job_ids[0] ?? null;
-    if (pollTimer) window.clearInterval(pollTimer);
-    pollTimer = window.setInterval(() => void pollJob(data.job_ids[0]!), 1500);
-  }
-  await loadProposals();
+  if (!ids.length || batchBusy.value) return;
+  const ok = await runBatchActivateL3(ids, buildProposalMeta(ids));
+  if (ok) clearSelectionForIds(ids);
 }
 
 async function retryFilteredFailed() {
@@ -679,15 +622,30 @@ async function retryFilteredFailed() {
   await batchActivateL3();
 }
 
+function proposalApiName(id: number): string {
+  const p = proposals.value.find((row) => row.id === id);
+  return String(p?.api_name ?? `#${id}`);
+}
+
 async function approveAndActivate(id: number) {
-  const data = await apiRequest<{ job_id: number }>(
-    `/api/v1/tia/proposals/${id}/approve-activate`,
-    { method: "POST" },
-  );
-  activateJobId.value = data.job_id;
-  ui.showMessage("已批准并排队 L3 八步流水线（含 Preflight）", "success");
-  pollTimer = window.setInterval(() => void pollJob(data.job_id), 1500);
-  await pollJob(data.job_id);
+  if (batchBusy.value) return;
+  const ok = await runBatchApprove([id], new Map([[id, proposalApiName(id)]]), true);
+  if (ok) clearSelectionForIds([id]);
+}
+
+async function activateProposal(id: number, reapply = false, forceSchema = false) {
+  if (pollTimer) {
+    window.clearInterval(pollTimer);
+    pollTimer = undefined;
+  }
+  activateJobId.value = null;
+  job.value = null;
+  const params = new URLSearchParams();
+  if (reapply) params.set("reapply", "true");
+  if (forceSchema) params.set("force_schema", "true");
+  const q = params.toString() ? `?${params.toString()}` : "";
+  const msg = forceSchema ? "L3 重建 Schema 已提交" : "L3 激活已提交";
+  await runSingleL3Job(id, proposalApiName(id), `/api/v1/tia/proposals/${id}/activate${q}`, msg);
 }
 
 function browseData(dataType: string) {
@@ -695,6 +653,7 @@ function browseData(dataType: string) {
 }
 
 async function enableBrowse(id: number) {
+  if (batchBusy.value) return;
   await apiRequest(`/api/v1/tia/proposals/${id}/enable-browse`, { method: "POST" });
   ui.showMessage("已启用数据查询", "success");
   await loadProposals();
@@ -829,26 +788,6 @@ async function downloadScaffold(id: number, apiName: string) {
   a.download = `tia_scaffold_${apiName}.zip`;
   a.click();
   URL.revokeObjectURL(a.href);
-}
-
-async function activateProposal(id: number, reapply = false, forceSchema = false) {
-  if (pollTimer) {
-    window.clearInterval(pollTimer);
-    pollTimer = undefined;
-  }
-  const params = new URLSearchParams();
-  if (reapply) params.set("reapply", "true");
-  if (forceSchema) params.set("force_schema", "true");
-  const q = params.toString() ? `?${params.toString()}` : "";
-  const data = await apiRequest<{ job_id: number }>(
-    `/api/v1/tia/proposals/${id}/activate${q}`,
-    { method: "POST" },
-  );
-  activateJobId.value = data.job_id;
-  ui.showMessage(forceSchema ? "L3 重建 Schema 已提交" : "L3 激活已提交", "success");
-  job.value = { id: data.job_id, status: "pending", progress: 0, message: "Queued" } as PlatformJob;
-  pollTimer = window.setInterval(() => void pollJob(data.job_id), 1500);
-  await pollJob(data.job_id);
 }
 
 const schemaMaintenanceProposalId = ref<number | null>(null);
@@ -1313,7 +1252,93 @@ function probeStatusLabel(status: string) {
     </div>
   </div>
 
-  <div v-if="job" class="panel">
+  <div v-if="batchOp" class="panel batch-governance-panel">
+    <div class="panel__header">
+      <span>{{ batchKindLabel(batchOp.kind) }}进度</span>
+      <span class="panel__header-count">
+        {{ batchOp.phase === "submitting" ? "受理中…" : batchOp.phase === "done" ? "已完成" : "执行中" }}
+      </span>
+      <button
+        v-if="batchOp.phase === 'done' && batchSummary?.failed"
+        type="button"
+        class="btn btn--secondary btn--sm"
+        :disabled="batchBusy"
+        @click="retryBatchFailed()"
+      >
+        重试失败项 ({{ batchSummary?.failed }})
+      </button>
+      <button
+        v-if="batchOp.phase === 'done'"
+        type="button"
+        class="btn btn--ghost btn--sm"
+        @click="dismissBatchPanel()"
+      >
+        关闭
+      </button>
+    </div>
+    <div class="panel__body">
+      <div v-if="batchOp.phase === 'submitting'" class="progress-meta">
+        <span>正在提交 {{ batchOp.total }} 条…</span>
+      </div>
+      <template v-else>
+        <div v-if="batchSummary" class="batch-governance-summary">
+          <span class="badge badge--ok">完成 {{ batchSummary.succeeded }}</span>
+          <span v-if="batchSummary.running" class="badge badge--warn">进行中 {{ batchSummary.running }}</span>
+          <span v-if="batchSummary.failed" class="badge badge--err">L3 失败 {{ batchSummary.failed }}</span>
+          <span v-if="batchSummary.submitFailed" class="badge badge--err">
+            提交失败 {{ batchSummary.submitFailed }}
+          </span>
+          <span v-if="batchSummary.queued" class="badge badge--muted">等待 {{ batchSummary.queued }}</span>
+        </div>
+        <div v-if="batchOp.jobRows.length" class="progress-meta">
+          <span>L3 后台执行（含 Preflight）</span>
+          <span class="numeric">{{ batchProgressPct }}%</span>
+        </div>
+        <div v-if="batchOp.jobRows.length" class="progress-bar">
+          <div class="progress-bar__fill" :style="{ width: `${batchProgressPct}%` }" />
+        </div>
+        <table v-if="batchOp.jobRows.length" class="data-table batch-governance-table">
+          <thead>
+            <tr>
+              <th>API</th>
+              <th>状态</th>
+              <th>进度</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in batchOp.jobRows" :key="row.jobId">
+              <td><code>{{ row.apiName }}</code></td>
+              <td>
+                <span
+                  class="badge"
+                  :class="
+                    row.status === 'success'
+                      ? 'badge--ok'
+                      : row.status === 'failed'
+                        ? 'badge--err'
+                        : 'badge--warn'
+                  "
+                >{{ row.status }}</span>
+              </td>
+              <td class="numeric">{{ row.progress }}%</td>
+              <td>{{ row.error || row.message || "—" }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul v-if="batchOp.submitErrors.length" class="batch-governance-errors">
+          <li v-for="err in batchOp.submitErrors" :key="err.proposalId">
+            <code>{{ err.apiName }}</code>：{{ err.error }}
+          </li>
+        </ul>
+        <p v-if="batchOp.phase === 'running'" class="panel__hint">
+          可刷新页面或离开本页，进度会自动恢复（24 小时内）。
+        </p>
+      </template>
+    </div>
+  </div>
+
+  <div v-if="job && !batchOp?.jobRows.length" class="panel">
     <div class="panel__header">
       <span>{{ activateJobId === job.id ? "L3 激活进度" : "扫描进度" }}</span>
       <span class="panel__header-count">{{ job.status }}</span>
@@ -1364,7 +1389,7 @@ function probeStatusLabel(status: string) {
           v-if="proposalStatusFilter === 'failed'"
           type="button"
           class="btn btn--secondary btn--sm"
-          :disabled="selectAllFilteredLoading"
+          :disabled="selectAllFilteredLoading || batchBusy"
           @click="retryFilteredFailed()"
         >
           全选筛选结果并重试 L3
@@ -1443,35 +1468,42 @@ function probeStatusLabel(status: string) {
           v-if="selectedPendingIds.length"
           type="button"
           class="btn btn--secondary btn--sm"
+          :disabled="batchBusy || batchSelectionOverLimit"
           @click="batchApprove(false)"
         >
-          批量批准 ({{ selectedPendingIds.length }})
+          {{ batchBusy ? "处理中…" : `批量批准 (${selectedPendingIds.length})` }}
         </button>
         <button
           v-if="selectedPendingIds.length"
           type="button"
           class="btn btn--primary btn--sm"
+          :disabled="batchBusy || batchSelectionOverLimit"
           @click="batchApprove(true)"
         >
-          批量批准并激活 ({{ selectedPendingIds.length }})
+          {{ batchBusy ? "处理中…" : `批量批准并激活 (${selectedPendingIds.length})` }}
         </button>
         <button
           v-if="selectedL3Ids.length"
           type="button"
           class="btn btn--primary btn--sm"
+          :disabled="batchBusy || batchSelectionOverLimit"
           @click="batchActivateL3()"
         >
-          批量 L3 激活 ({{ selectedL3Ids.length }})
+          {{ batchBusy ? "处理中…" : `批量 L3 激活 (${selectedL3Ids.length})` }}
         </button>
         <button
           v-if="selectedBrowseIds.length"
           type="button"
           class="btn btn--secondary btn--sm"
+          :disabled="batchBusy || batchSelectionOverLimit"
           @click="batchEnableBrowse()"
         >
-          批量开通查询 ({{ selectedBrowseIds.length }})
+          {{ batchBusy ? "处理中…" : `批量开通查询 (${selectedBrowseIds.length})` }}
         </button>
       </div>
+      <p v-if="batchSelectionOverLimit" class="panel__hint panel__hint--warn">
+        已选 {{ selectedCount }} 条，超过单次上限 {{ BATCH_GOVERNANCE_MAX }}，请缩小选择范围。
+      </p>
       <div v-if="selectedCount" class="proposal-selection-bar">
         <span>
           已选 <strong class="numeric">{{ selectedCount }}</strong> 条
@@ -1643,6 +1675,7 @@ function probeStatusLabel(status: string) {
                     <button
                       type="button"
                       class="btn btn--primary btn--sm"
+                      :disabled="batchBusy"
                       @click="approveAndActivate(p.id as number)"
                     >
                       批准并激活
@@ -1667,7 +1700,12 @@ function probeStatusLabel(status: string) {
                     >
                       L2
                     </button>
-                    <button type="button" class="btn btn--primary btn--sm" @click="activateProposal(p.id as number)">
+                    <button
+                      type="button"
+                      class="btn btn--primary btn--sm"
+                      :disabled="batchBusy"
+                      @click="activateProposal(p.id as number)"
+                    >
                       L3
                     </button>
                   </template>
@@ -1698,6 +1736,7 @@ function probeStatusLabel(status: string) {
                     <button
                       type="button"
                       class="btn btn--ghost btn--sm"
+                      :disabled="batchBusy"
                       @click="activateProposal(p.id as number, true)"
                     >
                       重试
@@ -1711,7 +1750,12 @@ function probeStatusLabel(status: string) {
                     >
                       Schema 运维
                     </button>
-                    <button type="button" class="btn btn--primary btn--sm" @click="activateProposal(p.id as number, true)">
+                    <button
+                      type="button"
+                      class="btn btn--primary btn--sm"
+                      :disabled="batchBusy"
+                      @click="activateProposal(p.id as number, true)"
+                    >
                       重试 L3
                     </button>
                   </template>
@@ -1988,6 +2032,29 @@ function probeStatusLabel(status: string) {
   flex-wrap: wrap;
   gap: var(--space-sm);
   margin-bottom: var(--space-md);
+}
+
+.batch-governance-panel {
+  margin-bottom: var(--space-md);
+}
+
+.batch-governance-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.batch-governance-table {
+  margin-top: var(--space-sm);
+  font-size: 0.875rem;
+}
+
+.batch-governance-errors {
+  margin: var(--space-sm) 0 0;
+  padding-left: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
 }
 
 .proposal-points-filter {

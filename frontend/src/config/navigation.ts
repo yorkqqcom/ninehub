@@ -118,7 +118,7 @@ export const NAV_GROUPS: NavGroup[] = [
       {
         name: "quality",
         to: "/quality",
-        label: "数据质量",
+        label: "质量监控",
         icon: "quality",
         desc: "规则引擎与报告",
       },

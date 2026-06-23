@@ -86,11 +86,7 @@ const allModules = [
 
   { name: "提案治理", path: "/tia", desc: "扫描 · 审批 · L3 激活流水线", adminOnly: true },
 
-
-
   { name: "质量监控", path: "/quality", desc: "规则引擎与报告", adminOnly: false },
-
-
 
   { name: "数据源", path: "/sources", desc: "Tushare / AkShare 配置", adminOnly: true },
 
