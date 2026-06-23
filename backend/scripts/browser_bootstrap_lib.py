@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import os
+from sqlalchemy import select, text
+from sqlalchemy.orm import Session
 
-from sqlalchemy import create_engine, select, text
-from sqlalchemy.orm import Session, sessionmaker
-
+from app.core.database import sync_engine
 from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.tia_override import TiaOverride
 from app.models.tia_proposal import TiaProposal  # noqa: F401
@@ -19,10 +18,8 @@ from app.services.tia.scan.tushare_doc_registry import resolve_api_meta
 
 
 def db_session() -> Session:
-    url = os.environ.get(
-        "DATABASE_URL", "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub"
-    ).replace("+asyncpg", "")
-    return sessionmaker(bind=create_engine(url))()
+    """Open sync session via Settings (.env); same DB as setup_collect_workflows."""
+    return Session(sync_engine)
 
 
 def ensure_proposal(session: Session, api_name: str, *, reason: str) -> TiaProposal:

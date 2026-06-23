@@ -1,10 +1,10 @@
 """One-off: retry L3 activation for one failed proposal (no token / wctapi fallback)."""
-import os
 import sys
 
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
+from app.core.database import sync_engine
 from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.tia_proposal import TiaProposal  # noqa: F401
 from app.models.user import User  # noqa: F401
@@ -13,13 +13,7 @@ from app.services.tia.activation_service import TiaActivationService
 
 api_name = sys.argv[1] if len(sys.argv) > 1 else "bse_mapping"
 
-url = (
-    os.environ.get("DATABASE_URL", "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub")
-    .replace("+asyncpg", "")
-)
-engine = create_engine(url)
-Session = sessionmaker(bind=engine)
-session = Session()
+session = Session(sync_engine)
 
 row = session.execute(
     text(

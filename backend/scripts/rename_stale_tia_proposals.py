@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from sqlalchemy import create_engine, select  # noqa: E402
+from sqlalchemy import select  # noqa: E402
 from sqlalchemy.orm import Session  # noqa: E402
 
 from app.models.platform_job import PlatformJob  # noqa: F401,E402
@@ -30,10 +30,9 @@ def main() -> None:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    url = os.environ.get("DATABASE_URL") or "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub"
-    engine = create_engine(url.replace("+asyncpg", ""))
+    from app.core.database import sync_engine
 
-    with Session(engine) as session:
+    with Session(sync_engine) as session:
         if args.dry_run:
             rows = list(
                 session.execute(

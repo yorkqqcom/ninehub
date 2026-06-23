@@ -1,12 +1,13 @@
 """One-off: dump failed proposal activation_steps."""
 import json
-import os
-from sqlalchemy import create_engine, text
 
-url = os.environ.get("DATABASE_URL") or "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub"
-e = create_engine(url.replace("+asyncpg", ""))
-with e.connect() as c:
-    rows = c.execute(
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.core.database import sync_engine
+
+with Session(sync_engine) as session:
+    rows = session.execute(
         text(
             "select id, api_name, status, reason, activation_steps "
             "from tia_proposals where status = 'failed' order by api_name"

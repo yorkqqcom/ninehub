@@ -4,14 +4,15 @@
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from sqlalchemy import create_engine, select, text
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import select, text
+from sqlalchemy.orm import Session
+
+from browser_bootstrap_lib import db_session
 
 from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.tia_proposal import TiaProposal  # noqa: F401
@@ -24,14 +25,6 @@ from app.tasks.sync_tasks import run_collect
 
 P0_APIS = ("daily", "trade_cal")
 P0_BROWSE_APIS = ("stock_basic", "daily", "adj_factor")
-
-
-def _db_session() -> Session:
-    url = os.environ.get(
-        "DATABASE_URL", "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub"
-    ).replace("+asyncpg", "")
-    engine = create_engine(url)
-    return sessionmaker(bind=engine)()
 
 
 def _ensure_proposal(session: Session, api_name: str) -> TiaProposal:
@@ -126,7 +119,7 @@ def _enable_browse(session: Session, api_name: str) -> None:
 
 
 def bootstrap(*, collect_only: bool) -> int:
-    session = _db_session()
+    session = db_session()
     failed = 0
 
     if not collect_only:
@@ -192,7 +185,7 @@ def main() -> None:
     )
     args = parser.parse_args()
     if args.browse_only:
-        session = _db_session()
+        session = db_session()
         for api in P0_BROWSE_APIS:
             _enable_browse(session, api)
         session.close()

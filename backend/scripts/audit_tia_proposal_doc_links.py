@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from sqlalchemy import create_engine, select, text  # noqa: E402
+from sqlalchemy import select, text  # noqa: E402
 from sqlalchemy.orm import Session  # noqa: E402
 
 from app.models.tia_proposal import TiaProposal  # noqa: E402
@@ -20,9 +20,9 @@ from app.services.tia.proposal_enrichment import invalidate_api_meta_cache  # no
 
 
 def _load_db_proposals() -> list[TiaProposal]:
-    url = os.environ.get("DATABASE_URL") or "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub"
-    engine = create_engine(url.replace("+asyncpg", ""))
-    with Session(engine) as session:
+    from app.core.database import sync_engine
+
+    with Session(sync_engine) as session:
         return list(session.execute(select(TiaProposal).order_by(TiaProposal.id)).scalars().all())
 
 

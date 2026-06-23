@@ -15,7 +15,6 @@ Run:
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
@@ -23,8 +22,10 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from sqlalchemy import create_engine, select, text
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import select, text
+from sqlalchemy.orm import Session
+
+from browser_bootstrap_lib import db_session
 
 from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.tia_override import TiaOverride
@@ -42,13 +43,6 @@ from app.services.tia.tia_data_loader import TiaDataLoader
 SHENWAN_APIS = ("index_classify", "index_member_all")
 MIN_POINTS = 2000
 SW_SRC = "SW2021"
-
-
-def _db_session() -> Session:
-    url = os.environ.get(
-        "DATABASE_URL", "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub"
-    ).replace("+asyncpg", "")
-    return sessionmaker(bind=create_engine(url))()
 
 
 def _ensure_proposal(session: Session, api_name: str) -> TiaProposal:
@@ -213,7 +207,7 @@ def _row_count(session: Session, table: str) -> int:
 
 
 def bootstrap(*, activate: bool, collect: bool) -> int:
-    session = _db_session()
+    session = db_session()
     failed = 0
 
     print("=== Shenwan bootstrap (index_classify + index_member_all) ===")

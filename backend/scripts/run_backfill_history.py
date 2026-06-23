@@ -41,8 +41,10 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-from sqlalchemy import create_engine, select, text
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import select, text
+from sqlalchemy.orm import Session
+
+from app.core.database import sync_engine
 
 from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.platform_setting import PlatformSetting
@@ -366,11 +368,7 @@ class ChunkPlan:
 
 
 def _db_session() -> Session:
-    url = os.environ.get(
-        "SYNC_DATABASE_URL",
-        os.environ.get("DATABASE_URL", "postgresql://ninehub:ninehub_dev@127.0.0.1:5432/ninehub"),
-    ).replace("+asyncpg", "").replace("+psycopg2", "")
-    return sessionmaker(bind=create_engine(url))()
+    return Session(sync_engine)
 
 
 def _resolve_source(session: Session) -> tuple[str, str, dict, int | None]:

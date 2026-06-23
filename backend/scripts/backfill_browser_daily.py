@@ -4,15 +4,16 @@
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from sqlalchemy import create_engine, select, text
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import select, text
+from sqlalchemy.orm import Session
+
+from browser_bootstrap_lib import db_session
 
 from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.tia_override import TiaOverride
@@ -29,13 +30,6 @@ DATA_TYPE = "tushare_daily"
 API_NAME = "daily"
 
 
-def _db_session() -> Session:
-    url = os.environ.get(
-        "DATABASE_URL", "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub"
-    ).replace("+asyncpg", "")
-    return sessionmaker(bind=create_engine(url))()
-
-
 def _trading_window(session: Session, trading_days: int) -> tuple[date, date]:
     from app.services.workflow.collect_batch import _trading_days_before
 
@@ -45,7 +39,7 @@ def _trading_window(session: Session, trading_days: int) -> tuple[date, date]:
 
 
 def backfill(trading_days: int = 5) -> int:
-    session = _db_session()
+    session = db_session()
     TiaOverrideService().load_all_into_registry_sync(session)
 
     override = session.execute(

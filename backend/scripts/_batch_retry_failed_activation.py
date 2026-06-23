@@ -1,11 +1,10 @@
 """Batch retry L3 activation for all failed TIA proposals (wctapi doc fallback)."""
-import os
 import sys
-import time
 
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
+from app.core.database import sync_engine
 from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.tia_proposal import TiaProposal  # noqa: F401
 from app.models.user import User  # noqa: F401
@@ -14,13 +13,7 @@ from app.services.tia.activation_service import TiaActivationService
 
 limit = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 
-url = (
-    os.environ.get("DATABASE_URL", "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub")
-    .replace("+asyncpg", "")
-)
-engine = create_engine(url)
-Session = sessionmaker(bind=engine)
-session = Session()
+session = Session(sync_engine)
 
 rows = session.execute(
     text("select id, api_name from tia_proposals where status = 'failed' order by api_name")

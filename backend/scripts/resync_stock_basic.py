@@ -4,15 +4,16 @@
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from sqlalchemy import create_engine, select, text
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import select, text
+from sqlalchemy.orm import Session
+
+from browser_bootstrap_lib import db_session
 
 from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.tia_override import TiaOverride
@@ -26,13 +27,6 @@ from app.sync.handlers import SyncContext
 
 DATA_TYPE = "tushare_stock_basic"
 API_NAME = "stock_basic"
-
-
-def _db_session() -> Session:
-    url = os.environ.get(
-        "DATABASE_URL", "postgresql://ninehub:ninehub@127.0.0.1:5432/ninehub"
-    ).replace("+asyncpg", "")
-    return sessionmaker(bind=create_engine(url))()
 
 
 def patch_schema(schema: dict) -> dict:
@@ -77,7 +71,7 @@ def _resolve_source(session: Session) -> tuple[str, str, dict, int | None]:
 
 
 def resync(*, patch_only: bool = False) -> int:
-    session = _db_session()
+    session = db_session()
     override = session.execute(
         select(TiaOverride).where(TiaOverride.data_type == DATA_TYPE).limit(1)
     ).scalar_one_or_none()
