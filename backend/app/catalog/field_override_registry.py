@@ -34,6 +34,8 @@ API_FIELD_OVERRIDES: dict[str, dict[str, str]] = {
     "pro_bar": {"change": "change_amount"},
     "forecast": {"type": "fcst_type"},
     "fund_basic": {"type": "category_type"},
+    "index_weight": {"con_code": "stock_code"},
+    "index_member": {"con_code": "stock_code"},
 }
 
 

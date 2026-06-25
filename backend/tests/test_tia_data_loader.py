@@ -98,6 +98,52 @@ def test_upsert_stock_basic_ts_code_not_symbol() -> None:
     assert code == "688820.SH"
 
 
+def test_upsert_index_weight_con_code_triple_key() -> None:
+    session = _session()
+    schema = {
+        "api_name": "index_weight",
+        "columns": [
+            {"key": "index_code", "type": "string", "api_field": "index_code"},
+            {"key": "stock_code", "type": "string", "api_field": "con_code"},
+            {"key": "trade_date", "type": "date", "api_field": "trade_date"},
+            {"key": "weight", "type": "number", "api_field": "weight"},
+        ],
+        "unique_keys": ["index_code", "stock_code", "trade_date"],
+        "field_mappings": {
+            "index_code": "index_code",
+            "con_code": "stock_code",
+            "trade_date": "trade_date",
+            "weight": "weight",
+        },
+    }
+    migration = TiaMigrationService()
+    migration.ensure_table(session, "tushare_index_weight_loader", schema)
+
+    df = pd.DataFrame(
+        [
+            {
+                "index_code": "399300.SZ",
+                "con_code": "000001.SZ",
+                "trade_date": "20260601",
+                "weight": 1.5,
+            },
+            {
+                "index_code": "000905.SH",
+                "con_code": "600000.SH",
+                "trade_date": "20260531",
+                "weight": 0.8,
+            },
+        ]
+    )
+    rows = TiaDataLoader().upsert_dataframe(session, "tushare_index_weight_loader", schema, df)
+    session.commit()
+    assert rows == 2
+    count = session.execute(
+        __import__("sqlalchemy").text("SELECT COUNT(*) FROM tushare_index_weight_loader")
+    ).scalar()
+    assert count == 2
+
+
 def test_stock_company_long_text_column_types() -> None:
     from app.services.tia.schema_inference import _infer_column_type
 

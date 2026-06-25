@@ -37,7 +37,6 @@ from app.services.collectors.tushare import TushareCollector
 from app.services.tia.credentials import require_tushare_token, resolve_tushare_scan_credentials
 from app.services.tia.override_service import TiaOverrideService
 from app.services.tia.tia_data_loader import TiaDataLoader
-from app.services.tia.unique_key_registry import resolve_unique_keys
 
 INDEX_API = "index_weight"
 MIN_POINTS = 2000
@@ -46,6 +45,7 @@ INDEX_TARGETS: dict[str, str] = {
     "399300.SZ": "沪深300",
     "000905.SH": "中证500",
 }
+INDEX_WEIGHT_UNIQUE_KEYS = ["index_code", "stock_code", "trade_date"]
 
 
 def _current_month_range(offset_months: int = 0) -> tuple[str, str]:
@@ -59,6 +59,28 @@ def _current_month_range(offset_months: int = 0) -> tuple[str, str]:
     last_day = monthrange(year, month)[1]
     end = date(year, month, last_day)
     return start.strftime("%Y%m%d"), end.strftime("%Y%m%d")
+
+
+def _drop_stale_index_weight_uniques(session, table: str) -> None:
+    insp = __import__("sqlalchemy").inspect(session.get_bind())
+    want = INDEX_WEIGHT_UNIQUE_KEYS
+    for uc in insp.get_unique_constraints(table):
+        cols = uc.get("column_names") or []
+        if cols != want:
+            name = uc["name"]
+            session.execute(text(f'ALTER TABLE "{table}" DROP CONSTRAINT IF EXISTS "{name}"'))
+            session.commit()
+            print(f"  dropped stale unique constraint {name} on {cols}")
+    for idx in insp.get_indexes(table):
+        if not idx.get("unique"):
+            continue
+        cols = idx.get("column_names") or []
+        if cols == want:
+            continue
+        name = idx["name"]
+        session.execute(text(f'DROP INDEX IF EXISTS "{name}"'))
+        session.commit()
+        print(f"  dropped stale unique index {name} on {cols}")
 
 
 def _repair_index_weight_schema(session) -> None:
@@ -81,8 +103,8 @@ def _repair_index_weight_schema(session) -> None:
         field_mappings.pop("con_code", None)
     field_mappings["con_code"] = "stock_code"
     schema["field_mappings"] = field_mappings
-    api_fields = [c.get("api_field") or c.get("key") for c in columns]
-    schema["unique_keys"] = resolve_unique_keys(INDEX_API, [f for f in api_fields if f])
+    schema["unique_keys"] = list(INDEX_WEIGHT_UNIQUE_KEYS)
+    schema["api_name"] = INDEX_API
     oj["schema"] = schema
     override.override_json = oj
     session.commit()
@@ -95,15 +117,7 @@ def _repair_index_weight_schema(session) -> None:
         session.execute(text(f'ALTER TABLE "{table}" RENAME COLUMN con_code TO stock_code'))
         session.commit()
         print(f"  renamed {table}.con_code -> stock_code")
-    bind = session.get_bind()
-    insp = __import__("sqlalchemy").inspect(bind)
-    for uc in insp.get_unique_constraints(table):
-        cols = uc.get("column_names") or []
-        if cols != ["index_code", "stock_code", "trade_date"]:
-            name = uc["name"]
-            session.execute(text(f'ALTER TABLE "{table}" DROP CONSTRAINT IF EXISTS "{name}"'))
-            session.commit()
-            print(f"  dropped stale unique constraint {name} on {cols}")
+    _drop_stale_index_weight_uniques(session, table)
     uq_name = f"uq_{table}_index_stock_date"
     session.execute(
         text(
@@ -116,15 +130,20 @@ def _repair_index_weight_schema(session) -> None:
     print(f"  repaired unique_keys -> {schema['unique_keys']}")
 
 
-def _collect_index_weight(session, collector: TushareCollector, loader: TiaDataLoader) -> int:
+def _collect_index_weight(
+    session,
+    collector: TushareCollector,
+    loader: TiaDataLoader,
+    *,
+    skip_repair: bool = False,
+) -> int:
     override = get_override(session, INDEX_API)
     if override is None or not override.is_activated:
         raise RuntimeError("index_weight not activated")
-    _repair_index_weight_schema(session)
+    if not skip_repair:
+        _repair_index_weight_schema(session)
     schema = schema_of(get_override(session, INDEX_API) or override)
     table = override.table_name or "tushare_index_weight"
-    session.execute(text(f'TRUNCATE TABLE "{table}"'))
-    session.commit()
     frames: list[pd.DataFrame] = []
     for index_code, label in INDEX_TARGETS.items():
         for offset in (0, 1):
@@ -144,13 +163,15 @@ def _collect_index_weight(session, collector: TushareCollector, loader: TiaDataL
     if not frames:
         return 0
     merged = pd.concat(frames, ignore_index=True)
+    session.execute(text(f'TRUNCATE TABLE "{table}"'))
+    session.commit()
     count = loader.upsert_dataframe(session, table, schema, merged)
     session.commit()
     print(f"  index_weight upserted {count} rows into {table}")
     return count
 
 
-def bootstrap(*, activate: bool, collect: bool) -> int:
+def bootstrap(*, activate: bool, collect: bool, skip_repair: bool = False) -> int:
     session = db_session()
     failed = 0
 
@@ -198,7 +219,9 @@ def bootstrap(*, activate: bool, collect: bool) -> int:
             max_calls_per_minute=int(mcpm) if mcpm else None,
         )
         try:
-            _collect_index_weight(session, collector, TiaDataLoader())
+            _collect_index_weight(
+                session, collector, TiaDataLoader(), skip_repair=skip_repair
+            )
         except Exception as exc:
             failed += 1
             session.rollback()
@@ -231,9 +254,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Bootstrap index_weight for Data Browser")
     parser.add_argument("--activate-only", action="store_true")
     parser.add_argument("--collect-only", action="store_true")
+    parser.add_argument(
+        "--skip-repair",
+        action="store_true",
+        help="Skip schema/DDL repair (use when unique_keys already fixed in DB)",
+    )
     args = parser.parse_args()
     raise SystemExit(
-        bootstrap(activate=not args.collect_only, collect=not args.activate_only)
+        bootstrap(
+            activate=not args.collect_only,
+            collect=not args.activate_only,
+            skip_repair=args.skip_repair,
+        )
     )
 
 

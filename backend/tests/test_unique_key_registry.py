@@ -86,6 +86,14 @@ def test_share_float_unique_keys() -> None:
     assert keys == ["stock_code", "ann_date"]
 
 
+def test_index_weight_unique_keys() -> None:
+    keys = resolve_unique_keys(
+        "index_weight", ["index_code", "con_code", "trade_date", "weight"]
+    )
+    assert keys == ["index_code", "stock_code", "trade_date"]
+    assert "index_weight" in API_UNIQUE_KEY_OVERRIDES
+
+
 def test_index_daily_unique_keys() -> None:
     keys = resolve_unique_keys("index_daily", ["ts_code", "trade_date", "close"])
     assert keys == ["stock_code", "trade_date"]
