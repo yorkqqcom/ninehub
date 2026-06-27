@@ -47,3 +47,14 @@ def resolve_stock_codes(
                 continue
 
     return DEFAULT_STOCK_CODES[:max_codes], 0
+
+
+def resolve_stock_codes_for_collect(ctx) -> list[str]:
+    """Resolve stock codes from strategy context."""
+    codes, _ = resolve_stock_codes(
+        ctx.session,
+        ctx.extra,
+        max_codes=ctx.config.max_codes_per_run,
+        rotation_offset=int(ctx.extra.get("stock_code_offset") or 0),
+    )
+    return codes

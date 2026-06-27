@@ -103,6 +103,11 @@ def register_tia_handler(
     data_type: str,
     schema: dict[str, Any] | None = None,
 ) -> None:
+    if data_type.startswith("tdx_"):
+        from app.sync.tdx_handler import register_tdx_handler
+
+        register_tdx_handler(api_name, data_type, schema)
+        return
     handler = TushareApiHandler(api_name, data_type, schema)
     register_handler(data_type, handler)
     for alias in data_type_aliases(api_name):

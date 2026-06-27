@@ -5,11 +5,13 @@ from __future__ import annotations
 from app.core.exceptions import ValidationError
 from app.services.tia.scan.adapters.akshare import AkShareScanAdapter
 from app.services.tia.scan.adapters.base import ProviderScanAdapter
+from app.services.tia.scan.adapters.tdx import TdxScanAdapter
 from app.services.tia.scan.adapters.tushare import TushareScanAdapter
 
 _REGISTRY: dict[str, ProviderScanAdapter] = {
     "tushare": TushareScanAdapter(),
     "akshare": AkShareScanAdapter(),
+    "tdx": TdxScanAdapter(),
 }
 
 

@@ -31,7 +31,14 @@ def test_stock_basic_task_override_merge() -> None:
         market="主板",
     )
     assert default.get("exchange") == ""
+    assert "exchange" in (default.get("fields") or "")
     assert effective.get("market") == "主板"
+
+
+def test_stock_basic_collect_includes_exchange_fields() -> None:
+    schema = {"api_fields": ["ts_code", "name", "exchange", "market"]}
+    params = resolve_collect_params("stock_basic", schema)
+    assert params["fields"] == "ts_code,name,exchange,market"
 
 
 def test_build_collect_config_runtime_keys() -> None:

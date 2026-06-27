@@ -209,11 +209,26 @@ class BrowserReadinessService:
                         f'FROM "{sb_entry.table_name}"'
                     )
                 )
-                if int(ex_cnt.scalar_one() or 0) == 0:
-                    warnings.append(
-                        "stock_basic 关键列（如 exchange/name）未采集，"
-                        f"请运行 python scripts/{STOCK_BASIC_RESYNC_SCRIPT}"
+                ex_non_null = int(ex_cnt.scalar_one() or 0)
+                if ex_non_null == 0:
+                    nm_cnt = await session.execute(
+                        text(
+                            f'SELECT COUNT(*) FILTER (WHERE name IS NOT NULL) '
+                            f'FROM "{sb_entry.table_name}"'
+                        )
                     )
+                    name_non_null = int(nm_cnt.scalar_one() or 0)
+                    if name_non_null == 0:
+                        msg = (
+                            "stock_basic 关键列 name 未采集，"
+                            f"请运行 python scripts/{STOCK_BASIC_RESYNC_SCRIPT}"
+                        )
+                    else:
+                        msg = (
+                            "stock_basic 关键列 exchange 未采集（Tushare 默认响应不含该列），"
+                            f"请运行 python scripts/{STOCK_BASIC_RESYNC_SCRIPT}"
+                        )
+                    warnings.append(msg)
             except Exception:
                 pass
 

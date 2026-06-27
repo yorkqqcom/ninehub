@@ -65,7 +65,9 @@ class TiaActivationService:
     def _apply_data_source(task: SyncTask, session: Session) -> None:
         if task.source_id is not None:
             return
-        creds = resolve_tushare_collect_credentials(session)
+        from app.services.tia.credentials_tdx import resolve_collect_source_credentials
+
+        creds = resolve_collect_source_credentials(session, None, data_type=task.data_type)
         source_id = creds.get("source_id")
         if source_id is not None:
             task.source_id = int(source_id)
@@ -165,8 +167,10 @@ class TiaActivationService:
             session.flush()
 
         data_type = proposal.data_type or override.data_type or api_to_data_type(proposal.api_name)
+        if data_type.startswith("tdx_"):
+            data_type = api_to_data_type(proposal.api_name, provider="tdx")
         proposal.data_type = data_type
-        table_name = override.table_name or api_to_table_name(proposal.api_name)
+        table_name = override.table_name or api_to_table_name(proposal.api_name, provider="tdx" if data_type.startswith("tdx_") else "tushare")
         override.table_name = table_name
 
         schema: dict[str, Any] = {}

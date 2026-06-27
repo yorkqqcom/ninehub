@@ -66,6 +66,18 @@ COLLECT_PATTERN_REGISTRY: dict[str, dict[str, str]] = {
         "api_calls_hint": "1 次/运行",
         "risk": "",
     },
+    "file_import": {
+        "mode": "file_import",
+        "label": "TDX vipdoc 文件导入",
+        "api_calls_hint": "文件批次数",
+        "risk": "需配置 Sidecar install_root / vipdoc",
+    },
+    "tdx_concept_snapshot": {
+        "mode": "tdx_concept_snapshot",
+        "label": "TDX 概念快照",
+        "api_calls_hint": "1 次/运行",
+        "risk": "",
+    },
 }
 
 # APIs where param inference is insufficient (business override)
@@ -73,6 +85,11 @@ API_PATTERN_OVERRIDES: dict[str, str] = {
     "share_float": "ts_code",
     "trade_cal": "exchange_date_range",
     "margin_secs": "trade_date",
+    "bar_1d": "file_import",
+    "bar_1m": "file_import",
+    "bar_5m": "file_import",
+    "concept_index": "tdx_concept_snapshot",
+    "concept_member": "tdx_concept_snapshot",
 }
 
 # Reference APIs per pattern (documentation + regression tests)
@@ -167,9 +184,14 @@ def _catalog_probe_category(api_name: str) -> str | None:
 
 
 def _official_entry_for_api(api_name: str) -> Any | None:
+    from app.services.tia.scan.index_loader import load_bundled_index
     from app.services.tia.scan.tushare_doc_registry import load_api_by_doc_id, resolve_api_meta
     from app.services.tia.scan.types import OfficialApiEntry
 
+    bundled = load_bundled_index("tdx")
+    for entry in bundled.apis:
+        if entry.api == api_name:
+            return entry
     for row in load_api_by_doc_id().values():
         if row.get("api") == api_name:
             return OfficialApiEntry.from_dict(row)

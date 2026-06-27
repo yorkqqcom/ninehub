@@ -8,7 +8,6 @@ from typing import Any
 from app.services.trading_calendar.service import CN_HOLIDAYS
 from app.services.tia.scan.tushare_doc_registry import resolve_api_meta
 
-# Explicit probe specs not covered by category templates alone.
 OFFICIAL_ONLY_API_PROBES: dict[str, dict[str, Any]] = {
     "balancesheet": {
         "min_points": 600,
@@ -20,6 +19,70 @@ OFFICIAL_ONLY_API_PROBES: dict[str, dict[str, Any]] = {
                 "fields": "ts_code,end_date,total_assets,total_liab",
             },
             "expected_fields": ["ts_code", "end_date", "total_assets"],
+        },
+    },
+    "bar_1d": {
+        "min_points": 0,
+        "probe": {
+            "params": {},
+            "expected_fields": [
+                "stock_code",
+                "trade_date",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "amount",
+            ],
+        },
+    },
+    "bar_1m": {
+        "min_points": 0,
+        "probe": {
+            "params": {},
+            "expected_fields": [
+                "stock_code",
+                "bar_time",
+                "period",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "amount",
+            ],
+        },
+    },
+    "bar_5m": {
+        "min_points": 0,
+        "probe": {
+            "params": {},
+            "expected_fields": [
+                "stock_code",
+                "bar_time",
+                "period",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "amount",
+            ],
+        },
+    },
+    "concept_index": {
+        "min_points": 0,
+        "probe": {
+            "params": {"trade_date": "__LAST_TRADING_DAY__"},
+            "expected_fields": ["index_code", "name", "trade_date"],
+        },
+    },
+    "concept_member": {
+        "min_points": 0,
+        "probe": {
+            "params": {"trade_date": "__LAST_TRADING_DAY__"},
+            "expected_fields": ["index_code", "stock_code", "trade_date"],
         },
     },
 }

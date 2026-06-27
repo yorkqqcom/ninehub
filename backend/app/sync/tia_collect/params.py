@@ -9,6 +9,48 @@ SNAPSHOT_FULL_MARKET_PARAMS: dict[str, dict[str, str]] = {
     "stock_basic": {"exchange": "", "list_status": "L"},
 }
 
+STOCK_BASIC_DEFAULT_FIELDS = (
+    "ts_code,symbol,name,area,industry,fullname,enname,cnspell,market,exchange,"
+    "curr_type,list_status,list_date,delist_date,is_hs,act_name,act_ent_type"
+)
+
+
+def stock_basic_collect_fields(schema: dict[str, Any] | None = None) -> str:
+    """Tushare default stock_basic omits exchange unless ``fields`` is set."""
+    api_fields = list((schema or {}).get("api_fields") or [])
+    if api_fields:
+        return ",".join(api_fields)
+    return STOCK_BASIC_DEFAULT_FIELDS
+
+# Tushare default stock_basic payload omits exchange/delist_date unless ``fields`` is set.
+_STOCK_BASIC_DEFAULT_API_FIELDS: tuple[str, ...] = (
+    "ts_code",
+    "symbol",
+    "name",
+    "area",
+    "industry",
+    "fullname",
+    "enname",
+    "cnspell",
+    "market",
+    "exchange",
+    "curr_type",
+    "list_status",
+    "list_date",
+    "delist_date",
+    "is_hs",
+    "act_name",
+    "act_ent_type",
+)
+
+
+def stock_basic_fields_param(schema: dict[str, Any] | None = None) -> str:
+    """Build explicit ``fields`` for stock_basic (full L3 columns, not probe subset)."""
+    api_fields = [str(f) for f in ((schema or {}).get("api_fields") or []) if f]
+    if not api_fields:
+        api_fields = list(_STOCK_BASIC_DEFAULT_API_FIELDS)
+    return ",".join(api_fields)
+
 
 # Probe-only filters that must not leak into per-code or full-span backfill calls.
 _ITERATION_PROBE_STRIP_KEYS = (
@@ -74,6 +116,8 @@ def resolve_collect_params(
 
     if api_name in SNAPSHOT_FULL_MARKET_PARAMS:
         params = dict(SNAPSHOT_FULL_MARKET_PARAMS[api_name])
+        if api_name == "stock_basic":
+            params["fields"] = stock_basic_collect_fields(schema)
     else:
         params = sanitize_collect_params(resolve_probe_params_for_api(api_name, schema))
     params.update(overrides)

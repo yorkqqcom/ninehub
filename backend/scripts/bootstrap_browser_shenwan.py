@@ -54,7 +54,7 @@ def _ensure_proposal(session: Session, api_name: str) -> TiaProposal:
     ).scalar_one_or_none()
     if row is not None:
         return row
-    meta = resolve_api_meta(api_name)
+    meta = resolve_api_meta(api_name) or {}
     proposal = TiaProposal(
         api_name=api_name,
         status="pending",
@@ -212,7 +212,7 @@ def bootstrap(*, activate: bool, collect: bool) -> int:
 
     print("=== Shenwan bootstrap (index_classify + index_member_all) ===")
     for api in SHENWAN_APIS:
-        meta = resolve_api_meta(api)
+        meta = resolve_api_meta(api) or {}
         pts = meta.get("min_points")
         print(f"  {api}: doc_id={meta.get('doc_id')} min_points={pts}")
 

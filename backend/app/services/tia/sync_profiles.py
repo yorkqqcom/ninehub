@@ -69,6 +69,18 @@ _BY_CATEGORY: dict[str, SyncProfile] = {
         label="交易所日历 · 单次区间拉取",
     ),
     "generic": _DEFAULT,
+    "file_import": SyncProfile(
+        mode="file_import",
+        schedule_cron="0 7 * * 1-5",
+        label="TDX vipdoc · 工作日 07:00 T+1",
+        max_codes_per_run=500,
+        max_api_calls_per_run=500,
+    ),
+    "tdx_concept_snapshot": SyncProfile(
+        mode="tdx_concept_snapshot",
+        schedule_cron="0 7 * * 1-5",
+        label="TDX 概念快照 · 工作日 07:00",
+    ),
 }
 
 

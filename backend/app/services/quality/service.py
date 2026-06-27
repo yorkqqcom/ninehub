@@ -231,6 +231,8 @@ class QualityService:
             return await self._check_min_rows(session, rule, stock_code)
         if rule.rule_type == "no_nulls":
             return await self._check_no_nulls(session, rule, stock_code)
+        if rule.rule_type == "cross_table_count":
+            return await self._check_cross_table_count(session, rule)
         return QualityReport(
             data_type=rule.target_data_type,
             stock_code=stock_code,
@@ -249,6 +251,8 @@ class QualityService:
             return self._check_min_rows_sync(session, rule, stock_code)
         if rule.rule_type == "no_nulls":
             return self._check_no_nulls_sync(session, rule, stock_code)
+        if rule.rule_type == "cross_table_count":
+            return self._check_cross_table_count_sync(session, rule)
         return QualityReport(
             data_type=rule.target_data_type,
             stock_code=stock_code,
@@ -358,3 +362,50 @@ class QualityService:
     ) -> dict[str, Any]:
         filters = {"stock_code": stock_code} if stock_code else {}
         return self._query.count_nulls_sync(session, data_type, fields, filters)
+
+    async def _check_cross_table_count(
+        self,
+        session: AsyncSession,
+        rule: QualityRule,
+    ) -> QualityReport:
+        return self._check_cross_table_count_sync(session, rule)
+
+    def _check_cross_table_count_sync(
+        self,
+        session: Session,
+        rule: QualityRule,
+    ) -> QualityReport:
+        cfg = rule.config_json or {}
+        ref_type = str(cfg.get("reference_data_type") or "")
+        threshold = float(rule.threshold or 0.8)
+        target_count = self._query.count_rows_sync(session, rule.target_data_type, {})
+        ref_count = self._query.count_rows_sync(session, ref_type, {}) if ref_type else 0
+        if ref_count <= 0:
+            return QualityReport(
+                data_type=rule.target_data_type,
+                stock_code=None,
+                status="passed",
+                rule_id=rule.id,
+                detail_json={
+                    "rule_type": "cross_table_count",
+                    "skipped": True,
+                    "reason": f"reference {ref_type} empty or missing",
+                    "target_count": target_count,
+                },
+            )
+        ratio = target_count / ref_count if ref_count else 0.0
+        passed = ratio >= threshold
+        return QualityReport(
+            data_type=rule.target_data_type,
+            stock_code=None,
+            status="passed" if passed else "failed",
+            rule_id=rule.id,
+            detail_json={
+                "rule_type": "cross_table_count",
+                "target_count": target_count,
+                "reference_count": ref_count,
+                "ratio": round(ratio, 4),
+                "threshold": threshold,
+                "reference_data_type": ref_type,
+            },
+        )

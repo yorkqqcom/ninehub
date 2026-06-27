@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     tushare_doc_fetch_sleep_seconds: float = 0.35
 
     sync_start_date: str = "2010-01-01"
+    tdx_sidecar_base_url: Optional[str] = None
+    tdx_sidecar_api_token: Optional[str] = None
+    tdx_install_root: Optional[str] = None
     static_dir: str = "static"
     export_dir: str = "exports"
     export_retention_days: int = 30

@@ -15,6 +15,8 @@ from app.schemas.datasource import (
     DataSourceUpdate,
     DataSourceVerifyRequest,
     DataSourceVerifyResponse,
+    TdxProbeRequest,
+    TdxProbeResponse,
 )
 from app.services.datasource.service import DataSourceService
 
@@ -116,3 +118,17 @@ async def verify_source(
     _: RequireAdmin,
 ) -> DataSourceVerifyResponse:
     return await _service.verify(session, body)
+
+
+@router.post(
+    "/tdx-probe",
+    response_model=TdxProbeResponse,
+    summary="TDX 路径探测",
+    description="探测 Sidecar vipdoc 状态并可同步 install_root/paths 到 Sidecar。",
+)
+async def probe_tdx_source(
+    body: TdxProbeRequest,
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    _: RequireAdmin,
+) -> TdxProbeResponse:
+    return await _service.probe_tdx(session, body)

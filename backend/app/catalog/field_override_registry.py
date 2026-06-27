@@ -24,6 +24,11 @@ PROVIDER_FIELD_OVERRIDES: dict[str, dict[str, str]] = {
     "akshare": {
         "symbol": "stock_code",
     },
+    "tdx": {
+        "code": "stock_code",
+        "vol": "volume",
+        "datetime": "trade_date",
+    },
 }
 
 # API-level overrides (highest priority; from legacy_schema_registry.json)

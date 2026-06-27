@@ -514,6 +514,10 @@ class TiaPreflightTestService:
             entry = self._official_entry(api_name)
             if not token:
                 doc_fields = _wctapi_output_fields(api_name)
+                if not doc_fields:
+                    from app.services.catalog.field_resolution import resolve_expected_fields
+
+                    doc_fields = resolve_expected_fields(api_name)
                 if doc_fields:
                     live_fields = list(doc_fields)
                     schema = self._apply_schema_from_field_list(
@@ -524,10 +528,10 @@ class TiaPreflightTestService:
                         fields_source="wctapi_md",
                         live_probe_status="warn",
                         live_probe_message=(
-                            f"无 Token，使用 wctapi 文档 {len(live_fields)} 列出参建表"
+                            f"无 Token，使用文档/注册表 {len(live_fields)} 列出参建表"
                         ),
                         field_match_message=(
-                            f"wctapi 文档 {len(live_fields)} 列，唯一键校验通过"
+                            f"注册表 {len(live_fields)} 列，唯一键校验通过"
                         ),
                         require_live_actual=False,
                     )

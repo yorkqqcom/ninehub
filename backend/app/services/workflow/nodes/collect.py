@@ -13,6 +13,10 @@ from app.models.workflow import WorkflowNode
 from app.services.platform.service import PlatformService
 from app.services.tia.constants import resolve_canonical_data_type
 from app.services.tia.credentials import require_tushare_token, resolve_tushare_collect_credentials
+from app.services.tia.credentials_tdx import (
+    build_sync_auth_extra,
+    resolve_collect_source_credentials,
+)
 from app.services.tushare.quota import validate_points_for_data_type
 from app.services.tushare.source_quota import resolve_max_calls_per_minute
 from app.services.workflow.collect_batch import (
@@ -47,7 +51,9 @@ class CollectNodeHandler:
                 message=f"采集完成（stub — {node.data_type} 无 Handler）",
             )
 
-        provider, token, source_config, resolved_source_id = self._resolve_source(session, node.source_id)
+        provider, token, source_config, resolved_source_id = self._resolve_source(
+            session, node.source_id, node.data_type
+        )
         source_id = node.source_id or resolved_source_id or 1
         validate_points_for_data_type(
             node.data_type,
@@ -114,18 +120,25 @@ class CollectNodeHandler:
                     start_date=start_date,
                     end_date=end_date,
                     batch_mode=batch_mode,
-                    extra={
-                        "session": collect_session,
-                        "provider": provider,
-                        "token": token,
-                        "source_config": source_config,
-                        "max_calls_per_minute": resolve_max_calls_per_minute(source_config),
-                        "table_name": entry.table_name if entry else None,
-                        "stock_codes_table": stock_codes_table or "tushare_stock_basic",
-                        "stock_code_offset": rotation_offset,
-                        "workflow_schema": schema,
-                        "workflow_profile": profile,
-                    },
+                    extra=build_sync_auth_extra(
+                        {
+                            "provider": provider,
+                            "base_url": source_config.get("base_url"),
+                            "api_token": source_config.get("api_token"),
+                            "source_config": source_config,
+                        },
+                        {
+                            "session": collect_session,
+                            "token": token,
+                            "source_config": source_config,
+                            "max_calls_per_minute": resolve_max_calls_per_minute(source_config),
+                            "table_name": entry.table_name if entry else None,
+                            "stock_codes_table": stock_codes_table or "tushare_stock_basic",
+                            "stock_code_offset": rotation_offset,
+                            "workflow_schema": schema,
+                            "workflow_profile": profile,
+                        },
+                    ),
                 )
             )
             msg = (result.message or "").lower()
@@ -163,6 +176,8 @@ class CollectNodeHandler:
         canonical = resolve_canonical_data_type(data_type)
         if canonical.startswith("tushare_"):
             return canonical[len("tushare_") :]
+        if canonical.startswith("tdx_"):
+            return canonical[len("tdx_") :]
         if canonical.startswith("tia_"):
             return canonical[len("tia_") :]
         return canonical
@@ -187,11 +202,20 @@ class CollectNodeHandler:
         self,
         session: Session,
         source_id: int | None,
+        data_type: str | None = None,
     ) -> tuple[str, str, dict, int | None]:
-        creds = resolve_tushare_collect_credentials(session, source_id)
+        creds = resolve_collect_source_credentials(session, source_id, data_type=data_type)
+        provider = str(creds.get("provider") or "tushare")
+        if provider == "tdx":
+            return (
+                provider,
+                "",
+                dict(creds.get("source_config") or creds),
+                creds.get("source_id"),
+            )
         token = require_tushare_token(creds)
         return (
-            str(creds.get("provider") or "tushare"),
+            provider,
             token,
             dict(creds.get("source_config") or {}),
             creds.get("source_id"),

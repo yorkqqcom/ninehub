@@ -40,6 +40,11 @@ API_UNIQUE_KEY_OVERRIDES: dict[str, list[str]] = {
     # con_code → stock_code at load time; heuristic misses ts_code/stock_code in api_fields
     "index_weight": ["index_code", "stock_code", "trade_date"],
     "index_member": ["index_code", "stock_code"],
+    "bar_1d": ["stock_code", "trade_date"],
+    "bar_1m": ["stock_code", "bar_time", "period"],
+    "bar_5m": ["stock_code", "bar_time", "period"],
+    "concept_index": ["index_code", "trade_date"],
+    "concept_member": ["index_code", "stock_code", "trade_date"],
 }
 
 # 浏览/筛选常用列 → 非唯一索引（加速 DataBrowse 按代码/日期过滤）
