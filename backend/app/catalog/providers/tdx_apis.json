@@ -1,0 +1,47 @@
+{
+  "provider": "tdx",
+  "version": "2026-06",
+  "source": "bundled",
+  "apis": [
+    {
+      "api": "bar_1d",
+      "category": "行情",
+      "probe_category": "none",
+      "label": "通达信日线(vipdoc)",
+      "min_points": 0,
+      "collect_mode": "file_import"
+    },
+    {
+      "api": "bar_1m",
+      "category": "行情",
+      "probe_category": "none",
+      "label": "通达信1分钟线(vipdoc)",
+      "min_points": 0,
+      "collect_mode": "file_import"
+    },
+    {
+      "api": "bar_5m",
+      "category": "行情",
+      "probe_category": "none",
+      "label": "通达信5分钟线(vipdoc)",
+      "min_points": 0,
+      "collect_mode": "file_import"
+    },
+    {
+      "api": "concept_index",
+      "category": "板块",
+      "probe_category": "none",
+      "label": "通达信概念板块",
+      "min_points": 0,
+      "collect_mode": "tdx_concept_snapshot"
+    },
+    {
+      "api": "concept_member",
+      "category": "板块",
+      "probe_category": "none",
+      "label": "通达信概念成分",
+      "min_points": 0,
+      "collect_mode": "tdx_concept_snapshot"
+    }
+  ]
+}
