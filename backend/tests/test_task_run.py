@@ -37,12 +37,12 @@ def test_execute_run_sync_calls_executor(sync_session) -> None:
     with patch("app.services.tasks.run_service.SyncExecutor") as mock_exec, patch(
         "app.services.tasks.run_service.validate_points_for_data_type"
     ), patch(
-        "app.services.tasks.run_service.resolve_tushare_collect_credentials",
+        "app.services.tasks.run_service.resolve_collect_source_credentials",
         return_value={
             "token": "test-token",
             "provider": "tushare",
-            "source_config": {},
-            "source_id": None,
+            "source_config": {"account_points": 120},
+            "source_id": 1,
         },
     ):
         mock_exec.return_value.run.return_value = mock_result

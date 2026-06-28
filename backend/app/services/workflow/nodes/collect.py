@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -12,7 +13,7 @@ from app.core.exceptions import ValidationError
 from app.models.workflow import WorkflowNode
 from app.services.platform.service import PlatformService
 from app.services.tia.constants import resolve_canonical_data_type
-from app.services.tia.credentials import require_tushare_token, resolve_tushare_collect_credentials
+from app.services.tia.credentials import require_tushare_token
 from app.services.tia.credentials_tdx import (
     build_sync_auth_extra,
     resolve_collect_source_credentials,
@@ -51,10 +52,10 @@ class CollectNodeHandler:
                 message=f"采集完成（stub — {node.data_type} 无 Handler）",
             )
 
-        provider, token, source_config, resolved_source_id = self._resolve_source(
-            session, node.source_id, node.data_type
-        )
-        source_id = node.source_id or resolved_source_id or 1
+        creds = self._resolve_source(session, node.source_id, node.data_type)
+        provider = str(creds.get("provider") or "tushare")
+        source_config = dict(creds.get("source_config") or {})
+        source_id = node.source_id or creds.get("source_id") or 1
         validate_points_for_data_type(
             node.data_type,
             provider=provider,
@@ -121,16 +122,9 @@ class CollectNodeHandler:
                     end_date=end_date,
                     batch_mode=batch_mode,
                     extra=build_sync_auth_extra(
-                        {
-                            "provider": provider,
-                            "base_url": source_config.get("base_url"),
-                            "api_token": source_config.get("api_token"),
-                            "source_config": source_config,
-                        },
+                        creds,
                         {
                             "session": collect_session,
-                            "token": token,
-                            "source_config": source_config,
                             "max_calls_per_minute": resolve_max_calls_per_minute(source_config),
                             "table_name": entry.table_name if entry else None,
                             "stock_codes_table": stock_codes_table or "tushare_stock_basic",
@@ -203,20 +197,9 @@ class CollectNodeHandler:
         session: Session,
         source_id: int | None,
         data_type: str | None = None,
-    ) -> tuple[str, str, dict, int | None]:
+    ) -> dict[str, Any]:
         creds = resolve_collect_source_credentials(session, source_id, data_type=data_type)
         provider = str(creds.get("provider") or "tushare")
-        if provider == "tdx":
-            return (
-                provider,
-                "",
-                dict(creds.get("source_config") or creds),
-                creds.get("source_id"),
-            )
-        token = require_tushare_token(creds)
-        return (
-            provider,
-            token,
-            dict(creds.get("source_config") or {}),
-            creds.get("source_id"),
-        )
+        if provider != "tdx":
+            require_tushare_token(creds)
+        return creds

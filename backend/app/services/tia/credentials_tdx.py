@@ -113,16 +113,19 @@ def resolve_collect_source_credentials(
 
 def build_sync_auth_extra(creds: dict[str, Any], extra: dict[str, Any]) -> dict[str, Any]:
     """Merge provider-specific auth fields into SyncContext.extra."""
-    provider = str(creds.get("provider") or "tushare")
+    provider = str(creds.get("provider") or extra.get("provider") or "tushare")
     extra = dict(extra)
     extra["provider"] = provider
-    extra["source_config"] = dict(creds.get("source_config") or {})
+    extra["source_config"] = dict(creds.get("source_config") or extra.get("source_config") or {})
     if provider == "tdx":
-        extra["tdx_base_url"] = creds.get("base_url")
-        extra["tdx_api_token"] = creds.get("api_token") or ""
+        extra["tdx_base_url"] = creds.get("base_url") or extra.get("tdx_base_url")
+        extra["tdx_api_token"] = creds.get("api_token") or extra.get("api_token") or ""
         extra["token"] = ""
         return extra
     from app.services.tia.credentials import require_tushare_token
 
-    extra["token"] = require_tushare_token(creds)
+    token = extra.get("token") or creds.get("token")
+    if not token:
+        token = require_tushare_token(creds)
+    extra["token"] = str(token)
     return extra

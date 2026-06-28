@@ -80,3 +80,31 @@ def test_execute_run_uses_active_data_source(sync_session, monkeypatch) -> None:
 
     sync_session.refresh(task)
     assert task.source_id == source.id
+
+
+def test_build_sync_auth_extra_preserves_resolved_token() -> None:
+    from app.services.tia.credentials_tdx import build_sync_auth_extra
+
+    merged = build_sync_auth_extra(
+        {
+            "provider": "tushare",
+            "token": "creds-token",
+            "source_config": {"account_points": 2000},
+        },
+        {
+            "session": object(),
+            "table_name": "tushare_fina_audit",
+        },
+    )
+    assert merged["token"] == "creds-token"
+    assert merged["provider"] == "tushare"
+
+
+def test_build_sync_auth_extra_prefers_extra_token() -> None:
+    from app.services.tia.credentials_tdx import build_sync_auth_extra
+
+    merged = build_sync_auth_extra(
+        {"provider": "tushare", "source_config": {"account_points": 2000}},
+        {"token": "extra-token"},
+    )
+    assert merged["token"] == "extra-token"

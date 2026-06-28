@@ -1,6 +1,7 @@
 """Task run logging and SyncExecutor integration."""
 
 from datetime import date, datetime, timedelta, timezone
+from typing import Any
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,10 +12,7 @@ from app.models.sync_task import SyncTask
 from app.models.task_run import TaskRun
 from app.schemas.task_run import TaskRunPageResponse, TaskRunResponse, TaskRunTriggerResponse
 from app.services.platform.service import PlatformService
-from app.services.tia.credentials import (
-    require_tushare_token,
-    resolve_tushare_collect_credentials,
-)
+from app.services.tia.credentials import require_tushare_token
 from app.services.tia.credentials_tdx import (
     build_sync_auth_extra,
     resolve_collect_source_credentials,
@@ -74,23 +72,12 @@ class TaskRunService:
         session: Session,
         source_id: int | None,
         data_type: str | None = None,
-    ) -> tuple[str, str, dict, int | None]:
+    ) -> dict[str, Any]:
         creds = resolve_collect_source_credentials(session, source_id, data_type=data_type)
         provider = str(creds.get("provider") or "tushare")
-        if provider == "tdx":
-            return (
-                provider,
-                "",
-                dict(creds.get("source_config") or creds),
-                creds.get("source_id"),
-            )
-        token = require_tushare_token(creds)
-        return (
-            provider,
-            token,
-            dict(creds.get("source_config") or {}),
-            creds.get("source_id"),
-        )
+        if provider != "tdx":
+            require_tushare_token(creds)
+        return creds
 
     @staticmethod
     def _is_failed_collect(result: CollectResult) -> bool:
@@ -121,11 +108,12 @@ class TaskRunService:
         self._check_upstream_sync(session, task)
 
         try:
-            provider, token, source_config, resolved_source_id = self._resolve_source_sync(
-                session, task.source_id, task.data_type
-            )
+            creds = self._resolve_source_sync(session, task.source_id, task.data_type)
+            provider = str(creds.get("provider") or "tushare")
+            source_config = dict(creds.get("source_config") or {})
+            resolved_source_id = creds.get("source_id")
             if task.source_id is None and resolved_source_id is not None:
-                task.source_id = resolved_source_id
+                task.source_id = int(resolved_source_id)
                 session.flush()
             validate_points_for_data_type(
                 task.data_type,
@@ -150,16 +138,9 @@ class TaskRunService:
                 start_date=start_date,
                 end_date=end_date,
                 extra=build_sync_auth_extra(
-                    {
-                        "provider": provider,
-                        "base_url": source_config.get("base_url"),
-                        "api_token": source_config.get("api_token"),
-                        "source_config": source_config,
-                    },
+                    creds,
                     {
                         "session": session,
-                        "token": token,
-                        "source_config": source_config,
                         "max_calls_per_minute": resolve_max_calls_per_minute(source_config),
                         "table_name": entry.table_name if entry else None,
                         "collect_params": task.collect_params or {},
