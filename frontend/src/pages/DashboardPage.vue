@@ -70,7 +70,6 @@ const allModules = [
     name: "数据浏览器",
     path: "/data-browser?tpl=wind_ohlc_demo",
     desc: "证券池 × 多指标宽表截面（三选一提）",
-    browseOnly: true,
   },
   { name: "数据查询", path: "/browse", desc: "L3 激活事实表分页查询", browseOnly: true },
 

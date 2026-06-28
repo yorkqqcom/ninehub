@@ -48,7 +48,6 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "数据浏览器",
         icon: "table",
         desc: "证券池 × 多指标宽表截面",
-        browseOnly: true,
       },
       {
         name: "browse",

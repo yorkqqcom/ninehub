@@ -7,7 +7,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
-from app.catalog.registry import get_data_type_entry
+from app.catalog.registry import ensure_data_type_entry_sync, get_data_type_entry
 from app.core.database import SyncSessionLocal
 from app.core.exceptions import ValidationError
 from app.models.workflow import WorkflowNode
@@ -65,7 +65,7 @@ class CollectNodeHandler:
         trigger_type = context.trigger_type if context else "manual"
         batch_mode = resolve_batch_mode(trigger_type, explicit=context.batch_mode if context else None)
         api_name = self._api_name(node.data_type)
-        entry = get_data_type_entry(node.data_type)
+        entry = ensure_data_type_entry_sync(session, node.data_type)
         schema = self._load_runtime_schema(session, node.data_type, api_name)
 
         from app.services.workflow.collect_batch import (
@@ -100,8 +100,8 @@ class CollectNodeHandler:
                 },
             )
 
-        stock_codes_table = entry.table_name if entry else None
-        if api_name == "stock_basic" and entry and entry.table_name:
+        stock_codes_table = entry.table_name
+        if api_name == "stock_basic":
             stock_codes_table = entry.table_name
 
         rotation_offset = 0
@@ -126,7 +126,7 @@ class CollectNodeHandler:
                         {
                             "session": collect_session,
                             "max_calls_per_minute": resolve_max_calls_per_minute(source_config),
-                            "table_name": entry.table_name if entry else None,
+                            "table_name": entry.table_name,
                             "stock_codes_table": stock_codes_table or "tushare_stock_basic",
                             "stock_code_offset": rotation_offset,
                             "workflow_schema": schema,

@@ -129,9 +129,9 @@ class TaskRunService:
             run.message = f"Collect started ({task.data_type})"
             session.flush()
 
-            from app.catalog.registry import get_data_type_entry
+            from app.catalog.registry import ensure_data_type_entry_sync
 
-            entry = get_data_type_entry(task.data_type)
+            entry = ensure_data_type_entry_sync(session, task.data_type)
             ctx = SyncContext(
                 data_type=task.data_type,
                 source_id=task.source_id or 0,
@@ -142,7 +142,7 @@ class TaskRunService:
                     {
                         "session": session,
                         "max_calls_per_minute": resolve_max_calls_per_minute(source_config),
-                        "table_name": entry.table_name if entry else None,
+                        "table_name": entry.table_name,
                         "collect_params": task.collect_params or {},
                     },
                 ),

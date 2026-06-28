@@ -3,6 +3,8 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+from sqlalchemy.orm import Session
+
 from app.schemas.catalog import CatalogColumnMeta, CatalogFilterMeta
 
 
@@ -38,6 +40,44 @@ CATALOG_REGISTRY: dict[str, DataTypeEntry] = {}
 
 def get_data_type_entry(data_type: str) -> Optional[DataTypeEntry]:
     return CATALOG_REGISTRY.get(data_type)
+
+
+def ensure_data_type_entry_sync(session: Session, data_type: str) -> DataTypeEntry:
+    """Load catalog + handlers when Celery/inline worker has empty registry."""
+    from app.core.exceptions import NotFoundError
+    from app.services.tia.constants import resolve_canonical_data_type
+
+    entry = get_data_type_entry(data_type)
+    if entry is not None:
+        return entry
+    canonical = resolve_canonical_data_type(data_type)
+    entry = get_data_type_entry(canonical)
+    if entry is not None:
+        return entry
+
+    from app.services.tia.override_service import TiaOverrideService
+
+    TiaOverrideService().load_all_into_registry_sync(session)
+    entry = get_data_type_entry(data_type) or get_data_type_entry(canonical)
+    if entry is not None:
+        return entry
+
+    from sqlalchemy import select
+
+    from app.models.tia_override import TiaOverride
+
+    override = session.execute(
+        select(TiaOverride)
+        .where(TiaOverride.data_type.in_([data_type, canonical]))
+        .limit(1)
+    ).scalar_one_or_none()
+    if override is None:
+        raise NotFoundError(f"No catalog entry for data_type={data_type}")
+    TiaOverrideService().bootstrap_override(override)
+    entry = get_data_type_entry(override.data_type)
+    if entry is None:
+        raise NotFoundError(f"Failed to register catalog entry for {data_type}")
+    return entry
 
 
 def list_data_types(domain: Optional[str] = None) -> List[DataTypeEntry]:

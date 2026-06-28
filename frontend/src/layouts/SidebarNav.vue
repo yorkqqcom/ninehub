@@ -23,12 +23,11 @@ type NavItem = { to: string; label: string; name: string; adminOnly?: boolean };
 
 
 const navItems = computed(() => {
-  const dataItems: NavItem[] = [];
+  const dataItems: NavItem[] = [
+    { to: "/data-browser", label: "数据浏览器", name: "data-browser" },
+  ];
   if (hasBrowseTypes.value) {
-    dataItems.push(
-      { to: "/data-browser", label: "数据浏览器", name: "data-browser" },
-      { to: "/browse", label: "数据查询", name: "browse" },
-    );
+    dataItems.push({ to: "/browse", label: "数据查询", name: "browse" });
   }
 
   const groups = [

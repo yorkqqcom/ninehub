@@ -144,6 +144,13 @@ class TdxConceptSnapshotStrategy(CollectStrategy):
         )
         if ctx.api_name == "concept_member":
             items = payload.get("concept_member_items") or []
+            if not items:
+                from app.core.exceptions import ValidationError
+
+                reason = payload.get("concept_member_missing_reason") or (
+                    "成分股为空，请检查 hq_cache 下 block_gn.dat 是否存在"
+                )
+                raise ValidationError(f"TDX concept_member: {reason}")
         else:
             items = payload.get("concept_index_items") or []
         df = pd.DataFrame(items) if items else pd.DataFrame()

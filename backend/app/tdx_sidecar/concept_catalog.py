@@ -8,6 +8,27 @@ from typing import Any
 
 import pandas as pd
 
+BLOCK_MEMBER_CANDIDATES = ("block_gn.dat", "block_fg.dat", "block_zs.dat", "block.dat")
+
+
+def _normalize_stock_code(raw: str) -> str | None:
+    code = raw.strip()
+    if len(code) != 6 or not code.isdigit():
+        return None
+    if code.startswith(("5", "6", "9")):
+        return f"{code}.SH"
+    return f"{code}.SZ"
+
+
+def _index_name_map(tdxzs_path: Path) -> dict[str, str]:
+    mapping: dict[str, str] = {}
+    for row in _parse_tdxzs(tdxzs_path):
+        name = str(row.get("name") or "").strip()
+        index_code = str(row.get("index_code") or "").strip()
+        if name and index_code:
+            mapping[name] = index_code
+    return mapping
+
 
 def _parse_tdxzs(path: Path) -> list[dict[str, str]]:
     if not path.is_file():
@@ -24,7 +45,22 @@ def _parse_tdxzs(path: Path) -> list[dict[str, str]]:
     return rows
 
 
-def _parse_block_gn(path: Path, trade_date: date) -> list[dict[str, str]]:
+def _resolve_block_member_file(hq_cache_root: Path) -> tuple[Path | None, list[str]]:
+    missing: list[str] = []
+    for name in BLOCK_MEMBER_CANDIDATES:
+        path = hq_cache_root / name
+        if path.is_file():
+            return path, missing
+        missing.append(name)
+    return None, missing
+
+
+def _parse_block_members(
+    path: Path,
+    trade_date: date,
+    *,
+    index_name_map: dict[str, str],
+) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     try:
         from pytdx.reader import BlockReader
@@ -34,14 +70,16 @@ def _parse_block_gn(path: Path, trade_date: date) -> list[dict[str, str]]:
         if blocks is None or blocks.empty:
             return rows
         for _, row in blocks.iterrows():
-            index_raw = str(row.get("blockname") or row.get("code") or "")
-            stock_raw = str(row.get("code") or "")
-            if not index_raw or not stock_raw:
+            blockname = str(row.get("blockname") or "").strip()
+            stock_raw = str(row.get("code") or "").strip()
+            index_code = index_name_map.get(blockname) or blockname
+            stock_code = _normalize_stock_code(stock_raw)
+            if not index_code or not stock_code:
                 continue
             rows.append(
                 {
-                    "index_code": index_raw,
-                    "stock_code": stock_raw,
+                    "index_code": index_code,
+                    "stock_code": stock_code,
                     "trade_date": trade_date.isoformat(),
                 }
             )
@@ -59,13 +97,33 @@ def export_concept_catalog(
     index_rows: list[dict[str, str]] = []
     member_rows: list[dict[str, str]] = []
     source = "none"
+    member_source: str | None = None
+    member_missing_reason: str | None = None
     if hq_cache_root:
-        tdxzs = Path(hq_cache_root) / "tdxzs.cfg"
+        cache_root = Path(hq_cache_root)
+        tdxzs = cache_root / "tdxzs.cfg"
         index_rows = _parse_tdxzs(tdxzs)
-        block_gn = Path(hq_cache_root) / "block_gn.dat"
-        if block_gn.is_file():
-            member_rows = _parse_block_gn(block_gn, trade_date)
-            source = "local:tdxzs+block_gn"
+        index_name_map = _index_name_map(tdxzs)
+        block_path, missing_names = _resolve_block_member_file(cache_root)
+        if block_path is not None:
+            member_rows = _parse_block_members(
+                block_path,
+                trade_date,
+                index_name_map=index_name_map,
+            )
+            member_source = block_path.name
+            if index_rows and member_rows:
+                source = f"local:tdxzs+{block_path.name}"
+            elif index_rows:
+                source = "local:tdxzs"
+        else:
+            member_missing_reason = (
+                "未找到板块成分股文件（"
+                + " / ".join(missing_names)
+                + "）。请在通达信客户端执行「系统 → 专业数据 → 板块数据」更新后重试。"
+            )
+            if index_rows:
+                source = "local:tdxzs"
     if index_rows:
         for row in index_rows:
             row["trade_date"] = trade_date.isoformat()
@@ -74,6 +132,8 @@ def export_concept_catalog(
         "concept_map_source": source,
         "concept_index": index_rows,
         "concept_member": member_rows,
+        "concept_member_source": member_source,
+        "concept_member_missing_reason": member_missing_reason,
     }
 
 
