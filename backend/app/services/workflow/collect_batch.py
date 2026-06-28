@@ -73,6 +73,12 @@ DAILY_BATCH_MODE_OVERRIDES: dict[str, str] = {
     "repurchase": "exchange_date_range",
     "hk_hold": "date_range",
     "weekly": "date_range",
+    # TDX T+1 (Sidecar vipdoc / concept snapshot)
+    "bar_1d": "file_import",
+    "bar_1m": "file_import",
+    "bar_5m": "file_import",
+    "concept_index": "tdx_concept_snapshot",
+    "concept_member": "tdx_concept_snapshot",
 }
 
 
@@ -97,6 +103,10 @@ def resolve_daily_max_codes(api_name: str, mode: str) -> int:
     """Max stock codes per daily/backfill workflow node within the API-call budget."""
     if mode in ("snapshot", "trade_date"):
         return DAILY_MAX_CODES
+    if mode == "file_import":
+        return min(500, DAILY_MAX_CODES)
+    if mode == "tdx_concept_snapshot":
+        return 1
     if mode == "exchange_date_range":
         return 1
     if mode == "period":

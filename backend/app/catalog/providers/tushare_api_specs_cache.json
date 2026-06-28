@@ -1,6 +1,6 @@
 {
   "provider": "tushare",
-  "updated_at": "2026-06-16T05:58:13.320527+00:00",
+  "updated_at": "2026-06-27T08:38:52.921490+00:00",
   "entries": {
     "25": {
       "doc_id": 25,
@@ -161,15 +161,15 @@
         "#查询当前所有正常上市交易的股票列表\n\ndata = pro.query('stock_basic', exchange='', list_status='L', fields='ts_code,symbol,name,area,industry,list_date')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "exchange": "SSE",
           "ts_code": "000001.SZ",
           "list_status": "L",
+          "exchange": "SSE",
           "limit": 3
         },
         "expected_fields": [
@@ -399,16 +399,16 @@
         "df = pro.daily(trade_date='20180810')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -488,16 +488,16 @@
         "df = pro.query('adj_factor',  trade_date='20180718')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -562,19 +562,19 @@
           "name": "turnover_rate",
           "type": "float",
           "required": null,
-          "description": "换手率（%）"
+          "description": "换手率 (成交量/无限售流通股数)"
         },
         {
           "name": "turnover_rate_f",
           "type": "float",
           "required": null,
-          "description": "换手率（自由流通股）"
+          "description": "换手率（自由流通股）(成交量/自由流通股数)"
         },
         {
           "name": "volume_ratio",
           "type": "float",
           "required": null,
-          "description": "量比"
+          "description": "量比 VOL/MA"
         },
         {
           "name": "pe",
@@ -586,25 +586,25 @@
           "name": "pe_ttm",
           "type": "float",
           "required": null,
-          "description": "市盈率（TTM，亏损的PE为空）"
+          "description": "市盈率（ 总市值/净利润TTM，亏损的PE为空）"
         },
         {
           "name": "pb",
           "type": "float",
           "required": null,
-          "description": "市净率（总市值/净资产）"
+          "description": "市净率（总市值/(净资产-其他权益工具)）"
         },
         {
           "name": "ps",
           "type": "float",
           "required": null,
-          "description": "市销率"
+          "description": "市销率 (总市值/营业收入(最新年报))"
         },
         {
           "name": "ps_ttm",
           "type": "float",
           "required": null,
-          "description": "市销率（TTM）"
+          "description": "市销率（TTM）(总市值/营业收入TTM)"
         },
         {
           "name": "dv_ratio",
@@ -674,16 +674,16 @@
         "df = pro.query('daily_basic', ts_code='', trade_date='20180726',fields='ts_code,trade_date,turnover_rate,volume_ratio,pe,pb')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -1431,16 +1431,16 @@
         "df = pro.income_vip(period='20181231',fields='ts_code,ann_date,f_ann_date,end_date,report_type,comp_type,basic_eps,diluted_eps')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
           "f_ann_date": "__LAST_TRADING_DAY__",
-          "ann_date": "20240131",
           "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -2708,15 +2708,15 @@
         "df2 = pro.balancesheet_vip(period='20181231',fields='ts_code,ann_date,f_ann_date,end_date,report_type,comp_type,cap_rese')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -3633,16 +3633,16 @@
         "df2 = pro.cashflow_vip(period='20181231',fields='')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您访问接口(cashflow)频率超限(20000次/天)，具体频次详情：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
           "f_ann_date": "__LAST_TRADING_DAY__",
-          "ann_date": "20240131",
           "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -3746,7 +3746,7 @@
           "update_flag"
         ]
       },
-      "reason": "ok"
+      "reason": "exists_with_error"
     },
     "45": {
       "doc_id": 45,
@@ -3885,15 +3885,15 @@
         "df = pro.forecast_vip(period='20181231',fields='ts_code,ann_date,end_date,type,p_change_min,p_change_max,net_profit_min')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -4185,15 +4185,15 @@
         "df = pro.express_vip(period='20181231',fields='ts_code,ann_date,end_date,revenue,operate_profit,total_profit,n_income,total_assets')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -4456,14 +4456,14 @@
         "pro.query('hsgt_top10', ts_code='600519.SH', start_date='20180701', end_date='20180725')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -4776,15 +4776,15 @@
         "df = pro.query('margin', trade_date='20180802', exchange_id='SSE')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -4797,7 +4797,8 @@
           "rzrqye",
           "rqyl"
         ]
-      }
+      },
+      "reason": "ok"
     },
     "79": {
       "doc_id": 79,
@@ -6293,15 +6294,15 @@
         "pro = ts.pro_api()\n\ndf = pro.fina_audit(ts_code='600000.SH', start_date='20100101', end_date='20180808')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -6427,14 +6428,14 @@
         "df = pro.fina_mainbz_vip(period='20181231', type='P' ,fields='ts_code,end_date,bz_item,bz_sales')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -6521,14 +6522,14 @@
         "pro = ts.pro_api()\n\ndf = pro.namechange(ts_code='600848.SH', fields='ts_code,name,start_date,end_date,change_reason')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
+          "start_date": "20240102",
           "ts_code": "000001.SZ"
         },
         "expected_fields": [
@@ -6700,16 +6701,16 @@
         "ts_code div_proc  stk_div record_date   ex_date\n\t0  600848.SH       实施     0.10    19950606  19950607\n\t1  600848.SH       实施     0.10    19970707  19970708\n\t2  600848.SH       实施     0.15    19960701  19960702\n\t3  600848.SH       实施     0.10    19980706  19980707\n\t4  600848.SH       预案     0.00        None      None\n\t5  600848.SH       实施     0.00    20180522  20180523"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
           "record_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ",
           "ann_date": "20240131",
           "imp_ann_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ",
           "ex_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
@@ -6859,14 +6860,14 @@
         "pro = ts.pro_api()\n\ndf = pro.top_list(trade_date='20180928')\n\n或者\n\ndf = pro.query('top_list', trade_date='20180928', ts_code='002219.SZ')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ"
         },
         "expected_fields": [
           "trade_date",
@@ -6983,14 +6984,14 @@
       ],
       "sample_codes": [],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ"
         },
         "expected_fields": [
           "trade_date",
@@ -7085,9 +7086,9 @@
         "df = pro.query('pledge_stat', ts_code='000014.SZ')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -7245,15 +7246,15 @@
         "df = pro.query('pledge_detail', ts_code='000014.SZ')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "ann_date": "20240131",
           "end_date": "20240105",
+          "start_date": "20240102",
           "ts_code": "000001.SZ"
         },
         "expected_fields": [
@@ -7429,9 +7430,9 @@
         "pro = ts.pro_api()\n\n#或者\n#pro = ts.pro_api('your token')\n\ndf = pro.stock_company(exchange='SZSE', fields='ts_code,chairman,manager,secretary,reg_capital,setup_date,province')"
       ],
       "min_points": 120,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -7566,14 +7567,14 @@
         "pro = ts.pro_api()\n\ndf = pro.new_share(start_date='20180901', end_date='20181018')"
       ],
       "min_points": 120,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
-          "end_date": "20240105"
+          "end_date": "20240105",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -7688,15 +7689,15 @@
         "pro = ts.pro_api()\n\ndf = pro.repurchase(ann_date='', start_date='20180101', end_date='20180510')\n\n#取某日\ndf = pro.repurchase(ann_date='20181010')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
+          "ann_date": "20240131",
           "end_date": "20240105",
-          "ann_date": "20240131"
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -7807,15 +7808,15 @@
         "pyhton\n\npro = ts.pro_api()\n\ndf = pro.share_float(ann_date='20181220')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "float_date": "__LAST_TRADING_DAY__"
         },
@@ -7920,16 +7921,16 @@
         "pyhton\n\npro = ts.pro_api()\n\ndf = pro.block_trade(trade_date='20181227')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -8031,17 +8032,17 @@
         "pro = ts.pro_api()\n\ndf = pro.disclosure_date(end_date='20181231')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "pre_date": "__LAST_TRADING_DAY__",
-          "ann_date": "20240131",
           "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105",
-          "actual_date": "__LAST_TRADING_DAY__"
+          "actual_date": "__LAST_TRADING_DAY__",
+          "pre_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
           "ts_code",
@@ -8128,15 +8129,15 @@
         "pyhton\n\npro = ts.pro_api()\n\ndf = pro.stk_holdernumber(ts_code='300199.SZ', start_date='20160101', end_date='20181231')"
       ],
       "min_points": 600,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105"
         },
         "expected_fields": [
@@ -8291,15 +8292,15 @@
         "#获取单日全部增减持数据\ndf = pro.stk_holdertrade(ann_date='20190426')\n\n#获取单个股票数据\ndf = pro.stk_holdertrade(ts_code='002149.SZ')\n\n#获取当日增持数据\ndf = pro.stk_holdertrade(ann_date='20190426', trade_type='IN')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105"
         },
         "expected_fields": [
@@ -8716,9 +8717,9 @@
         "pro = ts.pro_api()\n\ndf = pro.ths_index()"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(ths_index)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -8778,9 +8779,9 @@
         "#获取查询月份券商金股\ndf = pro.broker_recommend(month='202106')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -8882,14 +8883,14 @@
         "pro = ts.pro_api()\n\ndf = pro.ccass_hold_detail(ts_code='00960.HK', trade_date='20211101', fields='trade_date,ts_code,col_participant_id,col_participant_name,col_shareholding')"
       ],
       "min_points": 8000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(ccass_hold_detail)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -9007,16 +9008,16 @@
         "pro = ts.pro_api()\n\ndf = pro.stk_surv(ts_code='002223.SZ', trade_date='20211024', fields='ts_code,name,surv_date,fund_visitors,rece_place,rece_mode,rece_org')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stk_surv)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -9149,16 +9150,16 @@
         "pro = ts.pro_api()\n\ndf = pro.cyq_perf(ts_code='600000.SH', start_date='20220101', end_date='20220429')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(cyq_perf)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -9173,7 +9174,8 @@
           "weight_avg",
           "winner_rate"
         ]
-      }
+      },
+      "reason": "exists_with_error"
     },
     "294": {
       "doc_id": 294,
@@ -9243,16 +9245,16 @@
         "pro = ts.pro_api()\n\ndf = pro.cyq_chips(ts_code='600000.SH', start_date='20220101', end_date='20220429')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(cyq_chips)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -9627,9 +9629,9 @@
         "#代码示例\npro = ts.pro_api()\n\ndf = pro.hm_list()"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(hm_list)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {},
@@ -9749,14 +9751,14 @@
         "pro = ts.pro_api()\n\n#获取单日全部明细\ndf = pro.hm_detail(trade_date='20230815')"
       ],
       "min_points": 10000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(hm_detail)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -9876,9 +9878,9 @@
         "#获取查询月份券商金股\ndf = pro.dc_hot(trade_date='20240415', market='A股市场',hot_type='人气榜',  fields='ts_code,ts_name,rank')"
       ],
       "min_points": 8000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(dc_hot)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -9965,16 +9967,16 @@
         "pro = ts.pro_api()\n\n#获取2024年4月17日上交所融资融券标的\ndf = pro.margin_secs(trade_date='20240417', exchange='SSE')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "exchange": "SSE",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
+          "exchange": "SSE",
           "trade_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
@@ -11852,16 +11854,16 @@
         "pro = ts.pro_api()\n\n#获取浦发银行某个时段指定输出字段的技术面因子\ndf = pro.stk_factor_pro(ts_code='600000.SH', start_date='20220501', end_date='20220520', fields='ts_code,trade_date,kdj_qfq,ma_bfq_10,trix_qfq')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stk_factor_pro)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -12232,16 +12234,16 @@
         "pro = ts.pro_api()\n\ndf=pro.stk_auction_o(trade_date='20241122')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stk_auction_o)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -12360,16 +12362,16 @@
         "pro = ts.pro_api()\n\ndf=pro.stk_auction_c(trade_date='20241122')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stk_auction_c)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -12452,14 +12454,14 @@
         "pro = ts.pro_api()\n\ndf = pro.limit_step(trade_date='20241125')"
       ],
       "min_points": 8000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(limit_step)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -12567,16 +12569,16 @@
         "pro = ts.pro_api()\n\ndf = pro.limit_cpt_list(trade_date='20241127')"
       ],
       "min_points": 8000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(limit_cpt_list)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -12640,13 +12642,13 @@
         "#获取方大新材新旧代码对照数据\ndf = pro.bse_mapping(o_code='838163.BJ')\n\n\n#获取全部变更的股票代码对照表\ndf = pro.bse_mapping()"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "o_code": ""
+          "n_code": ""
         },
         "expected_fields": [
           "o_code",
@@ -12724,16 +12726,16 @@
         "pro = ts.pro_api()\n\n#获取20250813日所有的ST股票\ndf = pro.stock_st(trade_date='20250813')"
       ],
       "min_points": 3000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stock_st)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -12848,14 +12850,14 @@
         "pro = ts.pro_api()\n\n#获取20250813日深股通的股票列表\ndf = pro.stock_hsgt(trade_date='20250813',type='HK_SZ')"
       ],
       "min_points": 3000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stock_hsgt)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -12979,16 +12981,16 @@
         "df = pro.query('margin_detail', trade_date='20180802')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -13115,15 +13117,15 @@
         "df = pro.query('top10_holders', ts_code='600000.SH', start_date='20170101', end_date='20171231')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -13251,15 +13253,15 @@
         "df = pro.query('top10_floatholders', ts_code='600000.SH', start_date='20170101', end_date='20171231')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ann_date": "20240131",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "ann_date": "20240131",
           "end_date": "20240105",
           "period": "20231231"
         },
@@ -13395,16 +13397,16 @@
         "df = pro.weekly(trade_date='20181123', fields='ts_code,trade_date,open,high,low,close,vol,amount')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -13540,16 +13542,16 @@
         "df = pro.monthly(trade_date='20181031', fields='ts_code,trade_date,open,high,low,close,vol,amount')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -13636,14 +13638,14 @@
         "pyhton\n\npro = ts.pro_api()\n\ndf = pro.stk_account(start_date='20180101', end_date='20181231')"
       ],
       "min_points": 600,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
-          "end_date": "20240105"
+          "end_date": "20240105",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "date",
@@ -13949,16 +13951,16 @@
         "pro = ts.pro_api('your token')\n\n#获取单日全部股票数据\ndf = pro.moneyflow(trade_date='20190315')\n\n#获取单个股票数据\ndf = pro.moneyflow(ts_code='002149.SZ', start_date='20190115', end_date='20190315')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -14079,16 +14081,16 @@
         "pro = ts.pro_api()\n\n#获取单日全部持股\ndf = pro.hk_hold(trade_date='20190625')\n\n#获取单日交易所所有持股\ndf = pro.hk_hold(trade_date='20190625', exchange='SH')"
       ],
       "min_points": 120,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "exchange": "SSE",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
+          "exchange": "SSE",
           "trade_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
@@ -14176,14 +14178,14 @@
         "pro = ts.pro_api()\n\n#提取2020-03-12的停牌股票\ndf = pro.suspend_d(suspend_type='S', trade_date='20200312')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -14334,16 +14336,16 @@
         "pro = ts.pro_api()\n\ndf = pro.ths_daily(ts_code='865001.TI', start_date='20200101', end_date='20210101', fields='ts_code,trade_date,open,close,high,low,pct_change')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(ths_daily)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -14441,9 +14443,9 @@
         "pro = ts.pro_api()\n\ndf = pro.ths_member(ts_code='885800.TI')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(ths_member)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -14650,14 +14652,14 @@
         "pro = ts.pro_api()\n\ndf = pro.bak_basic(trade_date='20211012', fields='trade_date,ts_code,name,industry,pe')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(bak_basic)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ"
         },
         "expected_fields": [
           "trade_date",
@@ -14685,7 +14687,7 @@
           "holder_num"
         ]
       },
-      "reason": "ok"
+      "reason": "exists_with_error"
     },
     "292": {
       "doc_id": 292,
@@ -14881,16 +14883,16 @@
         "pro = ts.pro_api()\n\ndf = pro.report_rc(ts_code='', report_date='20220429')"
       ],
       "min_points": 8000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您访问接口(report_rc)频率超限(1次/小时)，具体频次详情：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
-          "report_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "report_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
           "ts_code",
@@ -15000,14 +15002,14 @@
         "pro = ts.pro_api()\n\ndf = pro.ccass_hold(ts_code='00960.HK')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(ccass_hold)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -15138,14 +15140,14 @@
         "#获取查询月份券商金股\ndf = pro.ths_hot(trade_date='20240315', market='热股', fields='ts_code,ts_name,hot,concept')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(ths_hot)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ"
         },
         "expected_fields": [
           "trade_date",
@@ -15252,16 +15254,16 @@
         "pro = ts.pro_api()\n\n#获取某一日盘前所有股票当日的最新股本\ndf = pro.stk_premarket(trade_date='20240603')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stk_premarket)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -15351,15 +15353,15 @@
         "pro = ts.pro_api()\n\ndf = pro.slb_len(start_date='20240601', end_date='20240620')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -15454,16 +15456,16 @@
         "pro = ts.pro_api()\n\ndf = pro.slb_sec(trade_date='20240620')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -15551,16 +15553,16 @@
         "pro = ts.pro_api()\n\ndf = pro.slb_sec_detail(trade_date='20240620')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -15654,16 +15656,16 @@
         "pro = ts.pro_api()\n\ndf = pro.slb_len_mm(trade_date='20240620')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -15813,16 +15815,16 @@
         "pro = ts.pro_api()\n\n#获取20251024这周周线数据\ndf=pro.stk_weekly_monthly(trade_date='20251024',freq='week')\n\n#获取202510月月线数据\ndf=pro.stk_weekly_monthly(trade_date='20251031',freq='month')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "freq": "D",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
+          "freq": "D",
           "trade_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
@@ -15967,16 +15969,16 @@
         "#获取当日所有同花顺行业资金流向\ndf = pro.moneyflow_ind_ths(trade_date='20240927')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(moneyflow_ind_ths)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -16160,14 +16162,14 @@
         "#获取当日所有板块资金流向\ndf = pro.moneyflow_ind_dc(trade_date='20240927', fields='trade_date,name,pct_change, close, net_amount,net_amount_rate,rank')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(moneyflow_ind_dc)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -16332,15 +16334,15 @@
         "#获取当日所有板块资金流向\ndf = pro.moneyflow_mkt_dc(start_date='20240901', end_date='20240930')"
       ],
       "min_points": 120,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(moneyflow_mkt_dc)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -16569,14 +16571,14 @@
         "pro = ts.pro_api()\n\ndf = pro.kpl_list(trade_date='20240927', tag='涨停', fields='ts_code,name,trade_date,tag,theme,status')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(kpl_list)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -16732,16 +16734,16 @@
         "pro = ts.pro_api()\n\n#获取单日全部股票数据\ndf = pro.moneyflow_ths(trade_date='20241011')\n\n#获取单个股票数据\ndf = pro.moneyflow_ths(ts_code='002149.SZ', start_date='20241001', end_date='20241011')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(moneyflow_ths)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -16898,16 +16900,16 @@
         "pro = ts.pro_api()\n\n#获取单日全部股票数据\ndf = pro.moneyflow_dc(trade_date='20241011')\n\n#获取单个股票数据\ndf = pro.moneyflow_dc(ts_code='002149.SZ', start_date='20240901', end_date='20240913')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(moneyflow_dc)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -17004,14 +17006,14 @@
         "pro = ts.pro_api()\n\ndf = pro.kpl_concept_cons(trade_date='20241014')"
       ],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(kpl_concept_cons)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
-          "trade_date": "__LAST_TRADING_DAY__"
+          "trade_date": "__LAST_TRADING_DAY__",
+          "ts_code": "000001.SZ"
         },
         "expected_fields": [
           "ts_code",
@@ -17237,14 +17239,14 @@
         "pro = ts.pro_api()\n\ndf = pro.limit_list_ths(trade_date='20241125', limit_type='涨停池', fields='ts_code,trade_date,tag,status,lu_desc')"
       ],
       "min_points": 8000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(limit_list_ths)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -17937,16 +17939,16 @@
       ],
       "sample_codes": [],
       "min_points": 5000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(idx_factor_pro)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "trade_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
           "ts_code",
@@ -18172,14 +18174,14 @@
         "#获取2025年1月3日的概念板块列表\ndf = pro.dc_index(trade_date='20250103', fields='ts_code,name,turnover_rate,up_num,down_num')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(dc_index)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -18267,14 +18269,14 @@
         "#获取2025年1月2日的人形机器人概念板块成分列表\ndf = pro.dc_member(trade_date='20250102', ts_code='BK1184.DC')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(dc_member)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -18423,16 +18425,16 @@
         "pro = ts.pro_api()\n\ndf=pro.stk_nineturn(ts_code='000001.SZ',freq='daily',fields='ts_code,trade_date,freq,up_count,down_count,nine_up_turn,nine_down_turn')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stk_nineturn)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "freq": "D",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
+          "freq": "D",
           "trade_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
@@ -18646,16 +18648,16 @@
         "pro = ts.pro_api()\n\ndf=pro.stk_week_month_adj(ts_code='000001.SZ',freq='week')"
       ],
       "min_points": 2000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 0,
+      "sdk_validation_msg": "",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "freq": "D",
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
+          "freq": "D",
           "trade_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
@@ -18771,17 +18773,17 @@
         "pro = ts.pro_api()\n\n#获取2025年2月12日上证e互动的问答文本\ndf = pro.irm_qa_sh(ann_date='20250212')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(irm_qa_sh)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
-          "trade_date": "__LAST_TRADING_DAY__",
-          "pub_date": "__LAST_TRADING_DAY__"
+          "pub_date": "__LAST_TRADING_DAY__",
+          "trade_date": "__LAST_TRADING_DAY__"
         },
         "expected_fields": [
           "ts_code",
@@ -18791,7 +18793,7 @@
           "pub_time"
         ]
       },
-      "reason": "ok"
+      "reason": "exists_with_error"
     },
     "369": {
       "doc_id": 369,
@@ -18896,16 +18898,16 @@
         "#获取2025年2月18日开盘集合竞价成交情况\ndf = pro.stk_auction(trade_date='20250218',fields='ts_code, trade_date,vol,price,amount,turnover_rate,volume_ratio')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(stk_auction)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -19017,16 +19019,16 @@
         "pro = ts.pro_api()\n\n#获取浦发银行60000.SH的历史分钟数据\ndf = pro.stk_mins(ts_code='600000.SH', freq='1min', start_date='2023-08-25 09:00:00', end_date='2023-08-25 19:00:00')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您访问接口(stk_mins)频率超限(1次/小时)，具体频次详情：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
-          "end_date": "20240105",
           "freq": "D",
-          "ts_code": "000001.SZ"
+          "start_date": "20240102",
+          "ts_code": "000001.SZ",
+          "end_date": "20240105"
         },
         "expected_fields": [
           "ts_code",
@@ -19158,16 +19160,16 @@
         "#获取当日同花顺板块资金流向\ndf = pro.moneyflow_cnt_ths(trade_date='20250320')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(moneyflow_cnt_ths)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "trade_date",
@@ -19305,9 +19307,9 @@
         "#获取今日开盘以来所有创业板实时日线和成交笔数\ndf = pro.rt_k(ts_code='3*.SZ')\n\n#获取今日开盘以来全市场所有股票实时日线和成交笔数（不建议一次提取全市场，可分批提取性能更好）\ndf = pro.rt_k(ts_code='3*.SZ,6*.SH,0*.SZ,9*.BJ')\n\n#获取当日开盘以来多个股票实时日线并指定输出字段\ndf = pro.rt_k(ts_code='600000.SH,000001.SZ', fields='ts_code,close,num')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(rt_k)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -19416,9 +19418,9 @@
         "pro = ts.pro_api()\n\n#获取浦发银行60000.SH的实时分钟数据\ndf = pro.rt_min(ts_code='600000.SH', freq='1MIN')"
       ],
       "min_points": null,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 50101,
+      "sdk_validation_msg": "参数校验失败, 请输入正确的频率(1MIN,5MIN,15MIN,30MIN,60MIN)",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -19528,9 +19530,9 @@
         "#获取通达信2025年5月13日的概念板块列表\ndf = pro.tdx_index(trade_date='20250513', fields='ts_code,name,idx_type,idx_count')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(tdx_index)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
@@ -19624,14 +19626,14 @@
         "#获取通达信板块2025年5月13日的航运概念板块成分股\ndf = pro.tdx_member(trade_date='20250513', ts_code='880728.TDX')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(tdx_member)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -19950,16 +19952,16 @@
         "#获取通达信2025年5月13日概念板块行情\ndf = pro.tdx_daily(trade_date='20250513')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(tdx_daily)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "start_date": "20240102",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__",
-          "ts_code": "000001.SZ"
+          "ts_code": "000001.SZ",
+          "start_date": "20240102"
         },
         "expected_fields": [
           "ts_code",
@@ -20134,14 +20136,14 @@
         "#获取2025年5月13日概念板块行情\ndf = pro.dc_daily(trade_date='20250513')"
       ],
       "min_points": 6000,
-      "sdk_valid": null,
-      "sdk_validation_code": null,
-      "sdk_validation_msg": null,
+      "sdk_valid": true,
+      "sdk_validation_code": 40203,
+      "sdk_validation_msg": "抱歉，您没有接口(dc_daily)访问权限，权限的具体详情访问：https://tushare.pro/document/1?doc_id=108。",
       "spec_source": "wctapi_md",
       "probe_spec": {
         "params": {
-          "ts_code": "000001.SZ",
           "start_date": "20240102",
+          "ts_code": "000001.SZ",
           "end_date": "20240105",
           "trade_date": "__LAST_TRADING_DAY__"
         },
@@ -20159,7 +20161,8 @@
           "swing",
           "turnover_rate"
         ]
-      }
+      },
+      "reason": "exists_with_error"
     },
     "19": {
       "doc_id": 19,

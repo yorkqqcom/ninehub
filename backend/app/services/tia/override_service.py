@@ -11,11 +11,13 @@ from app.core.exceptions import NotFoundError, ValidationError
 from app.models.tia_override import TiaOverride
 from app.schemas.catalog import CatalogColumnMeta, CatalogFilterMeta
 from app.services.tia.constants import (
+    DEFAULT_PROVIDER,
     api_to_data_type,
     api_to_domain,
     api_to_label,
     api_to_table_name,
     data_type_aliases,
+    provider_from_data_type,
 )
 from app.services.tia.scan.tushare_doc_registry import resolve_api_meta
 
@@ -26,11 +28,13 @@ class TiaOverrideService:
         api_name: str,
         domain: str | None = None,
         min_points: int | None = None,
+        *,
+        provider: str = DEFAULT_PROVIDER,
     ) -> TiaOverride:
         from app.catalog.tia_probe_registry import OFFICIAL_ONLY_API_PROBES
 
         meta = OFFICIAL_ONLY_API_PROBES.get(api_name) or resolve_api_meta(api_name) or {}
-        data_type = api_to_data_type(api_name)
+        data_type = api_to_data_type(api_name, provider=provider)
         doc_id = meta.get("doc_id")
         doc_url = meta.get("doc_url") or (
             f"https://tushare.pro/document/2?doc_id={doc_id}" if doc_id else None
@@ -50,7 +54,7 @@ class TiaOverrideService:
             label=meta.get("label") or api_to_label(api_name),
             min_points=int(min_points_val),
             doc_url=doc_url,
-            table_name=api_to_table_name(api_name),
+            table_name=api_to_table_name(api_name, provider=provider),
             is_activated=False,
             override_json={"source": "tia_l1", "api_name": api_name},
         )
@@ -109,7 +113,8 @@ class TiaOverrideService:
             browse_enabled=enabled,
         )
         register_catalog_entry(entry)
-        for alias in data_type_aliases(override.api_name):
+        alias_provider = provider_from_data_type(override.data_type)
+        for alias in data_type_aliases(override.api_name, provider=alias_provider):
             if alias == override.data_type:
                 continue
             # Legacy aliases (e.g. tia_trade_cal) are sync/lookup keys only — not browse entries.

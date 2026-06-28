@@ -37,20 +37,19 @@ class TiaProposalService:
         self,
         session: Session,
         local_apis: list[str],
+        *,
+        provider: str = "tushare",
     ) -> int:
         """Reject stale pending proposals for APIs already in local catalog."""
         if not local_apis:
             return 0
-        rows = (
-            session.execute(
-                select(TiaProposal).where(
-                    TiaProposal.status == "pending",
-                    TiaProposal.api_name.in_(local_apis),
-                )
-            )
-            .scalars()
-            .all()
+        query = select(TiaProposal).where(
+            TiaProposal.status == "pending",
+            TiaProposal.api_name.in_(local_apis),
         )
+        if provider == "tdx":
+            query = query.where(TiaProposal.data_type.ilike("tdx_%"))
+        rows = session.execute(query).scalars().all()
         for proposal in rows:
             proposal.status = "rejected"
             proposal.reason = "already_in_local_catalog"
@@ -58,32 +57,60 @@ class TiaProposalService:
         session.flush()
         return len(rows)
 
-    def count_pending_sync(self, session: Session) -> int:
-        return int(
-            session.execute(
-                select(func.count())
-                .select_from(TiaProposal)
-                .where(TiaProposal.status == "pending")
-            ).scalar_one()
+    def count_pending_sync(self, session: Session, *, provider: str | None = None) -> int:
+        query = select(func.count()).select_from(TiaProposal).where(
+            TiaProposal.status == "pending"
         )
+        query = self._apply_provider_filter(query, provider)
+        return int(session.execute(query).scalar_one())
+
+    @staticmethod
+    def _apply_provider_filter(query, provider: str | None):
+        if not provider:
+            return query
+        if provider == "tdx":
+            return query.where(TiaProposal.data_type.ilike("tdx_%"))
+        if provider == "tushare":
+            return query.where(
+                or_(
+                    TiaProposal.data_type.ilike("tushare_%"),
+                    TiaProposal.data_type.ilike("tia_%"),
+                    TiaProposal.data_type.is_(None),
+                )
+            )
+        return query
+
+    @staticmethod
+    def _proposal_provider(proposal: TiaProposal) -> str:
+        data_type = proposal.data_type or ""
+        if data_type.startswith("tdx_"):
+            return "tdx"
+        return "tushare"
 
     def upsert_from_scan_sync(
         self,
         session: Session,
         job_id: int,
         new_apis: list[str],
+        *,
+        provider: str = "tushare",
     ) -> int:
         created = 0
+        data_type_prefix = f"{provider}_"
         for api in new_apis:
-            existing = session.execute(
-                select(TiaProposal).where(
-                    TiaProposal.api_name == api,
-                    TiaProposal.status == "pending",
+            pending_query = select(TiaProposal).where(
+                TiaProposal.api_name == api,
+                TiaProposal.status == "pending",
+            )
+            if provider != "tushare":
+                pending_query = pending_query.where(
+                    TiaProposal.data_type.ilike(f"{data_type_prefix}%")
                 )
-            ).scalar_one_or_none()
+            existing = session.execute(pending_query).scalar_one_or_none()
             if existing:
                 existing.job_id = job_id
                 existing.reason = "new_on_official"
+                existing.data_type = api_to_data_type(api, provider=provider)
                 continue
             session.add(
                 TiaProposal(
@@ -92,7 +119,7 @@ class TiaProposalService:
                     action="review",
                     reason="new_on_official",
                     job_id=job_id,
-                    data_type=api_to_data_type(api),
+                    data_type=api_to_data_type(api, provider=provider),
                 )
             )
             created += 1
@@ -123,7 +150,9 @@ class TiaProposalService:
         status: str | None,
         q: str | None,
         api_names: set[str] | None = None,
+        provider: str | None = None,
     ):
+        query = TiaProposalService._apply_provider_filter(query, provider)
         if status:
             query = query.where(TiaProposal.status == status)
         if q:
@@ -189,6 +218,7 @@ class TiaProposalService:
         min_points_gte: int | None = None,
         min_points_lte: int | None = None,
         include_summary: bool = True,
+        provider: str | None = None,
     ) -> TiaProposalPageResponse:
         if status and status not in _VALID_STATUSES:
             raise ValidationError(f"Invalid status filter: {status}")
@@ -223,7 +253,9 @@ class TiaProposalService:
         points_apis: set[str] | None = None
         if min_points_gte is not None or min_points_lte is not None:
             scope_q = select(TiaProposal.api_name).distinct()
-            scope_q = self._apply_filters(scope_q, status=status, q=q, api_names=None)
+            scope_q = self._apply_filters(
+                scope_q, status=status, q=q, api_names=None, provider=provider
+            )
             api_names_in_scope = set((await session.execute(scope_q)).scalars().all())
             points_apis = apis_matching_points_filter(
                 api_names_in_scope,
@@ -236,12 +268,12 @@ class TiaProposalService:
 
         query = select(TiaProposal)
         query = self._apply_filters(
-            query, status=status, q=q, api_names=points_apis
+            query, status=status, q=q, api_names=points_apis, provider=provider
         )
 
         count_q = select(func.count()).select_from(TiaProposal)
         count_q = self._apply_filters(
-            count_q, status=status, q=q, api_names=points_apis
+            count_q, status=status, q=q, api_names=points_apis, provider=provider
         )
         total = (await session.execute(count_q)).scalar_one()
 
@@ -280,7 +312,9 @@ class TiaProposalService:
             await session.flush()
             return self._to_response(proposal)
         proposal.status = "approved"
-        proposal.data_type = api_to_data_type(proposal.api_name)
+        proposal.data_type = api_to_data_type(
+            proposal.api_name, provider=self._proposal_provider(proposal)
+        )
         existing = await session.execute(
             select(TiaOverride).where(TiaOverride.api_name == proposal.api_name)
         )

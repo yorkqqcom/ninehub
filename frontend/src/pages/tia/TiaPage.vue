@@ -44,6 +44,16 @@ let jobPollCount = 0;
 const activateJobId = ref<number | null>(null);
 let pollTimer: number | undefined;
 
+const SCAN_PROVIDER_STORAGE_KEY = "ninehub.tiaScanProvider";
+const scanProvider = ref<"tushare" | "tdx">("tushare");
+const scanProviders = ref<string[]>(["tushare", "tdx"]);
+const tdxSidecarProbe = ref(false);
+const tdxReadiness = ref<Record<string, unknown> | null>(null);
+const tdxReadinessLoading = ref(false);
+
+const isTdxProvider = computed(() => scanProvider.value === "tdx");
+const isTushareProvider = computed(() => scanProvider.value === "tushare");
+
 const {
   batchOp,
   batchBusy,
@@ -64,7 +74,17 @@ function openStandards(apiName: string) {
 
 onMounted(() => {
   loadPointsPrefs();
+  const stored = localStorage.getItem(SCAN_PROVIDER_STORAGE_KEY);
+  if (stored === "tdx" || stored === "tushare") {
+    scanProvider.value = stored;
+  } else if (route.query.provider === "tdx") {
+    scanProvider.value = "tdx";
+  }
+  void loadScanProviders();
   void loadProposals();
+  if (scanProvider.value === "tdx") {
+    void loadTdxReadiness();
+  }
   restoreBatch();
   const proposalQ = route.query.proposal;
   if (proposalQ) {
@@ -123,7 +143,53 @@ function buildProposalQueryParams(opts: {
   if (proposalActivePointsMax.value != null) {
     params.set("min_points_lte", String(proposalActivePointsMax.value));
   }
+  if (scanProvider.value) params.set("provider", scanProvider.value);
   return params;
+}
+
+async function loadScanProviders() {
+  try {
+    const data = await apiRequest<{ providers: string[] }>("/api/v1/tia/scan/providers");
+    const allowed = (data.providers || []).filter((p) => p === "tushare" || p === "tdx");
+    if (allowed.length) scanProviders.value = allowed;
+  } catch {
+    scanProviders.value = ["tushare", "tdx"];
+  }
+}
+
+async function loadTdxReadiness() {
+  tdxReadinessLoading.value = true;
+  try {
+    tdxReadiness.value = await apiRequest<Record<string, unknown>>("/api/v1/tia/tdx-readiness");
+  } catch {
+    tdxReadiness.value = null;
+  } finally {
+    tdxReadinessLoading.value = false;
+  }
+}
+
+function providerTabLabel(id: string) {
+  if (id === "tdx") return "通达信 (TDX)";
+  if (id === "tushare") return "Tushare";
+  return id;
+}
+
+function switchScanProvider(provider: "tushare" | "tdx") {
+  if (scanProvider.value === provider) return;
+  scanProvider.value = provider;
+  localStorage.setItem(SCAN_PROVIDER_STORAGE_KEY, provider);
+  scanResult.value = null;
+  auditResult.value = null;
+  clearProposalSelection();
+  proposalPage.value = 1;
+  if (provider === "tdx") {
+    void loadTdxReadiness();
+  }
+  void loadProposals(1);
+}
+
+function goSourcesPage() {
+  void router.push({ name: "sources" });
 }
 
 async function fetchAllFilteredProposals() {
@@ -371,6 +437,27 @@ watch([pageAllSelected, pageSomeSelected], () => {
   const el = headerSelectRef.value;
   if (el) el.indeterminate = pageSomeSelected.value && !pageAllSelected.value;
 });
+
+watch(
+  () => batchOp.value?.phase,
+  (phase, prev) => {
+    if (phase !== "done" || prev === "done") return;
+    const op = batchOp.value;
+    if (!op || op.kind !== "activate_l3") return;
+    const succeeded = op.jobRows.filter((row) => row.status === "success");
+    if (!succeeded.length) return;
+    for (const row of succeeded) {
+      const proposal = proposals.value.find((p) => p.id === row.proposalId);
+      const dataType = String(proposal?.data_type ?? "");
+      if (dataType.startsWith("tdx_")) {
+        ui.showMessage(`${dataType} 已激活`, "success");
+      }
+    }
+    if (scanProvider.value === "tdx") {
+      void loadTdxReadiness();
+    }
+  },
+);
 
 function toggleSelectPage() {
   if (pageAllSelected.value) {
@@ -680,18 +767,33 @@ async function startScan() {
   scanResult.value = null;
   activateJobId.value = null;
   try {
-    const body = {
-      provider: "tushare",
-      mode: "full" as const,
-      index_scope: "stock_a" as const,
-      probe: true,
-      probe_scope: "all" as const,
-      probe_limit: 500,
-      probe_unlimited: false,
-      index_source: "document2" as const,
-      sync_doc_pages: false,
-      sync_doc_specs: true,
-    };
+    const body =
+      scanProvider.value === "tdx"
+        ? {
+            provider: "tdx" as const,
+            mode: "full" as const,
+            index_scope: "stock_a" as const,
+            probe: tdxSidecarProbe.value,
+            probe_scope: "all" as const,
+            probe_limit: 500,
+            probe_unlimited: false,
+            index_source: "bundled" as const,
+            sync_doc_pages: false,
+            sync_doc_specs: false,
+            sync_sdk_scan: false,
+          }
+        : {
+            provider: "tushare" as const,
+            mode: "full" as const,
+            index_scope: "stock_a" as const,
+            probe: true,
+            probe_scope: "all" as const,
+            probe_limit: 500,
+            probe_unlimited: false,
+            index_source: "document2" as const,
+            sync_doc_pages: false,
+            sync_doc_specs: true,
+          };
     const data = await apiRequest<{ job_id: number; message: string }>("/api/v1/tia/scan", {
       method: "POST",
       body: JSON.stringify(body),
@@ -699,6 +801,9 @@ async function startScan() {
     ui.showMessage(data.message || "扫描已提交", "success");
     pollTimer = window.setInterval(() => void pollJob(data.job_id), 1500);
     await pollJob(data.job_id);
+    if (scanProvider.value === "tdx") {
+      void loadTdxReadiness();
+    }
   } catch (e) {
     ui.showMessage(e instanceof Error ? e.message : String(e), "error");
     scanInProgress.value = false;
@@ -871,14 +976,86 @@ function probeStatusLabel(status: string) {
 <template>
   <PageHeader title="提案治理" description="扫描 · 审批 · L3 激活流水线">
     <template #actions>
-      <button type="button" class="btn btn--secondary" @click="runAudit">积分审计</button>
+      <button
+        v-if="isTushareProvider"
+        type="button"
+        class="btn btn--secondary"
+        @click="runAudit"
+      >
+        积分审计
+      </button>
       <button type="button" class="btn btn--primary" :disabled="scanInProgress" @click="startScan">
         {{ scanInProgress ? "扫描中…" : "开始扫描" }}
       </button>
     </template>
   </PageHeader>
 
-  <div v-if="auditResult" class="panel">
+  <div class="provider-tabs">
+    <button
+      v-for="provider in scanProviders"
+      :key="provider"
+      type="button"
+      class="btn btn--sm"
+      :class="{ 'btn--primary': scanProvider === provider }"
+      @click="switchScanProvider(provider as 'tushare' | 'tdx')"
+    >
+      {{ providerTabLabel(provider) }}
+    </button>
+  </div>
+
+  <div v-if="isTdxProvider" class="panel panel--compact">
+    <div class="panel__body">
+      <div v-if="tdxReadinessLoading" class="panel__hint">检查 Sidecar 就绪状态…</div>
+      <template v-else-if="tdxReadiness">
+        <div class="kv-list kv-list--compact">
+          <div class="kv-row">
+            <span class="kv-row__label">索引</span>
+            <span class="kv-row__value">bundled 官方目录 · {{ tdxReadiness.bundled_api_count }} 个 T+1 接口</span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-row__label">数据源</span>
+            <span class="kv-row__value">
+              <template v-if="tdxReadiness.has_data_source">
+                {{ tdxReadiness.source_name }}
+                <code class="table-sub">{{ tdxReadiness.base_url }}</code>
+              </template>
+              <span v-else class="badge badge--warn">未配置</span>
+            </span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-row__label">Sidecar</span>
+            <span class="kv-row__value tdx-sidecar-status">
+              <span
+                class="badge"
+                :class="tdxReadiness.sidecar_ok ? 'badge--ok' : 'badge--warn'"
+              >
+                {{ tdxReadiness.sidecar_ok ? "就绪" : "不可用" }}
+              </span>
+              <span class="tdx-sidecar-status__msg">{{ tdxReadiness.sidecar_message }}</span>
+            </span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-row__label">L3 进度</span>
+            <span class="kv-row__value numeric">
+              已激活 {{ tdxReadiness.applied_count }} / {{ tdxReadiness.bundled_api_count }}
+              · 待审 {{ tdxReadiness.pending_count }}
+            </span>
+          </div>
+        </div>
+        <p v-if="!tdxReadiness.ready" class="panel__hint panel__hint--warn">
+          请先在
+          <button type="button" class="inline-link" @click="goSourcesPage">数据源</button>
+          配置 TDX Sidecar 并确保服务可达后再扫描与激活。
+        </p>
+        <label v-else class="tdx-scan-option">
+          <input v-model="tdxSidecarProbe" type="checkbox" />
+          扫描时执行 Sidecar 抽样探针（可选）
+        </label>
+      </template>
+    </div>
+  </div>
+
+  <div v-if="auditResult && isTushareProvider" class="panel">
     <div class="panel__header">
       <span>积分审计结果 (F-08)</span>
     </div>
@@ -935,34 +1112,54 @@ function probeStatusLabel(status: string) {
     <div class="panel__body">
       <div class="kv-list">
         <div class="kv-row">
-          <span class="kv-row__label">本地 override</span>
+          <span class="kv-row__label">{{ isTdxProvider ? "本地已激活" : "本地 override" }}</span>
           <span class="kv-row__value numeric">{{ scanResult.local_count }}</span>
         </div>
         <div class="kv-row">
-          <span class="kv-row__label">官网索引</span>
+          <span class="kv-row__label">{{ isTdxProvider ? "bundled 索引" : "官网索引" }}</span>
           <span class="kv-row__value numeric">{{ scanResult.official_count }}</span>
         </div>
-        <div v-if="scanResult.official_index_total" class="kv-row">
+        <div
+          v-if="isTdxProvider && (scanResult.scan_credentials as Record<string, unknown> | undefined)"
+          class="kv-row"
+        >
+          <span class="kv-row__label">Sidecar</span>
+          <span class="kv-row__value">
+            {{
+              (scanResult.scan_credentials as Record<string, unknown>).source_name || "—"
+            }}
+            <code
+              v-if="(scanResult.scan_credentials as Record<string, unknown>).base_url"
+              class="table-sub"
+            >
+              {{ (scanResult.scan_credentials as Record<string, unknown>).base_url }}
+            </code>
+          </span>
+        </div>
+        <div v-if="!isTdxProvider && scanResult.official_index_total" class="kv-row">
           <span class="kv-row__label">官方索引</span>
           <span class="kv-row__value">
             {{ scanResult.official_index_total }} 条
             <span class="badge badge--muted">{{ scanResult.official_index_source }}</span>
           </span>
         </div>
-        <div v-if="scanResult.doc_ids_traversed" class="kv-row">
+        <div v-if="!isTdxProvider && scanResult.doc_ids_traversed" class="kv-row">
           <span class="kv-row__label">遍历 doc_id</span>
           <span class="kv-row__value numeric">{{ scanResult.doc_ids_traversed }}</span>
         </div>
-        <div v-if="scanResult.sidebar_link_total" class="kv-row">
+        <div v-if="!isTdxProvider && scanResult.sidebar_link_total" class="kv-row">
           <span class="kv-row__label">菜单链接</span>
           <span class="kv-row__value numeric">{{ scanResult.sidebar_link_total }}</span>
         </div>
-        <div v-if="scanResult.unresolved_doc_count" class="kv-row">
+        <div v-if="!isTdxProvider && scanResult.unresolved_doc_count" class="kv-row">
           <span class="kv-row__label">未解析 api</span>
           <span class="kv-row__value numeric">{{ scanResult.unresolved_doc_count }}</span>
         </div>
         <div
-          v-if="(scanResult.sidebar_index as Record<string, unknown> | undefined)?.snapshot_path"
+          v-if="
+            !isTdxProvider &&
+            (scanResult.sidebar_index as Record<string, unknown> | undefined)?.snapshot_path
+          "
           class="kv-row"
         >
           <span class="kv-row__label">menu 快照</span>
@@ -971,7 +1168,7 @@ function probeStatusLabel(status: string) {
           }}</span>
         </div>
         <div v-if="(scanResult.new_on_official as string[] | undefined)?.length" class="kv-row">
-          <span class="kv-row__label">官网新增</span>
+          <span class="kv-row__label">{{ isTdxProvider ? "待激活" : "官网新增" }}</span>
           <span class="kv-row__value numeric">{{ (scanResult.new_on_official as string[]).length }}</span>
         </div>
       </div>
@@ -1001,7 +1198,7 @@ function probeStatusLabel(status: string) {
       </details>
 
       <div
-        v-if="scanResult.scan_options as Record<string, unknown> | undefined"
+        v-if="!isTdxProvider && (scanResult.scan_options as Record<string, unknown> | undefined)"
         class="panel__hint scan-options-applied"
       >
         本次扫描：document/2 股票数据 · 全索引探测 · 最多 500 个接口
@@ -1014,7 +1211,7 @@ function probeStatusLabel(status: string) {
       </div>
 
       <div
-        v-if="scanResult.doc_specs_sync as Record<string, unknown> | undefined"
+        v-if="!isTdxProvider && (scanResult.doc_specs_sync as Record<string, unknown> | undefined)"
         class="probe-section"
       >
         <h3 class="probe-section__title">接口规格同步（wctapi + SDK）</h3>
@@ -1054,7 +1251,7 @@ function probeStatusLabel(status: string) {
       </div>
 
       <div
-        v-if="scanResult.points_coverage as Record<string, unknown> | undefined"
+        v-if="!isTdxProvider && (scanResult.points_coverage as Record<string, unknown> | undefined)"
         class="probe-section"
       >
         <h3 class="probe-section__title">积分识别覆盖</h3>
@@ -1395,7 +1592,7 @@ function probeStatusLabel(status: string) {
           全选筛选结果并重试 L3
         </button>
       </div>
-      <div class="kv-row proposal-points-filter">
+      <div v-if="!isTdxProvider" class="kv-row proposal-points-filter">
         <span class="table-sub proposal-points-filter__label">积分区间</span>
         <input
           v-model="proposalPointsMin"
@@ -1549,8 +1746,8 @@ function probeStatusLabel(status: string) {
               />
             </th>
             <th>API</th>
-            <th>文档</th>
-            <th>积分</th>
+            <th>{{ isTdxProvider ? "说明" : "文档" }}</th>
+            <th v-if="!isTdxProvider">积分</th>
             <th>data_type</th>
             <th>状态</th>
             <th>扫描任务</th>
@@ -1575,7 +1772,7 @@ function probeStatusLabel(status: string) {
               </td>
               <td>
                 <a
-                  v-if="p.doc_url"
+                  v-if="!isTdxProvider && p.doc_url"
                   :href="String(p.doc_url)"
                   target="_blank"
                   rel="noopener"
@@ -1583,9 +1780,10 @@ function probeStatusLabel(status: string) {
                 >
                   doc {{ p.doc_id }}
                 </a>
+                <span v-else-if="isTdxProvider && p.label" class="table-sub">{{ p.label }}</span>
                 <span v-else>—</span>
               </td>
-              <td class="numeric proposal-points-cell">
+              <td v-if="!isTdxProvider" class="numeric proposal-points-cell">
                 <div v-if="isEditingPoints(p)" class="proposal-points-edit" @click.stop>
                   <input
                     v-model.number="editingPointsValue"
@@ -2218,5 +2416,89 @@ function probeStatusLabel(status: string) {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 3px;
+}
+
+.provider-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: var(--space-md);
+  padding: 3px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.provider-tabs .btn {
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  box-shadow: none;
+}
+
+.provider-tabs .btn:hover:not(:disabled) {
+  background: var(--color-row-hover);
+  color: var(--color-text);
+}
+
+.provider-tabs .btn.btn--primary {
+  background: var(--color-primary-muted);
+  color: var(--color-primary);
+}
+
+.panel--compact .panel__body {
+  padding: var(--space-sm) var(--space-md);
+}
+
+.panel__hint {
+  margin: var(--space-sm) 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.panel__hint--warn {
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-warn-bg);
+  color: var(--color-warn-text);
+  border: 1px solid color-mix(in srgb, var(--color-warn-text) 22%, transparent);
+}
+
+.inline-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.inline-link:hover {
+  opacity: 0.85;
+}
+
+.tdx-sidecar-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tdx-sidecar-status__msg {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  word-break: break-word;
+}
+
+.tdx-scan-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
 }
 </style>

@@ -27,6 +27,7 @@ from app.schemas.workflow import (
     WorkflowValidateResponse,
 )
 from app.services.platform.job_service import PlatformJobService
+from app.services.tia.override_service import TiaOverrideService
 from app.services.workflow.executor import WorkflowExecutor
 from app.services.workflow.validator import WorkflowValidator
 
@@ -114,10 +115,14 @@ class WorkflowService:
 
         response_data_type = entry.data_type
         api_name = canonical[len("tushare_") :] if canonical.startswith("tushare_") else canonical
-        if canonical.startswith("tia_"):
+        if canonical.startswith("tdx_"):
+            api_name = canonical[len("tdx_") :]
+        elif canonical.startswith("tia_"):
             api_name = canonical[len("tia_") :]
         elif response_data_type.startswith("tushare_"):
             api_name = response_data_type[len("tushare_") :]
+        elif response_data_type.startswith("tdx_"):
+            api_name = response_data_type[len("tdx_") :]
         elif response_data_type.startswith("tia_"):
             api_name = response_data_type[len("tia_") :]
 
@@ -217,6 +222,7 @@ class WorkflowService:
         workflow = await session.get(Workflow, workflow_id)
         if workflow is None:
             raise NotFoundError(f"Workflow {workflow_id} not found")
+        await TiaOverrideService().load_all_into_registry(session)
         nodes, edges = await self._load_nodes_edges(session, workflow_id)
         errors = self._validator.collect_errors(nodes, edges, for_publish=for_publish)
         warnings: list[str] = []

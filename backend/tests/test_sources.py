@@ -171,3 +171,36 @@ async def test_verify_without_token(client: AsyncClient) -> None:
     )
     assert response.status_code == 200
     assert response.json()["ok"] is False
+
+
+@pytest.mark.asyncio
+async def test_verify_with_source_id_uses_stored_token(client: AsyncClient, monkeypatch) -> None:
+    create = await client.post(
+        "/api/v1/sources",
+        json={
+            "name": "Verify Src",
+            "provider": "tushare",
+            "config": {"token": "abcd1234efgh5678", "account_points": 2000},
+        },
+    )
+    source_id = create.json()["id"]
+
+    def fake_verify(_self, token: str):
+        from app.schemas.datasource import DataSourceVerifyResponse
+
+        assert token == "abcd1234efgh5678"
+        return DataSourceVerifyResponse(ok=True, message="Tushare 连通正常")
+
+    monkeypatch.setattr(
+        "app.services.datasource.service.DataSourceService._verify_tushare",
+        fake_verify,
+    )
+
+    response = await client.post(
+        "/api/v1/sources/verify",
+        json={"provider": "tushare", "source_id": source_id},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["ok"] is True
+    assert body["quota"]["account_points"] == 2000

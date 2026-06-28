@@ -101,6 +101,84 @@ async def list_scan_providers_endpoint(_: RequireAdmin) -> dict:
     return {"providers": list_scan_providers()}
 
 
+@router.get(
+    "/tdx-readiness",
+    summary="TDX 治理就绪状态",
+    description="检查 TDX 数据源、Sidecar health 与提案激活概况。",
+)
+async def tdx_readiness(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    _: RequireAdmin,
+) -> dict:
+    from sqlalchemy import func, select
+
+    from app.models.tia_proposal import TiaProposal
+    from app.services.tia.credentials_tdx import resolve_tdx_collect_credentials
+    from app.services.tia.scan.index_loader import load_bundled_index
+
+    bundled = load_bundled_index("tdx")
+    bundled_count = bundled.total
+    creds: dict = {}
+    sidecar_ok = False
+    sidecar_message = "未配置 TDX 数据源"
+    try:
+        creds = await session.run_sync(
+            lambda sync_sess: resolve_tdx_collect_credentials(sync_sess, None)
+        )
+        base_url = (creds.get("base_url") or "").strip()
+        if base_url:
+            from app.services.collectors.tdx_sidecar import TdxSidecarClient
+
+            health = await session.run_sync(
+                lambda _sync_sess: TdxSidecarClient(
+                    base_url, creds.get("api_token")
+                ).health()
+            )
+            sidecar_ok = bool(health.get("ok", True))
+            sidecar_message = str(health.get("message") or "Sidecar OK")
+        else:
+            sidecar_message = "数据源未配置 base_url"
+    except Exception as exc:
+        sidecar_message = str(exc)
+
+    applied = int(
+        (
+            await session.execute(
+                select(func.count())
+                .select_from(TiaProposal)
+                .where(
+                    TiaProposal.status == "applied",
+                    TiaProposal.data_type.ilike("tdx_%"),
+                )
+            )
+        ).scalar_one()
+    )
+    pending = int(
+        (
+            await session.execute(
+                select(func.count())
+                .select_from(TiaProposal)
+                .where(
+                    TiaProposal.status == "pending",
+                    TiaProposal.data_type.ilike("tdx_%"),
+                )
+            )
+        ).scalar_one()
+    )
+    return {
+        "bundled_api_count": bundled_count,
+        "applied_count": applied,
+        "pending_count": pending,
+        "has_data_source": bool(creds.get("from_data_source")),
+        "source_id": creds.get("source_id"),
+        "source_name": creds.get("source_name"),
+        "base_url": creds.get("base_url"),
+        "sidecar_ok": sidecar_ok,
+        "sidecar_message": sidecar_message,
+        "ready": bool(creds.get("base_url")) and sidecar_ok,
+    }
+
+
 @router.post(
     "/scan",
     response_model=TIAScanJobResponse,
@@ -342,6 +420,7 @@ async def list_proposals(
     min_points_gte: int | None = Query(None, ge=0, description="最低积分（含）"),
     min_points_lte: int | None = Query(None, ge=0, description="最高积分（含）"),
     include_summary: bool = Query(True, description="是否返回全库状态汇总"),
+    provider: str | None = Query(None, description="tushare|tdx 按 data_type 前缀筛选"),
 ) -> TiaProposalPageResponse:
     try:
         return await _proposal_service.list_proposals(
@@ -353,6 +432,7 @@ async def list_proposals(
             min_points_gte=min_points_gte,
             min_points_lte=min_points_lte,
             include_summary=include_summary,
+            provider=provider,
         )
     except ValidationError as exc:
         raise HTTPException(status_code=400, detail=exc.message) from exc

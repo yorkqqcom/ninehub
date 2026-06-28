@@ -20,6 +20,13 @@ API_TO_LABEL: dict[str, str] = {
 }
 
 
+def provider_from_data_type(data_type: str) -> str:
+    """Infer catalog provider prefix from data_type."""
+    if data_type.startswith("tdx_"):
+        return "tdx"
+    return DEFAULT_PROVIDER
+
+
 def api_to_data_type(api_name: str, provider: str = DEFAULT_PROVIDER) -> str:
     """Platform data_type: {provider}_{api_name}."""
     return f"{provider}_{api_name}"

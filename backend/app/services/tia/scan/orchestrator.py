@@ -7,7 +7,11 @@ from typing import Any, Callable
 
 from sqlalchemy.orm import Session
 
-from app.catalog.scan_catalog import local_api_names_sorted, local_override_min_points
+from app.catalog.scan_catalog import (
+    local_api_names_sorted,
+    local_override_min_points,
+    local_provider_api_names_sorted,
+)
 from app.services.platform.job_service import PlatformJobService
 from app.services.tia.api_probe_service import TiaApiProbeService
 from app.services.tia.proposal_service import TiaProposalService
@@ -67,7 +71,7 @@ class TiaScanOrchestrator:
             doc_pages_sync = self._maybe_sync_doc_pages(session, options, progress)
             session.commit()
 
-        local_apis = local_api_names_sorted(session) if options.provider == "tushare" else []
+        local_apis = local_provider_api_names_sorted(session, options.provider)
         progress(15, f"Phase P1: loaded {len(local_apis)} local APIs")
         session.commit()
 
@@ -122,15 +126,18 @@ class TiaScanOrchestrator:
 
         proposals_created = 0
         proposals_reconciled = 0
-        if options.provider == "tushare":
+        if options.provider in ("tushare", "tdx"):
             proposals_reconciled = self._proposals.reconcile_local_catalog_proposals_sync(
-                session, diff.local_apis
+                session, diff.local_apis, provider=options.provider
             )
             proposals_created = self._proposals.upsert_from_scan_sync(
-                session, job_id, diff.new_on_official
+                session,
+                job_id,
+                diff.new_on_official,
+                provider=options.provider,
             )
-        proposals_pending = (
-            self._proposals.count_pending_sync(session) if options.provider == "tushare" else 0
+        proposals_pending = self._proposals.count_pending_sync(
+            session, provider=options.provider if options.provider in ("tushare", "tdx") else None
         )
 
         probe_apis, planner_meta = plan_probe_apis(
@@ -162,21 +169,31 @@ class TiaScanOrchestrator:
             progress(70, f"Phase P4: probing {len(probe_apis)} APIs")
             session.commit()
 
-            def on_probe(api: str, row: dict[str, Any], idx: int, total: int) -> None:
-                pct = 70 + int(25 * idx / max(total, 1))
-                progress(pct, f"Probed {api}: {row.get('status')}")
-                session.commit()
+            if options.provider == "tdx":
+                api_probes = self._probe_tdx_sidecar(
+                    probe_apis,
+                    creds,
+                    official_map=official_map,
+                    progress=progress,
+                    session=session,
+                )
+                probe_summary = TiaApiProbeService.summarize(api_probes)
+            else:
+                def on_probe(api: str, row: dict[str, Any], idx: int, total: int) -> None:
+                    pct = 70 + int(25 * idx / max(total, 1))
+                    progress(pct, f"Probed {api}: {row.get('status')}")
+                    session.commit()
 
-            api_probes = self._probe.probe_catalog_apis(
-                probe_apis,
-                token=creds.get("token"),
-                account_points=int(creds.get("account_points") or 0),
-                max_calls_per_minute=creds.get("max_calls_per_minute"),
-                official_map=official_map,
-                override_points=override_points or None,
-                on_progress=on_probe,
-            )
-            probe_summary = TiaApiProbeService.summarize(api_probes)
+                api_probes = self._probe.probe_catalog_apis(
+                    probe_apis,
+                    token=creds.get("token"),
+                    account_points=int(creds.get("account_points") or 0),
+                    max_calls_per_minute=creds.get("max_calls_per_minute"),
+                    official_map=official_map,
+                    override_points=override_points or None,
+                    on_progress=on_probe,
+                )
+                probe_summary = TiaApiProbeService.summarize(api_probes)
 
         probe_msg = (
             f"probes ok={probe_summary['ok']} "
@@ -196,7 +213,8 @@ class TiaScanOrchestrator:
             "provider": options.provider,
             "unresolved_doc_ids": getattr(official_snapshot, "unresolved_doc_ids", [])[:100],
             "unresolved_doc_ids_total": len(getattr(official_snapshot, "unresolved_doc_ids", []) or []),
-            "local_override_count": len(diff.local_apis) if options.provider == "tushare" else 0,
+            "local_override_count": len(diff.local_apis),
+            "local_applied_count": len(diff.local_apis) if options.provider == "tdx" else 0,
             "proposals_created": proposals_created,
             "proposals_reconciled": proposals_reconciled,
             "proposals_pending": proposals_pending,
@@ -217,6 +235,7 @@ class TiaScanOrchestrator:
                 "account_points": creds.get("account_points"),
                 "max_calls_per_minute": creds.get("max_calls_per_minute"),
                 "has_token": bool(creds.get("token")),
+                "base_url": creds.get("base_url"),
                 "note": creds.get("note"),
             },
             "api_probes": api_probes,
@@ -234,6 +253,62 @@ class TiaScanOrchestrator:
             "scan_message": scan_message,
         }
         return result
+
+    @staticmethod
+    def _probe_tdx_sidecar(
+        probe_apis: list[str],
+        creds: dict[str, Any],
+        *,
+        official_map: dict[str, Any],
+        progress: ProgressFn,
+        session: Session,
+    ) -> list[dict[str, Any]]:
+        from app.catalog.tia_probe_registry import api_probe_meta
+        from app.services.collectors.tdx_sidecar import TdxSidecarClient
+
+        base_url = (creds.get("base_url") or "").strip()
+        rows: list[dict[str, Any]] = []
+        health_ok = False
+        health_msg = creds.get("note") or "Sidecar 未配置"
+        if base_url:
+            try:
+                client = TdxSidecarClient(base_url, creds.get("api_token"))
+                health = client.health()
+                health_ok = bool(health.get("ok", True))
+                health_msg = str(health.get("message") or "Sidecar OK")
+            except Exception as exc:
+                health_msg = str(exc)
+
+        total = len(probe_apis)
+        for idx, api in enumerate(probe_apis, start=1):
+            meta = api_probe_meta(api) or {}
+            expected = list((meta.get("probe") or {}).get("expected_fields") or [])
+            entry = official_map.get(api)
+            label = getattr(entry, "label", None) if entry else None
+            if health_ok:
+                status = "ok"
+                message = health_msg
+            elif base_url:
+                status = "failed"
+                message = health_msg
+            else:
+                status = "skipped"
+                message = health_msg
+            rows.append(
+                {
+                    "api": api,
+                    "status": status,
+                    "message": message,
+                    "probe_source": "tdx_sidecar",
+                    "rows": len(expected) if expected else None,
+                    "expected_fields": expected,
+                    "label": label,
+                }
+            )
+            pct = 70 + int(25 * idx / max(total, 1))
+            progress(pct, f"Probed {api}: {status}")
+            session.commit()
+        return rows
 
     @staticmethod
     def _maybe_sdk_batch_validate(

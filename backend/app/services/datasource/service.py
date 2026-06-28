@@ -196,7 +196,6 @@ class DataSourceService:
         await session.delete(source)
 
     async def verify(self, session: AsyncSession, body: DataSourceVerifyRequest) -> DataSourceVerifyResponse:
-        token = body.token
         source: DataSource | None = None
         if body.source_id is not None:
             source = await session.get(DataSource, body.source_id)
@@ -205,12 +204,13 @@ class DataSourceService:
             cfg = source.config or {}
             body = DataSourceVerifyRequest(
                 provider=source.provider,
-                token=(cfg.get("token") or token) if source.provider != "tdx" else None,
+                token=(cfg.get("token") or body.token) if source.provider != "tdx" else None,
                 source_id=body.source_id,
                 base_url=body.base_url or cfg.get("base_url"),
                 api_token=body.api_token or cfg.get("api_token"),
                 install_root=body.install_root or cfg.get("install_root"),
             )
+        token = body.token
         if body.provider == "akshare":
             return self._verify_akshare()
         if body.provider == "tdx":

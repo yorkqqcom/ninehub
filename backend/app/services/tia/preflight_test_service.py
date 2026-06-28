@@ -467,14 +467,21 @@ class TiaPreflightTestService:
         # 6. min_points
         creds: dict[str, Any] = {}
         if session is not None:
-            try:
-                creds = resolve_tushare_scan_credentials(session)
-            except (NotFoundError, ValidationError):
-                creds = {}
+            creds = self._resolve_preflight_credentials(session, api_name)
         account_pts = int(creds.get("account_points") or 0)
         min_pts = self._min_points(api_name)
         from_data_source = bool(creds.get("from_data_source"))
-        if min_pts and account_pts and account_pts < min_pts:
+        is_tdx = self._is_tdx_api(api_name)
+        if is_tdx or not min_pts:
+            checks.append(
+                PreflightCheck(
+                    key="min_points",
+                    label=_CHECK_LABELS["min_points"],
+                    status="pass",
+                    message="TDX 接口无积分门槛" if is_tdx else f"积分 OK（要求 {min_pts or '—'}）",
+                )
+            )
+        elif min_pts and account_pts and account_pts < min_pts:
             status = "fail" if from_data_source else "warn"
             msg = f"账户积分 {account_pts} < 接口要求 {min_pts}"
             checks.append(
@@ -510,188 +517,242 @@ class TiaPreflightTestService:
         # 7–8. live_probe + field_match
         probe_row: dict[str, Any] | None = None
         if live_probe and probe_spec and session is not None:
-            token = creds.get("token")
-            entry = self._official_entry(api_name)
-            if not token:
-                doc_fields = _wctapi_output_fields(api_name)
-                if not doc_fields:
-                    from app.services.catalog.field_resolution import resolve_expected_fields
-
-                    doc_fields = resolve_expected_fields(api_name)
-                if doc_fields:
-                    live_fields = list(doc_fields)
-                    schema = self._apply_schema_from_field_list(
-                        api_name=api_name,
-                        checks=checks,
-                        blocking=blocking,
-                        field_list=live_fields,
-                        fields_source="wctapi_md",
-                        live_probe_status="warn",
-                        live_probe_message=(
-                            f"无 Token，使用文档/注册表 {len(live_fields)} 列出参建表"
-                        ),
-                        field_match_message=(
-                            f"注册表 {len(live_fields)} 列，唯一键校验通过"
-                        ),
-                        require_live_actual=False,
-                    )
-                else:
-                    checks.append(
-                        PreflightCheck(
-                            key="live_probe",
-                            label=_CHECK_LABELS["live_probe"],
-                            status="fail",
-                            message="无 Token 且无 wctapi 出参，无法建表",
-                        )
-                    )
-                    blocking.append(f"{api_name}: 无 Token，无法实盘探针且无文档出参")
-                    checks.append(
-                        PreflightCheck(
-                            key="field_match",
-                            label=_CHECK_LABELS["field_match"],
-                            status="fail",
-                            message="依赖实盘探针或 wctapi 出参",
-                        )
-                    )
-            else:
-                narrow_params = _narrow_probe_params(
-                    resolve_probe_params(dict(probe_spec.get("params") or {}))
+            if is_tdx:
+                schema = self._run_tdx_live_probe(
+                    api_name=api_name,
+                    probe_spec=probe_spec,
+                    creds=creds,
+                    checks=checks,
+                    blocking=blocking,
                 )
-                narrow_spec = {**probe_spec, "params": narrow_params}
-                try:
-                    result = self._probe._probe_one(
-                        api_name,
-                        probe_spec=narrow_spec,
-                        spec_source=spec_source,
-                        official_entry=entry,
-                        min_points_override=min_pts,
-                        token=token,
-                        account_points=account_pts or min_pts or 120,
-                        max_calls_per_minute=creds.get("max_calls_per_minute"),
-                    )
-                    probe_row = result.to_dict()
-                    if result.status == "ok":
-                        live_fields = list(result.actual_fields or [])
+                if schema:
+                    live_fields = [
+                        str(col.get("key"))
+                        for col in schema.get("columns", [])
+                        if col.get("key")
+                    ]
+            else:
+                token = creds.get("token")
+                entry = self._official_entry(api_name)
+                if not token:
+                    doc_fields = _wctapi_output_fields(api_name)
+                    if not doc_fields:
+                        from app.services.catalog.field_resolution import resolve_expected_fields
+
+                        doc_fields = resolve_expected_fields(api_name)
+                    if doc_fields:
+                        live_fields = list(doc_fields)
+                        schema = self._apply_schema_from_field_list(
+                            api_name=api_name,
+                            checks=checks,
+                            blocking=blocking,
+                            field_list=live_fields,
+                            fields_source="wctapi_md",
+                            live_probe_status="warn",
+                            live_probe_message=(
+                                f"无 Token，使用文档/注册表 {len(live_fields)} 列出参建表"
+                            ),
+                            field_match_message=(
+                                f"注册表 {len(live_fields)} 列，唯一键校验通过"
+                            ),
+                            require_live_actual=False,
+                        )
+                    else:
                         checks.append(
                             PreflightCheck(
                                 key="live_probe",
                                 label=_CHECK_LABELS["live_probe"],
-                                status="pass",
-                                message=f"返回 {result.rows} 行",
-                                detail={"latency_ms": result.latency_ms},
+                                status="fail",
+                                message="无 Token 且无 wctapi 出参，无法建表",
                             )
                         )
-                        schema = resolve_schema_for_ddl(
+                        blocking.append(f"{api_name}: 无 Token，无法实盘探针且无文档出参")
+                        checks.append(
+                            PreflightCheck(
+                                key="field_match",
+                                label=_CHECK_LABELS["field_match"],
+                                status="fail",
+                                message="依赖实盘探针或 wctapi 出参",
+                            )
+                        )
+                else:
+                    narrow_params = _narrow_probe_params(
+                        resolve_probe_params(dict(probe_spec.get("params") or {}))
+                    )
+                    narrow_spec = {**probe_spec, "params": narrow_params}
+                    try:
+                        result = self._probe._probe_one(
                             api_name,
-                            None,
-                            force_rebuild=True,
-                            live_fields=live_fields or None,
-                            require_live_actual=True,
+                            probe_spec=narrow_spec,
+                            spec_source=spec_source,
+                            official_entry=entry,
+                            min_points_override=min_pts,
+                            token=token,
+                            account_points=account_pts or min_pts or 120,
+                            max_calls_per_minute=creds.get("max_calls_per_minute"),
                         )
-                        missing = result.missing_fields
-                        extra = result.extra_fields
-                        from app.services.tia.unique_key_registry import (
-                            probe_columns_cover_unique_keys,
-                        )
+                        probe_row = result.to_dict()
+                        if result.status == "ok":
+                            live_fields = list(result.actual_fields or [])
+                            checks.append(
+                                PreflightCheck(
+                                    key="live_probe",
+                                    label=_CHECK_LABELS["live_probe"],
+                                    status="pass",
+                                    message=f"返回 {result.rows} 行",
+                                    detail={"latency_ms": result.latency_ms},
+                                )
+                            )
+                            schema = resolve_schema_for_ddl(
+                                api_name,
+                                None,
+                                force_rebuild=True,
+                                live_fields=live_fields or None,
+                                require_live_actual=True,
+                            )
+                            missing = result.missing_fields
+                            extra = result.extra_fields
+                            from app.services.tia.unique_key_registry import (
+                                probe_columns_cover_unique_keys,
+                            )
 
-                        uk_ok, uk_missing = probe_columns_cover_unique_keys(
-                            schema,
-                            list(result.actual_fields or []),
-                        )
-                        if not uk_ok:
-                            checks.append(
-                                PreflightCheck(
-                                    key="field_match",
-                                    label=_CHECK_LABELS["field_match"],
-                                    status="fail",
-                                    message=f"唯一键列未在探针返回: {', '.join(uk_missing)}",
-                                    detail={
-                                        "unique_keys": schema.get("unique_keys", []),
-                                        "missing_unique_keys": uk_missing,
-                                    },
-                                )
+                            uk_ok, uk_missing = probe_columns_cover_unique_keys(
+                                schema,
+                                list(result.actual_fields or []),
                             )
-                            blocking.append(
-                                f"{api_name}: 唯一键列未返回 — {', '.join(uk_missing)}"
-                            )
-                        elif missing:
-                            checks.append(
-                                PreflightCheck(
-                                    key="field_match",
-                                    label=_CHECK_LABELS["field_match"],
-                                    status="pass",
-                                    message=(
-                                        f"实盘 {len(live_fields)} 列；文档缺 "
-                                        f"{len(missing)} 列（以实盘为准）"
-                                    ),
-                                    detail={
-                                        "actual_fields": live_fields,
-                                        "missing_in_doc": missing,
-                                        "extra_vs_doc": extra,
-                                        "unique_keys": schema.get("unique_keys", []),
-                                    },
+                            if not uk_ok:
+                                checks.append(
+                                    PreflightCheck(
+                                        key="field_match",
+                                        label=_CHECK_LABELS["field_match"],
+                                        status="fail",
+                                        message=f"唯一键列未在探针返回: {', '.join(uk_missing)}",
+                                        detail={
+                                            "unique_keys": schema.get("unique_keys", []),
+                                            "missing_unique_keys": uk_missing,
+                                        },
+                                    )
                                 )
-                            )
-                        elif extra:
-                            checks.append(
-                                PreflightCheck(
-                                    key="field_match",
-                                    label=_CHECK_LABELS["field_match"],
-                                    status="pass",
-                                    message=(
-                                        f"实盘 {len(live_fields)} 列；较文档多 "
-                                        f"{len(extra)} 列（以实盘为准）"
-                                    ),
-                                    detail={
-                                        "unique_keys": schema.get("unique_keys", []),
-                                        "extra_vs_doc": extra,
-                                        "actual_fields": live_fields,
-                                    },
+                                blocking.append(
+                                    f"{api_name}: 唯一键列未返回 — {', '.join(uk_missing)}"
                                 )
-                            )
-                        else:
-                            checks.append(
-                                PreflightCheck(
-                                    key="field_match",
-                                    label=_CHECK_LABELS["field_match"],
-                                    status="pass",
-                                    message=f"实盘 {len(live_fields)} 列，与文档一致",
-                                    detail={
-                                        "unique_keys": schema.get("unique_keys", []),
-                                        "actual_fields": live_fields,
-                                    },
+                            elif missing:
+                                checks.append(
+                                    PreflightCheck(
+                                        key="field_match",
+                                        label=_CHECK_LABELS["field_match"],
+                                        status="pass",
+                                        message=(
+                                            f"实盘 {len(live_fields)} 列；文档缺 "
+                                            f"{len(missing)} 列（以实盘为准）"
+                                        ),
+                                        detail={
+                                            "actual_fields": live_fields,
+                                            "missing_in_doc": missing,
+                                            "extra_vs_doc": extra,
+                                            "unique_keys": schema.get("unique_keys", []),
+                                        },
+                                    )
                                 )
-                            )
-                        ddl_errors = validate_canonical_for_ddl(schema, api_name)
-                        for idx, check in enumerate(checks):
-                            if check.key != "schema_ddl":
-                                continue
-                            if ddl_errors:
-                                checks[idx] = PreflightCheck(
-                                    key="schema_ddl",
-                                    label=_CHECK_LABELS["schema_ddl"],
-                                    status="fail",
-                                    message="; ".join(ddl_errors),
+                            elif extra:
+                                checks.append(
+                                    PreflightCheck(
+                                        key="field_match",
+                                        label=_CHECK_LABELS["field_match"],
+                                        status="pass",
+                                        message=(
+                                            f"实盘 {len(live_fields)} 列；较文档多 "
+                                            f"{len(extra)} 列（以实盘为准）"
+                                        ),
+                                        detail={
+                                            "unique_keys": schema.get("unique_keys", []),
+                                            "extra_vs_doc": extra,
+                                            "actual_fields": live_fields,
+                                        },
+                                    )
                                 )
-                                blocking.extend(ddl_errors)
                             else:
-                                checks[idx] = PreflightCheck(
-                                    key="schema_ddl",
-                                    label=_CHECK_LABELS["schema_ddl"],
-                                    status="pass",
-                                    message=(
-                                        f"{len(schema.get('columns', []))} 列，"
-                                        "DDL 就绪（含实盘字段）"
-                                    ),
-                                    detail={
-                                        "unique_keys": schema.get("unique_keys", []),
-                                        "indexes": schema.get("indexes", []),
-                                        "unique_constraint": schema.get("unique_constraint"),
-                                        "live_field_count": len(live_fields),
-                                    },
+                                checks.append(
+                                    PreflightCheck(
+                                        key="field_match",
+                                        label=_CHECK_LABELS["field_match"],
+                                        status="pass",
+                                        message=f"实盘 {len(live_fields)} 列，与文档一致",
+                                        detail={
+                                            "unique_keys": schema.get("unique_keys", []),
+                                            "actual_fields": live_fields,
+                                        },
+                                    )
                                 )
-                            break
-                    else:
+                            ddl_errors = validate_canonical_for_ddl(schema, api_name)
+                            for idx, check in enumerate(checks):
+                                if check.key != "schema_ddl":
+                                    continue
+                                if ddl_errors:
+                                    checks[idx] = PreflightCheck(
+                                        key="schema_ddl",
+                                        label=_CHECK_LABELS["schema_ddl"],
+                                        status="fail",
+                                        message="; ".join(ddl_errors),
+                                    )
+                                    blocking.extend(ddl_errors)
+                                else:
+                                    checks[idx] = PreflightCheck(
+                                        key="schema_ddl",
+                                        label=_CHECK_LABELS["schema_ddl"],
+                                        status="pass",
+                                        message=(
+                                            f"{len(schema.get('columns', []))} 列，"
+                                            "DDL 就绪（含实盘字段）"
+                                        ),
+                                        detail={
+                                            "unique_keys": schema.get("unique_keys", []),
+                                            "indexes": schema.get("indexes", []),
+                                            "unique_constraint": schema.get("unique_constraint"),
+                                            "live_field_count": len(live_fields),
+                                        },
+                                    )
+                                break
+                        else:
+                            doc_fields = _wctapi_output_fields(api_name)
+                            if doc_fields:
+                                live_fields = list(doc_fields)
+                                schema = self._apply_schema_from_field_list(
+                                    api_name=api_name,
+                                    checks=checks,
+                                    blocking=blocking,
+                                    field_list=live_fields,
+                                    fields_source="wctapi_md",
+                                    live_probe_status="warn",
+                                    live_probe_message=(
+                                        f"实盘探针未返回列（{result.message or result.status}），"
+                                        f"使用 wctapi 文档 {len(live_fields)} 列建表"
+                                    ),
+                                    field_match_message=(
+                                        f"wctapi 文档 {len(live_fields)} 列，唯一键校验通过"
+                                    ),
+                                    require_live_actual=False,
+                                )
+                            else:
+                                checks.append(
+                                    PreflightCheck(
+                                        key="live_probe",
+                                        label=_CHECK_LABELS["live_probe"],
+                                        status="fail",
+                                        message=result.message or result.status,
+                                        detail=probe_row,
+                                    )
+                                )
+                                blocking.append(f"{api_name}: 实盘探针失败 — {result.message}")
+                                checks.append(
+                                    PreflightCheck(
+                                        key="field_match",
+                                        label=_CHECK_LABELS["field_match"],
+                                        status="skip",
+                                        message="探针未成功",
+                                    )
+                                )
+                    except Exception as exc:
                         doc_fields = _wctapi_output_fields(api_name)
                         if doc_fields:
                             live_fields = list(doc_fields)
@@ -703,7 +764,7 @@ class TiaPreflightTestService:
                                 fields_source="wctapi_md",
                                 live_probe_status="warn",
                                 live_probe_message=(
-                                    f"实盘探针未返回列（{result.message or result.status}），"
+                                    f"实盘探针异常（{exc}），"
                                     f"使用 wctapi 文档 {len(live_fields)} 列建表"
                                 ),
                                 field_match_message=(
@@ -717,57 +778,18 @@ class TiaPreflightTestService:
                                     key="live_probe",
                                     label=_CHECK_LABELS["live_probe"],
                                     status="fail",
-                                    message=result.message or result.status,
-                                    detail=probe_row,
+                                    message=str(exc),
                                 )
                             )
-                            blocking.append(f"{api_name}: 实盘探针失败 — {result.message}")
+                            blocking.append(str(exc))
                             checks.append(
                                 PreflightCheck(
                                     key="field_match",
                                     label=_CHECK_LABELS["field_match"],
                                     status="skip",
-                                    message="探针未成功",
+                                    message="探针异常",
                                 )
                             )
-                except Exception as exc:
-                    doc_fields = _wctapi_output_fields(api_name)
-                    if doc_fields:
-                        live_fields = list(doc_fields)
-                        schema = self._apply_schema_from_field_list(
-                            api_name=api_name,
-                            checks=checks,
-                            blocking=blocking,
-                            field_list=live_fields,
-                            fields_source="wctapi_md",
-                            live_probe_status="warn",
-                            live_probe_message=(
-                                f"实盘探针异常（{exc}），"
-                                f"使用 wctapi 文档 {len(live_fields)} 列建表"
-                            ),
-                            field_match_message=(
-                                f"wctapi 文档 {len(live_fields)} 列，唯一键校验通过"
-                            ),
-                            require_live_actual=False,
-                        )
-                    else:
-                        checks.append(
-                            PreflightCheck(
-                                key="live_probe",
-                                label=_CHECK_LABELS["live_probe"],
-                                status="fail",
-                                message=str(exc),
-                            )
-                        )
-                        blocking.append(str(exc))
-                        checks.append(
-                            PreflightCheck(
-                                key="field_match",
-                                label=_CHECK_LABELS["field_match"],
-                                status="skip",
-                                message="探针异常",
-                            )
-                        )
         else:
             checks.append(
                 PreflightCheck(
@@ -912,6 +934,114 @@ class TiaPreflightTestService:
             collect_pattern=pattern_meta,
             blocking_errors=blocking,
             actual_fields=live_fields,
+        )
+
+    @staticmethod
+    def _is_tdx_api(api_name: str) -> bool:
+        from app.services.tia.scan.index_loader import load_bundled_index
+
+        bundled = load_bundled_index("tdx")
+        return api_name in {entry.api for entry in bundled.apis}
+
+    @staticmethod
+    def _resolve_preflight_credentials(session: Session, api_name: str) -> dict[str, Any]:
+        if TiaPreflightTestService._is_tdx_api(api_name):
+            from app.services.tia.credentials_tdx import resolve_tdx_collect_credentials
+
+            try:
+                return resolve_tdx_collect_credentials(session, None)
+            except (NotFoundError, ValidationError):
+                return {"provider": "tdx", "note": "TDX Sidecar credentials not configured"}
+        try:
+            return resolve_tushare_scan_credentials(session)
+        except (NotFoundError, ValidationError):
+            return {}
+
+    def _run_tdx_live_probe(
+        self,
+        *,
+        api_name: str,
+        probe_spec: dict[str, Any],
+        creds: dict[str, Any],
+        checks: list[PreflightCheck],
+        blocking: list[str],
+    ) -> dict[str, Any] | None:
+        from app.services.catalog.field_resolution import resolve_expected_fields
+        from app.services.collectors.tdx_sidecar import TdxSidecarClient
+
+        expected = list(probe_spec.get("expected_fields") or [])
+        if not expected:
+            expected = resolve_expected_fields(api_name)
+        base_url = (creds.get("base_url") or "").strip()
+        live_fields: list[str] = []
+        fields_source = "tdx_registry"
+        live_status = "warn"
+        live_message = "未配置 Sidecar，使用注册表字段建表"
+
+        if base_url:
+            try:
+                client = TdxSidecarClient(base_url, creds.get("api_token"))
+                health = client.health()
+                if not health.get("ok", True):
+                    live_message = str(health.get("message") or "Sidecar health failed")
+                elif api_name.startswith("concept"):
+                    from app.catalog.tia_probe_registry import last_trading_day
+
+                    catalog = client.concept_catalog(
+                        last_trading_day(),
+                        install_root=creds.get("install_root"),
+                        paths=creds.get("paths"),
+                    )
+                    rows = catalog.get("indices") or catalog.get("members") or []
+                    if rows and isinstance(rows[0], dict):
+                        live_fields = list(rows[0].keys())
+                        fields_source = "tdx_sidecar_concept"
+                        live_status = "pass"
+                        live_message = f"Sidecar concept-catalog 返回 {len(rows)} 行"
+                    else:
+                        live_fields = list(expected)
+                        live_message = "Sidecar OK，concept-catalog 无样本，使用注册表字段"
+                else:
+                    live_fields = list(expected)
+                    fields_source = "tdx_sidecar_health"
+                    live_status = "pass"
+                    live_message = "Sidecar health OK"
+            except Exception as exc:
+                live_fields = list(expected)
+                live_message = f"Sidecar 探针异常（{exc}），使用注册表字段"
+        else:
+            live_fields = list(expected)
+
+        if not live_fields:
+            checks.append(
+                PreflightCheck(
+                    key="live_probe",
+                    label=_CHECK_LABELS["live_probe"],
+                    status="fail",
+                    message="无 Sidecar 且无注册表出参",
+                )
+            )
+            blocking.append(f"{api_name}: 无法解析 TDX 字段")
+            checks.append(
+                PreflightCheck(
+                    key="field_match",
+                    label=_CHECK_LABELS["field_match"],
+                    status="fail",
+                    message="无可用字段",
+                )
+            )
+            return None
+
+        return self._apply_schema_from_field_list(
+            api_name=api_name,
+            checks=checks,
+            blocking=blocking,
+            field_list=live_fields,
+            fields_source=fields_source,
+            live_probe_status=live_status,
+            live_probe_message=live_message,
+            field_match_message=f"TDX {len(live_fields)} 列，唯一键校验通过",
+            require_live_actual=False,
         )
 
     @staticmethod

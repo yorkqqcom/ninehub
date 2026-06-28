@@ -162,7 +162,12 @@ class TiaActivationService:
         try:
             override = self._overrides.get_by_api_sync(session, proposal.api_name)
         except NotFoundError:
-            override = self._overrides.build_override_from_api(proposal.api_name)
+            proposal_dt = proposal.data_type or ""
+            provider = "tdx" if proposal_dt.startswith("tdx_") else "tushare"
+            override = self._overrides.build_override_from_api(
+                proposal.api_name,
+                provider=provider,
+            )
             session.add(override)
             session.flush()
 
@@ -170,7 +175,9 @@ class TiaActivationService:
         if data_type.startswith("tdx_"):
             data_type = api_to_data_type(proposal.api_name, provider="tdx")
         proposal.data_type = data_type
-        table_name = override.table_name or api_to_table_name(proposal.api_name, provider="tdx" if data_type.startswith("tdx_") else "tushare")
+        provider = "tdx" if data_type.startswith("tdx_") else "tushare"
+        table_name = override.table_name or api_to_table_name(proposal.api_name, provider=provider)
+        override.data_type = data_type
         override.table_name = table_name
 
         schema: dict[str, Any] = {}
