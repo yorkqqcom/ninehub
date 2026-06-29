@@ -162,6 +162,15 @@ function isStepComplete(step: WizardStep): boolean {
   return Boolean(asOfDate.value);
 }
 
+function goWizardStep(step: WizardStep) {
+  if (step === "time" && !selectedIndicators.value.length) {
+    ui.showMessage("请先在「选指标」添加至少 1 项指标", "info");
+    wizardStep.value = "indicators";
+    return;
+  }
+  wizardStep.value = step;
+}
+
 function stepStatus(step: WizardStep): "active" | "done" | "pending" {
   const currentIdx = WIZARD_ORDER.indexOf(wizardStep.value);
   const stepIdx = WIZARD_ORDER.indexOf(step);
@@ -237,6 +246,11 @@ async function loadMeta() {
     meta.value = m;
     userTemplates.value = tpls.filter((t) => !t.is_system);
     userWatchlists.value = wls;
+    if (!(m.indicators_flat?.length)) {
+      ui.showMessage("指标列表为空，请确认 P0 数据已激活并重启后端", "error");
+    }
+  } catch {
+    ui.showMessage("加载指标元数据失败，请检查 API 是否在线", "error");
   } finally {
     loadingMeta.value = false;
   }
@@ -768,7 +782,7 @@ onMounted(async () => {
           type="button"
           class="browser-wizard__step"
           :class="stepStatus(step.key)"
-          @click="wizardStep = step.key"
+          @click="goWizardStep(step.key)"
         >
           <span class="browser-wizard__num">{{ step.num }}</span>
           {{ step.label }}
@@ -833,6 +847,7 @@ onMounted(async () => {
       </div>
     </nav>
 
+    <div class="browser-step-host">
     <Transition name="browser-step" mode="out-in">
     <div
       :key="wizardStep"
@@ -1270,6 +1285,7 @@ onMounted(async () => {
       </main>
     </div>
     </Transition>
+    </div>
 
     <div v-if="modalOpen" class="browser-modal-backdrop" @click.self="modalOpen = false">
       <div class="browser-modal panel">
@@ -1326,8 +1342,26 @@ onMounted(async () => {
 }
 
 .browser-page--wizard {
+  flex: 1;
+  min-height: 0;
   height: calc(100vh - 88px);
   max-height: calc(100vh - 88px);
+  overflow: hidden;
+}
+
+.browser-step-host {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.browser-step-host :deep(.browser-layout) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -1619,6 +1653,9 @@ onMounted(async () => {
 .browser-layout.browser-layout--triple {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .browser-layout--split .browser-side {
@@ -1682,7 +1719,7 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: minmax(240px, 28%) minmax(200px, 22%) minmax(320px, 50%);
   flex: 1;
-  min-height: 0;
+  min-height: 360px;
   height: 100%;
   overflow: hidden;
   padding: 0;

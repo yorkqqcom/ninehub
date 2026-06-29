@@ -58,6 +58,24 @@ FROM (
         return None
 
 
+async def _table_exists(session: AsyncSession, table_name: str) -> bool:
+    try:
+        row = (
+            await session.execute(
+                text(
+                    "SELECT EXISTS ("
+                    "SELECT FROM information_schema.tables "
+                    "WHERE table_schema = 'public' AND table_name = :t"
+                    ")"
+                ),
+                {"t": table_name},
+            )
+        ).scalar()
+        return bool(row)
+    except Exception:
+        return False
+
+
 async def _table_row_count(session: AsyncSession, table_name: str) -> int | None:
     try:
         result = await session.execute(text(f'SELECT COUNT(*) FROM "{table_name}"'))
@@ -250,8 +268,11 @@ class BrowserReadinessService:
                 else:
                     row_count = await _table_row_count(session, table_name)
                     if row_count is None:
-                        message = "表不可读"
-                        warnings.append(f"P1 表不可读 {table_name}")
+                        if not await _table_exists(session, table_name):
+                            message = "表不存在"
+                        else:
+                            message = "表不可读"
+                        warnings.append(f"P1 {message} {table_name}")
                     elif row_count < min_rows:
                         message = f"行数偏低 ({row_count} < {min_rows})"
                         warnings.append(
