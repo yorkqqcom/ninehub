@@ -230,9 +230,18 @@ def bootstrap(*, activate: bool, collect: bool) -> int:
             try:
                 proposal = _ensure_proposal(session, api)
                 print(f"  proposal id={proposal.id} status={proposal.status}")
-                if proposal.status == "applied":
+                override = _get_override(session, api)
+                if (
+                    proposal.status == "applied"
+                    and override is not None
+                    and override.is_activated
+                ):
                     print("  already applied")
                     continue
+                if proposal.status == "applied" and (
+                    override is None or not override.is_activated
+                ):
+                    print("  proposal applied but override not activated — reapply L3")
                 _approve_if_pending(session, proposal)
                 session.commit()
                 reapply = proposal.status in ("applied", "failed")

@@ -14,6 +14,34 @@ def test_probeable_includes_new_on_official() -> None:
     assert apis == ["balancesheet"]
 
 
+def test_index_member_all_probe_spec() -> None:
+    from app.services.tia.scan.probe_planner import resolve_probe_spec
+
+    spec, source, min_pts = resolve_probe_spec("index_member_all", None)
+    assert source == "explicit_probe"
+    assert min_pts == 2000
+    assert spec is not None
+    assert spec["params"]["l1_code"] == "801010.SI"
+    assert "ts_code" in spec["expected_fields"]
+
+
+def test_index_member_all_preflight_without_live_probe() -> None:
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from app.models.base import Base
+    from app.services.tia.preflight_test_service import TiaPreflightTestService
+
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    session = sessionmaker(bind=engine)()
+    result = TiaPreflightTestService().run(session, "index_member_all", live_probe=False)
+    session.close()
+    assert result.passed is True
+    probe = next(c for c in result.checks if c.key == "probe_spec")
+    assert probe.status == "pass"
+
+
 def test_plan_probe_unlimited_ignores_limit() -> None:
     from app.services.tia.scan.probe_planner import plan_probe_apis
     from app.services.tia.scan.types import OfficialApiEntry, ScanOptions

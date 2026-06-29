@@ -85,6 +85,44 @@ OFFICIAL_ONLY_API_PROBES: dict[str, dict[str, Any]] = {
             "expected_fields": ["index_code", "stock_code", "trade_date"],
         },
     },
+    # doc 181 — SW2021 申万行业树（browser P1）
+    "index_classify": {
+        "min_points": 2000,
+        "doc_id": 181,
+        "probe": {
+            "params": {"level": "L1", "src": "SW2021"},
+            "expected_fields": [
+                "index_code",
+                "industry_name",
+                "parent_code",
+                "level",
+                "industry_code",
+                "is_pub",
+                "src",
+            ],
+        },
+    },
+    # doc 335 — 申万行业成分（无 wctapi 缓存，须显式 probe）
+    "index_member_all": {
+        "min_points": 2000,
+        "doc_id": 335,
+        "probe": {
+            "params": {"l1_code": "801010.SI", "is_new": "Y"},
+            "expected_fields": [
+                "l1_code",
+                "l1_name",
+                "l2_code",
+                "l2_name",
+                "l3_code",
+                "l3_name",
+                "ts_code",
+                "name",
+                "in_date",
+                "out_date",
+                "is_new",
+            ],
+        },
+    },
 }
 
 

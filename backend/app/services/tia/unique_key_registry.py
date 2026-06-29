@@ -40,6 +40,8 @@ API_UNIQUE_KEY_OVERRIDES: dict[str, list[str]] = {
     # con_code → stock_code at load time; heuristic misses ts_code/stock_code in api_fields
     "index_weight": ["index_code", "stock_code", "trade_date"],
     "index_member": ["index_code", "stock_code"],
+    "index_classify": ["index_code", "src"],
+    "index_member_all": ["stock_code", "l3_code", "in_date"],
     "bar_1d": ["stock_code", "trade_date"],
     "bar_1m": ["stock_code", "bar_time", "period"],
     "bar_5m": ["stock_code", "bar_time", "period"],

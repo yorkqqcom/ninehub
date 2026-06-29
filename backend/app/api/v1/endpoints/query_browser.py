@@ -33,6 +33,7 @@ from app.schemas.query_browser import (
 )
 from app.catalog.registry import DOMAINS, CATALOG_REGISTRY
 from app.models.browser import BrowserWatchlist
+from app.services.tia.override_service import TiaOverrideService
 from app.services.query.browser_audit import BrowserAuditLogger
 from app.services.query.browser_coverage import BrowserDataCoverage
 from app.services.query.browser_export import BrowserExportService
@@ -58,6 +59,7 @@ _readiness = BrowserReadinessService()
 
 
 async def _enriched_indicators(session: AsyncSession) -> list[IndicatorRef]:
+    await TiaOverrideService().load_all_into_registry(session)
     refs = _indicators.list_indicators()
     table_names = {
         entry.table_name

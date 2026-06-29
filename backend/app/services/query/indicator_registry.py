@@ -11,6 +11,7 @@ import yaml
 
 from app.catalog.registry import DOMAINS, CATALOG_REGISTRY, DataTypeEntry
 from app.schemas.query_browser import IndicatorRef, IndicatorTreeNode
+from app.services.tia.constants import is_legacy_data_type
 from app.services.tia.schema_inference import _field_label
 
 _OHLC_KEYS = frozenset({"open", "high", "low", "close", "pre_close"})
@@ -144,6 +145,8 @@ class IndicatorRegistry:
       refs: list[IndicatorRef] = []
       for entry in CATALOG_REGISTRY.values():
           if not entry.is_activated:
+              continue
+          if is_legacy_data_type(entry.data_type):
               continue
           for col in entry.columns:
               if col.key in ("id", "created_at"):

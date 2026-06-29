@@ -189,6 +189,9 @@ async def test_browser_meta_api(client: AsyncClient, browser_catalog):
     assert r.status_code == 200
     body = r.json()
     assert "indicator_tree" in body
+    assert "indicators_flat" in body
+    assert len(body["indicators_flat"]) >= 1
+    assert len(body["indicator_tree"]) >= 1
     assert "dimensions" in body
     assert any(t["id"] == "wind_ohlc_demo" for t in body["system_templates"])
 

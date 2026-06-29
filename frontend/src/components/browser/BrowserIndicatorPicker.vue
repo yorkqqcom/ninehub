@@ -52,6 +52,18 @@ const treeScrollRef = ref<HTMLElement | null>(null);
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
 let treeSortable: Sortable | null = null;
 
+watch(
+  () => props.indicatorsFlat,
+  (flat) => {
+    if (!flat.length) return;
+    const hasReady = flat.some((i) => i.available && i.data_ready);
+    if (!hasReady && dataReadyOnly.value) {
+      dataReadyOnly.value = false;
+    }
+  },
+  { immediate: true },
+);
+
 const dragOptions = {
   delayOnTouchOnly: true,
   delay: 400,
@@ -353,14 +365,26 @@ onUnmounted(() => {
       </div>
 
       <div v-else-if="showEmpty" class="ind-picker__empty">
-        <p>未找到匹配指标</p>
+        <template v-if="!indicatorsFlat.length">
+          <p>暂无可用指标</p>
+          <p class="muted">请确认 P0 数据已激活（股票基础、日线等），并刷新本页。</p>
+        </template>
+        <template v-else-if="activeDomain">
+          <p>当前域「{{ domainTabs.find((d) => d.key === activeDomain)?.label ?? activeDomain }}」无匹配指标</p>
+          <button type="button" class="btn btn--ghost btn--sm" @click="selectDomain(null)">
+            查看全部域
+          </button>
+        </template>
+        <template v-else>
+          <p>未找到匹配指标</p>
+        </template>
         <button
           v-if="dataReadyOnly"
           type="button"
           class="btn btn--ghost btn--sm"
           @click="dataReadyOnly = false"
         >
-          关闭「仅有数据」
+          关闭「仅有数据」（{{ readyIndicatorCount }}/{{ indicatorsFlat.length }} 有数据）
         </button>
       </div>
 
