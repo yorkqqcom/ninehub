@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import Sortable from "sortablejs";
-import draggable from "vuedraggable";
 import type {
   BrowserIndicatorRef,
   BrowserTemplateItem,
@@ -39,8 +38,10 @@ const emit = defineEmits<{
 
 const flash = ref(false);
 const dragOver = ref(false);
+const basketListRef = ref<HTMLElement | null>(null);
 const removeSlotRef = ref<HTMLElement | null>(null);
 let flashTimer: ReturnType<typeof setTimeout> | null = null;
+let basketSortable: Sortable | null = null;
 let removeSortable: Sortable | null = null;
 
 const dragOptions = {
@@ -104,48 +105,40 @@ function buildPick(id: string): IndicatorPick | null {
   };
 }
 
-function onDragAdd(evt: { newIndex: number; item: HTMLElement }) {
-  const id =
-    parseIndicatorIdFromElement(evt.item) ?? props.modelValue[evt.newIndex]?.id ?? null;
-  const next = [...props.modelValue];
-  next.splice(evt.newIndex, 1);
+function onBasketAdd(evt: Sortable.SortableEvent) {
+  evt.item.remove();
+  const id = parseIndicatorIdFromElement(evt.item);
+  if (!id) return;
 
-  if (!id) {
-    emit("update:modelValue", next);
-    return;
-  }
-
-  if (next.some((s) => s.id === id)) {
-    emit("update:modelValue", next);
+  if (props.modelValue.some((s) => s.id === id)) {
     emit("drag-rejected", "duplicate");
     return;
   }
-
-  if (next.length >= INDICATOR_LIMIT) {
-    emit("update:modelValue", next);
+  if (props.modelValue.length >= INDICATOR_LIMIT) {
     emit("drag-rejected", "limit");
-    return;
-  }
-
-  const meta = indicatorMeta(id);
-  if (!meta?.available) {
-    emit("update:modelValue", next);
-    emit("drag-rejected", "unavailable");
     return;
   }
 
   const pick = buildPick(id);
   if (!pick) {
-    emit("update:modelValue", next);
     emit("drag-rejected", "unavailable");
     return;
   }
 
-  next.splice(evt.newIndex, 0, pick);
+  const next = [...props.modelValue];
+  next.splice(evt.newIndex ?? next.length, 0, pick);
   emit("update:modelValue", next);
 }
 
-function onBasketMove(evt: { from: HTMLElement; to: HTMLElement; dragged: HTMLElement }) {
+function onBasketUpdate(evt: Sortable.SortableEvent) {
+  const next = [...props.modelValue];
+  const [moved] = next.splice(evt.oldIndex ?? 0, 1);
+  if (!moved) return;
+  next.splice(evt.newIndex ?? 0, 0, moved);
+  emit("update:modelValue", next);
+}
+
+function onBasketMove(evt: Sortable.MoveEvent) {
   const external = evt.from !== evt.to;
   dragOver.value = external;
   if (external && atLimit.value) return false;
@@ -158,6 +151,29 @@ function onBasketDragStart() {
 
 function onBasketDragEnd() {
   dragOver.value = false;
+}
+
+function destroyBasketSortable() {
+  if (basketSortable) {
+    basketSortable.destroy();
+    basketSortable = null;
+  }
+}
+
+function initBasketSortable() {
+  if (!basketListRef.value) return;
+  destroyBasketSortable();
+  basketSortable = Sortable.create(basketListRef.value, {
+    ...dragOptions,
+    group: BROWSER_INDICATOR_TARGET_GROUP,
+    animation: 150,
+    draggable: ".ind-basket__item",
+    onAdd: onBasketAdd,
+    onUpdate: onBasketUpdate,
+    onMove: onBasketMove,
+    onStart: onBasketDragStart,
+    onEnd: onBasketDragEnd,
+  });
 }
 
 function initRemoveSortable() {
@@ -183,6 +199,7 @@ watch(
         flash.value = false;
       }, 200);
     }
+    nextTick(() => initBasketSortable());
   },
 );
 
@@ -191,9 +208,15 @@ function templateIndicatorCount(tpl: { payload: Record<string, unknown> }): numb
   return Array.isArray(inds) ? inds.length : 0;
 }
 
-onMounted(() => nextTick(() => initRemoveSortable()));
+onMounted(() => {
+  nextTick(() => {
+    initBasketSortable();
+    initRemoveSortable();
+  });
+});
 onUnmounted(() => {
   if (flashTimer) clearTimeout(flashTimer);
+  destroyBasketSortable();
   if (removeSortable) removeSortable.destroy();
 });
 </script>
@@ -253,54 +276,46 @@ onUnmounted(() => {
         aria-dropeffect="copy"
         aria-label="已选指标篮，可拖入指标或拖拽排序"
       >
-        <draggable
-          :model-value="modelValue"
-          item-key="id"
+        <ul
+          ref="basketListRef"
           class="ind-basket__list"
           :class="{ 'ind-basket__list--empty': !count }"
-          :group="BROWSER_INDICATOR_TARGET_GROUP"
-          v-bind="dragOptions"
-          @update:model-value="emit('update:modelValue', $event)"
-          @add="onDragAdd"
-          @start="onBasketDragStart"
-          @end="onBasketDragEnd"
-          @move="onBasketMove"
         >
-          <template #item="{ element }">
-            <div
-              class="ind-basket__item"
-              :data-indicator-id="element.id"
-              @dblclick="onListDblClick(element.id)"
+          <li
+            v-for="element in modelValue"
+            :key="element.id"
+            class="ind-basket__item"
+            :data-indicator-id="element.id"
+            @dblclick="onListDblClick(element.id)"
+          >
+            <span
+              class="ind-basket__drag"
+              aria-label="拖拽排序或拖出移除"
+              title="拖拽排序"
             >
-              <span
-                class="ind-basket__drag"
-                aria-label="拖拽排序或拖出移除"
-                title="拖拽排序"
-              >
-                ⋮⋮
-              </span>
-              <span class="ind-basket__label">{{ indicatorLabel(element.id) }}</span>
-              <select
-                v-if="indicatorMeta(element.id)?.supports_adjust"
-                v-model="element.adjust"
-                class="ind-basket__adj input"
-                @click.stop
-              >
-                <option value="none">不复权</option>
-                <option value="qfq">前复权</option>
-                <option value="hfq">后复权</option>
-              </select>
-              <button
-                type="button"
-                class="ind-basket__remove"
-                :aria-label="`移除 ${indicatorLabel(element.id)}`"
-                @click="removeIndicator(element.id)"
-              >
-                ×
-              </button>
-            </div>
-          </template>
-        </draggable>
+              ⋮⋮
+            </span>
+            <span class="ind-basket__label">{{ indicatorLabel(element.id) }}</span>
+            <select
+              v-if="indicatorMeta(element.id)?.supports_adjust"
+              v-model="element.adjust"
+              class="ind-basket__adj input"
+              @click.stop
+            >
+              <option value="none">不复权</option>
+              <option value="qfq">前复权</option>
+              <option value="hfq">后复权</option>
+            </select>
+            <button
+              type="button"
+              class="ind-basket__remove"
+              :aria-label="`移除 ${indicatorLabel(element.id)}`"
+              @click="removeIndicator(element.id)"
+            >
+              ×
+            </button>
+          </li>
+        </ul>
 
         <p v-if="!count" class="ind-basket__empty muted">拖入指标或从左侧点击添加</p>
       </div>
@@ -500,6 +515,9 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .ind-basket__list--empty {

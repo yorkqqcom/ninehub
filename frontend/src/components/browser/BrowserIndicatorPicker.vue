@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import Sortable from "sortablejs";
-import draggable from "vuedraggable";
 import { apiRequest } from "@/api/client";
 import type {
   BrowserIndicatorRef,
@@ -12,7 +11,6 @@ import BrowserIndicatorTree from "@/components/browser/BrowserIndicatorTree.vue"
 import {
   BROWSER_INDICATOR_SOURCE_GROUP,
   canDragIndicator,
-  cloneIndicatorPick,
   indicatorDragDataset,
 } from "./browserDragUtils";
 import {
@@ -49,8 +47,10 @@ const selectedGroup = ref<string | null>(null);
 const serverSearchResults = ref<BrowserIndicatorRef[] | null>(null);
 const searchLoading = ref(false);
 const treeScrollRef = ref<HTMLElement | null>(null);
+const listScrollRef = ref<HTMLElement | null>(null);
 let searchTimer: ReturnType<typeof setTimeout> | null = null;
 let treeSortable: Sortable | null = null;
+let listSortable: Sortable | null = null;
 
 watch(
   () => props.indicatorsFlat,
@@ -152,6 +152,8 @@ const useListMode = computed(() => {
   return false;
 });
 
+const displayList = computed(() => (useListMode.value ? listDragSource.value : []));
+
 const listCount = computed(() =>
   searchQ.value.trim() ? (serverSearchResults.value?.length ?? 0) : flatBrowseList.value.length,
 );
@@ -219,8 +221,39 @@ function onPick(ind: BrowserIndicatorRef) {
   emit("pick", ind);
 }
 
-function onListMove(evt: { draggedContext: { element: BrowserIndicatorRef } }) {
-  return canDragIndicator(evt.draggedContext.element, { dataReadyOnly: dataReadyOnly.value });
+function onListMove(evt: Sortable.MoveEvent) {
+  const row = evt.dragged as HTMLElement;
+  const id = row.dataset.indicatorId;
+  if (!id) return false;
+  const ind = props.indicatorsFlat.find((i) => i.id === id);
+  if (!ind) return false;
+  return canDragIndicator(ind, { dataReadyOnly: dataReadyOnly.value });
+}
+
+function destroyListSortable() {
+  if (listSortable) {
+    listSortable.destroy();
+    listSortable = null;
+  }
+}
+
+function initListSortable() {
+  destroyListSortable();
+  if (!useListMode.value || !listScrollRef.value) return;
+  listSortable = Sortable.create(listScrollRef.value, {
+    ...dragOptions,
+    group: BROWSER_INDICATOR_SOURCE_GROUP,
+    sort: false,
+    draggable: ".ind-picker__list-row:not(.ind-picker__list-row--disabled)",
+    handle: ".ind-picker__drag-handle",
+    filter: ".ind-picker__list-row--disabled",
+    preventOnFilter: true,
+    onMove: onListMove,
+    onClone(evt: Sortable.SortableEvent) {
+      const id = evt.item.dataset.indicatorId;
+      if (id) evt.clone.dataset.indicatorId = id;
+    },
+  });
 }
 
 function destroyTreeSortable() {
@@ -260,19 +293,26 @@ watch([dataReadyOnly, selectedTags, activeDomain], () => {
   if (searchQ.value.trim()) scheduleSearch();
 });
 
-watch([useListMode, filteredTree, () => props.loading], () => {
-  nextTick(() => initTreeSortable());
+watch([useListMode, filteredTree, () => props.loading, displayList], () => {
+  nextTick(() => {
+    initTreeSortable();
+    initListSortable();
+  });
 });
 
 onMounted(() => {
   window.addEventListener("keydown", onKeydown);
-  nextTick(() => initTreeSortable());
+  nextTick(() => {
+    initTreeSortable();
+    initListSortable();
+  });
 });
 
 onUnmounted(() => {
   window.removeEventListener("keydown", onKeydown);
   if (searchTimer) clearTimeout(searchTimer);
   destroyTreeSortable();
+  destroyListSortable();
 });
 </script>
 
@@ -388,50 +428,40 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <draggable
+      <ul
         v-else-if="useListMode"
-        :list="listDragSource"
-        item-key="id"
-        tag="ul"
+        ref="listScrollRef"
         class="ind-picker__list"
-        :group="BROWSER_INDICATOR_SOURCE_GROUP"
-        :sort="false"
-        :clone="cloneIndicatorPick"
-        :move="onListMove"
-        handle=".ind-picker__drag-handle"
-        filter=".ind-picker__list-row--disabled"
-        :prevent-on-filter="true"
-        v-bind="dragOptions"
       >
-        <template #item="{ element: ind }">
-          <li
-            class="ind-picker__list-row"
-            :class="{
-              'ind-picker__list-row--selected': selectedIds.includes(ind.id),
-              'ind-picker__list-row--disabled': !ind.available || (dataReadyOnly && !ind.data_ready),
-            }"
-            v-bind="indicatorDragDataset(ind)"
-            @click="onPick(ind)"
-            @dblclick.stop="onPick(ind)"
+        <li
+          v-for="ind in displayList"
+          :key="ind.id"
+          class="ind-picker__list-row"
+          :class="{
+            'ind-picker__list-row--selected': selectedIds.includes(ind.id),
+            'ind-picker__list-row--disabled': !ind.available || (dataReadyOnly && !ind.data_ready),
+          }"
+          v-bind="indicatorDragDataset(ind)"
+          @click="onPick(ind)"
+          @dblclick.stop="onPick(ind)"
+        >
+          <span
+            v-if="canDragIndicator(ind, { dataReadyOnly })"
+            class="ind-picker__drag-handle"
+            aria-label="拖拽手柄，将指标添加到已选篮"
+            title="拖入已选篮"
+            @click.stop
           >
-            <span
-              v-if="canDragIndicator(ind, { dataReadyOnly })"
-              class="ind-picker__drag-handle"
-              aria-label="拖拽手柄，将指标添加到已选篮"
-              title="拖入已选篮"
-              @click.stop
-            >
-              ⋮⋮
-            </span>
-            <span v-if="selectedIds.includes(ind.id)" class="ind-picker__list-check">✓</span>
-            <span class="ind-picker__list-label">{{ ind.label }}</span>
-            <span class="muted ind-picker__list-meta">{{ ind.data_type_label }}</span>
-            <span v-if="ind.unit" class="muted">{{ ind.unit }}</span>
-            <span class="badge badge--muted">{{ FREQ_LABELS[ind.freq] ?? ind.freq }}</span>
-            <span v-if="!ind.data_ready && !dataReadyOnly" class="badge badge--warn">暂无数据</span>
-          </li>
-        </template>
-      </draggable>
+            ⋮⋮
+          </span>
+          <span v-if="selectedIds.includes(ind.id)" class="ind-picker__list-check">✓</span>
+          <span class="ind-picker__list-label">{{ ind.label }}</span>
+          <span class="muted ind-picker__list-meta">{{ ind.data_type_label }}</span>
+          <span v-if="ind.unit" class="muted">{{ ind.unit }}</span>
+          <span class="badge badge--muted">{{ FREQ_LABELS[ind.freq] ?? ind.freq }}</span>
+          <span v-if="!ind.data_ready && !dataReadyOnly" class="badge badge--warn">暂无数据</span>
+        </li>
+      </ul>
 
       <div v-else ref="treeScrollRef" class="ind-picker__tree-scroll">
         <BrowserIndicatorTree
