@@ -1,7 +1,7 @@
 # NineHub
 
 **NineHub** 是面向 A 股场景的 **Catalog-driven 数据管理平台**：以 Catalog 统一数据规格，通过任务与工作流编排采集，TIA 治理接口接入，Query Engine 统一查询，并配套数据质量监控与平台运维能力。
-
+[知乎专栏](https://www.zhihu.com/column/c_2051647988053943380) — 产品介绍、使用教程与更新说明
 ![平台主界面](pic/dashboard.png)
 
 | 模块 | 路由 | 功能简述 |
