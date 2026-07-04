@@ -88,6 +88,9 @@ playwright/.cache/
 # --- Project docs (local only, not versioned) ---
 docs/
 
+# --- Promo video assets (local generation output, see scripts/PROMO_MOVED.md) ---
+promo_videos/
+
 # --- Misc ---
 *.bak
 *.tmp
