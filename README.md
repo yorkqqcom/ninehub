@@ -101,17 +101,24 @@ python scripts/init_db.py
 4. 创建管理员 `admin / admin123456`
 5. 引导 TIA 文档积分缓存与默认提案种子
 
-### 2.1 2000 积分 A 股采集（Tushare）
+### 2.1 数据初始化与历史加载
 
-多数 A 股接口需 **≥2000 积分**（200 次/分钟）。`init_db` 完成后按以下顺序配置（详见 [backend/README.md — 2000 积分 A 股采集部署](backend/README.md#2000-积分-a-股采集部署)）：
+`init_db` 完成后，按 [backend/README.md — 数据初始化与历史加载](backend/README.md#数据初始化与历史加载) 分阶段执行。摘要：
 
-1. **数据源**：Token + `account_points: 2000`（UI「数据源」；勿仅用 `.env` 默认 120）
-2. **平台设置**：`sync_start_date`（如 `2020-01-01`）
-3. **TIA L3 激活**：扫描 → 审批 → 激活事实表（P0：`bootstrap_browser_p0.py`）
-4. **工作流与采集配置**：`python scripts/setup_collect_workflows.py --migrate --backfill-plan`（32 个 API override + 5 条 DAG / 31 节点；`--migrate` 可省略若 `init_db` 已最新）
-5. **历史回填**：`python scripts/run_backfill_history.py --list` 后按 tier 或 `--all` 执行
+| 阶段 | 命令 |
+|------|------|
+| 平台初始化 | `python scripts/init_db.py` |
+| P0 L3 激活 | `python scripts/bootstrap_browser_p0.py` |
+| 工作流 API 补激活 | `python scripts/bootstrap_tia_apis.py --missing-workflows` |
+| 工作流配置 | `python scripts/setup_collect_workflows.py --migrate --backfill-plan` |
+| 历史回填计划 | `python scripts/run_backfill_history.py --list` |
+| 历史回填执行 | `python scripts/run_backfill_history.py --tier 0` … `--tier 4` |
+| TDX（可选） | `bootstrap_tdx_bar_1d.py` → `setup_tdx_workflows.py` → `import_tdx_vipdoc.py` |
+| 就绪检查 | `python scripts/check_browser_data_readiness.py` |
 
-工作流日批 API 预算 **200 次/节点**；`stk_holdertrade` 接口独立限速 100 次/分钟，大规模历史须 `--from-chunk` 续跑。
+**前置**：UI「数据源」配置 Token + `account_points: 2000`；「平台设置」配置 `sync_start_date`（如 `2020-01-01`）。
+
+工作流日批 API 预算 **200 次/节点**；`stk_holdertrade` 接口独立限速 100 次/分钟，大规模历史须 `--from-chunk` 续跑。详见 [backend/README.md — 2000 积分 A 股采集部署](backend/README.md#2000-积分-a-股采集部署)。
 
 ### 3. 启动后端 API
 
@@ -182,15 +189,29 @@ ninehub/
 
 ## 常用命令
 
+完整分阶段说明见 [backend/README.md — 数据初始化与历史加载](backend/README.md#数据初始化与历史加载)。
+
 ```bash
 # 后端测试
 cd backend && pytest tests -v -p no:pytest_postgresql
 
-# 2000 积分采集链路（L3 激活后）
+# 数据初始化
 cd backend
-python scripts/setup_collect_workflows.py --check-only
+python scripts/init_db.py
+python scripts/bootstrap_browser_p0.py
+python scripts/bootstrap_tia_apis.py --missing-workflows
 python scripts/setup_collect_workflows.py --migrate --backfill-plan
-python scripts/run_backfill_history.py --list  # 历史回填计划
+
+# 历史数据加载
+python scripts/run_backfill_history.py --list
+python scripts/run_backfill_history.py --tier 0
+python scripts/run_backfill_history.py --tier 1
+python scripts/check_browser_data_readiness.py
+
+# TDX（可选）
+python scripts/bootstrap_tdx_bar_1d.py --apis bar_1d concept_index concept_member
+python scripts/setup_tdx_workflows.py
+python scripts/import_tdx_vipdoc.py --data-type tdx_bar_1d
 
 # 代码格式化
 cd backend && black app tests

@@ -49,7 +49,7 @@ python scripts/init_db.py
 
 脚本将创建库用户 `ninehub`、写入 `.env`、执行 Alembic 迁移、种子管理员 `admin / admin123456`，并引导 TIA 文档积分缓存与默认提案。
 
-**2000 积分 A 股采集**（L3 激活后）见下文 [§2000 积分 A 股采集部署](#2000-积分-a-股采集部署)。
+**2000 积分 A 股采集**（L3 激活后）见 [数据初始化与历史加载](#数据初始化与历史加载) 与 [§2000 积分 A 股采集部署](#2000-积分-a-股采集部署)。
 
 ### 启动服务
 
@@ -67,6 +67,171 @@ celery -A app.tasks.celery_app beat --loglevel=info
 | 健康检查 | `GET /health` |
 | OpenAPI | <http://127.0.0.1:8888/docs> |
 | 前端开发 | `cd ../frontend && npm run dev` → <http://localhost:5173> |
+
+---
+
+## 数据初始化与历史加载
+
+以下命令均在 **`backend/`** 目录执行。推荐按阶段顺序完成；各阶段可单独 `--check-only` 预检。
+
+### 阶段 0：平台初始化
+
+```bash
+cd backend
+pip install -e ".[dev]"
+python scripts/init_db.py          # 建库、迁移、admin 种子、TIA 文档缓存
+```
+
+`init_db.py` 完成：创建用户/库、写入 `.env`、Alembic `upgrade head`、管理员 `admin / admin123456`、TIA 默认提案种子。
+
+启动 API 与 Celery（生产推荐 Worker + Beat）：
+
+```bash
+uvicorn app.main:app --host 127.0.0.1 --port 8888 --reload
+celery -A app.tasks.celery_app worker --loglevel=info
+celery -A app.tasks.celery_app beat --loglevel=info
+```
+
+### 阶段 1：数据源与平台参数
+
+在 UI「数据源」创建 Tushare 连接（**须**填写 `token` + `account_points: 2000`）；在「平台设置」配置 **`sync_start_date`**（如 `2020-01-01`）——历史回填与增量采集均以此为下界。
+
+TDX Sidecar（可选）：在「数据源」创建 `provider=tdx`，配置 `config.base_url` 指向 Sidecar 服务。
+
+### 阶段 2：TIA L3 激活
+
+**P0 — 数据浏览器门禁**（trade_cal / stock_basic / daily 等）：
+
+```bash
+python scripts/bootstrap_browser_p0.py
+python scripts/check_browser_data_readiness.py
+```
+
+**Tushare 工作流 API**（L3 预检失败或 `tia_overrides` 缺失时）：
+
+```bash
+python scripts/bootstrap_tia_apis.py --missing-workflows   # 补全 31 个 Tushare 工作流 API
+python scripts/bootstrap_tia_apis.py fina_indicator stk_limit stk_managers  # 指定 API
+```
+
+**P1 — 申万 / 指数**（各需 ≥2000 积分，非 P0 门禁）：
+
+```bash
+python scripts/bootstrap_browser_shenwan.py
+python scripts/bootstrap_browser_index.py
+```
+
+**TDX Sidecar**（bar / 概念板块，与 Tushare 分开激活）：
+
+```bash
+python scripts/bootstrap_tdx_bar_1d.py --apis bar_1d bar_1m bar_5m concept_index concept_member
+```
+
+也可在 TIA 工作台 UI 完成：扫描 → Preflight → 批准 → L3 激活。
+
+### 阶段 3：工作流与采集配置
+
+**Tushare（31 个 API + 5 条 DAG）**：
+
+```bash
+python scripts/setup_collect_workflows.py --check-only              # 预检：积分 / override
+python scripts/setup_collect_workflows.py --migrate --backfill-plan # 迁移 + override + 种子 DAG + 回填计划
+python scripts/setup_collect_workflows.py --replace-workflows       # 重建 01–05 工作流
+```
+
+分步等价：
+
+```bash
+python scripts/apply_workflow_daily_batch.py
+python scripts/seed_tia_workflows.py
+python scripts/seed_tia_workflows.py --replace   # 强制重建
+```
+
+**TDX（5 个 API + TDX 工作流）**：
+
+```bash
+python scripts/setup_tdx_workflows.py --check-only
+python scripts/setup_tdx_workflows.py
+python scripts/setup_tdx_workflows.py --replace-workflows
+```
+
+### 阶段 4：历史数据加载
+
+**查看回填计划**（推荐第一步）：
+
+```bash
+python scripts/run_backfill_history.py --list
+python scripts/setup_collect_workflows.py --backfill-plan
+```
+
+**Tushare 全量历史**（从 `sync_start_date` 起，按 tier 分层；tier 0 须先跑）：
+
+```bash
+python scripts/run_backfill_history.py --tier 0    # 交易日历 + 股票列表 + 申万/指数
+python scripts/run_backfill_history.py --tier 1    # 日频行情（daily / daily_basic / adj_factor 等）
+python scripts/run_backfill_history.py --tier 2    # 周频 / 新股等
+python scripts/run_backfill_history.py --tier 3    # 财报 / 公司信息
+python scripts/run_backfill_history.py --tier 4    # 股东 / 质押 / 分红等（按 API 轮换，较慢）
+```
+
+**单表 / 续跑 / 重载**：
+
+```bash
+python scripts/run_backfill_history.py --data-type tushare_daily
+python scripts/run_backfill_history.py --data-type tushare_fina_indicator
+python scripts/run_backfill_history.py --data-type tushare_stk_managers
+python scripts/run_backfill_history.py --data-type tushare_stk_holdertrade --from-chunk 21  # 中断续跑
+python scripts/run_backfill_history.py --data-type tushare_daily --truncate               # 清表后全量重载
+python scripts/run_backfill_history.py --all --dry-run                                    # 预览，不调用 API
+```
+
+| 参数 | 默认 | 说明 |
+|------|------|------|
+| chunk 预算 | 200 | 与 `DAILY_MAX_API_CALLS` 一致 |
+| `--chunk-days` | 100 | 每 chunk 交易日数（`trade_date` 策略） |
+| `--from-chunk` | 1 | 续跑（如 holdertrade 第 21 轮 ≈ 偏移 2000 代码） |
+| `--truncate` | off | 清表后全量重载（tier 1+ 时保留 tier-0 代码表） |
+
+进度：`logs/backfill_history.log`；任务：`platform_jobs`（`job_type=history_backfill`）。
+
+**数据浏览器快速日线**（仅最近若干交易日，P0 演示用）：
+
+```bash
+python scripts/backfill_browser_daily.py       # 默认最近 5 个交易日
+python scripts/check_browser_data_readiness.py
+```
+
+**TDX vipdoc 历史导入**（本地通达信数据，需 Sidecar + L3 已激活）：
+
+```bash
+python scripts/import_tdx_vipdoc.py --data-type tdx_bar_1d
+python scripts/import_tdx_vipdoc.py --period 1d --start-date 2020-01-01 --end-date 2025-12-31 --direct
+python scripts/import_tdx_vipdoc.py --period 1m --data-type tdx_bar_1m
+```
+
+**工作流 UI**（小范围补数）：手动运行 published DAG，选 `batch_mode=backfill`。单次受 200 次 API 预算限制，**不适合**从 `sync_start_date` 起的全量历史；全量请用 `run_backfill_history.py`。
+
+### 阶段 5：日常增量
+
+- **Tushare 日批**：Celery Beat 按工作流 Cron（如 `0 18 * * 1-5`）触发，或 UI 手动运行
+- **质检**：Beat 每日 18:00 `run_quality_check`
+- **Schema 漂移**：TIA 工作台 → Schema 维护；必要时 `alembic upgrade head`
+
+### 一键速查（新装环境）
+
+```bash
+cd backend
+python scripts/init_db.py
+# → UI：数据源（token + 2000 积分）、sync_start_date
+python scripts/bootstrap_browser_p0.py
+python scripts/bootstrap_tia_apis.py --missing-workflows
+python scripts/setup_collect_workflows.py --migrate --backfill-plan
+python scripts/run_backfill_history.py --list
+python scripts/run_backfill_history.py --tier 0
+python scripts/run_backfill_history.py --tier 1
+# tier 2–4 按需；TDX 见 bootstrap_tdx_bar_1d.py + setup_tdx_workflows.py
+python scripts/check_browser_data_readiness.py
+```
 
 ---
 
@@ -454,24 +619,9 @@ python scripts/seed_tia_workflows.py --replace # 重建
 
 ### 5. 历史数据回填
 
-工作流 `batch_mode=backfill` 单次运行受 200 次 API 预算限制；全量历史请用分 chunk 脚本：
+全量历史回填命令、tier 分层、续跑与 TDX 导入见上文 [数据初始化与历史加载](#数据初始化与历史加载) 阶段 4。
 
-```bash
-python scripts/run_backfill_history.py --list              # 估算 tier / chunk 数
-python scripts/run_backfill_history.py --tier 0            # 日历 + 代码表 + 申万/指数
-python scripts/run_backfill_history.py --tier 1            # 日频行情
-python scripts/run_backfill_history.py --data-type tushare_stk_holdertrade --from-chunk 21
-python scripts/run_backfill_history.py --all --dry-run
-```
-
-| 参数 | 默认 | 说明 |
-|------|------|------|
-| chunk 预算 | 200 | 与 `DAILY_MAX_API_CALLS` 一致 |
-| `--chunk-days` | 100 | 每 chunk 交易日数（`trade_date` 策略） |
-| `--from-chunk` | 1 | 续跑（如 holdertrade 第 21 轮 ≈ 偏移 2000 代码） |
-| `--truncate` | off | 清表后全量重载（保留 tier-0 代码表） |
-
-进度写入 `logs/backfill_history.log` 与 `platform_jobs`（job_type=`history_backfill`）。
+工作流 `batch_mode=backfill` 单次运行受 200 次 API 预算限制；从 `sync_start_date` 起的全量历史请用 `run_backfill_history.py` 分 chunk 执行。
 
 ### 6. 日常运维
 
@@ -490,10 +640,13 @@ pytest tests -v -p no:pytest_postgresql
 # 格式化
 black app tests
 
-# 2000 积分采集 / 工作流 / 回填
+# 数据初始化 / 历史加载（详见上文「数据初始化与历史加载」）
 python scripts/setup_collect_workflows.py --check-only
 python scripts/setup_collect_workflows.py --migrate --backfill-plan
 python scripts/run_backfill_history.py --list
+python scripts/bootstrap_tia_apis.py --missing-workflows
+python scripts/bootstrap_tdx_bar_1d.py --apis bar_1d concept_index concept_member
+python scripts/check_browser_data_readiness.py
 
 # UI 截图（需前端 dev + 本机 API 运行）
 python ../scripts/capture_ui_screenshots.py
