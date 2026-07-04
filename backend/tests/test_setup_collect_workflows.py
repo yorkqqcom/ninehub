@@ -14,9 +14,11 @@ assert _spec.loader is not None
 _spec.loader.exec_module(_mod)
 
 
-def test_workflow_apis_match_daily_batch_overrides() -> None:
-    assert len(_mod.WORKFLOW_APIS) == len(_mod.DAILY_BATCH_MODE_OVERRIDES)
-    assert set(_mod.WORKFLOW_APIS) == set(_mod.DAILY_BATCH_MODE_OVERRIDES.keys())
+def test_workflow_apis_exclude_tdx_sidecar() -> None:
+    from app.services.workflow.collect_batch import DAILY_BATCH_MODE_OVERRIDES, TDX_WORKFLOW_APIS
+
+    assert set(_mod.WORKFLOW_APIS) == set(DAILY_BATCH_MODE_OVERRIDES) - TDX_WORKFLOW_APIS
+    assert "concept_member" not in _mod.WORKFLOW_APIS
 
 
 def test_min_account_points_default_2000() -> None:

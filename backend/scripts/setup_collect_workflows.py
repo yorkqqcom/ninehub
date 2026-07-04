@@ -30,10 +30,10 @@ from app.models.data_source import DataSource
 from app.models.tia_override import TiaOverride
 from app.services.tia.credentials import resolve_tushare_scan_credentials
 from app.services.tushare.source_quota import points_to_max_calls_per_minute
-from app.services.workflow.collect_batch import DAILY_BATCH_MODE_OVERRIDES
+from app.services.workflow.collect_batch import TUSHARE_WORKFLOW_APIS
 
 MIN_ACCOUNT_POINTS = 2000
-WORKFLOW_APIS = list(DAILY_BATCH_MODE_OVERRIDES.keys())
+WORKFLOW_APIS = list(TUSHARE_WORKFLOW_APIS)
 
 
 def _load_script_module(filename: str):

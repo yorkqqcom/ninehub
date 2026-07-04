@@ -202,6 +202,18 @@ python scripts/capture_browser_screenshots.py
 
 ---
 
+## 宣传视频（repo-intro-kit）
+
+开源解读短视频（TTS + Ken Burns）工具链已迁至独立仓库 **[repo-intro-kit](../repo-intro-kit)**。详见 [scripts/PROMO_MOVED.md](scripts/PROMO_MOVED.md)。
+
+```bash
+cd ../repo-intro-kit
+pip install -e "tooling/[core]"
+repkit regenerate --project ninehub
+```
+
+---
+
 ## 注意事项
 
 - **Tushare Token**：在「数据源」页配置 Token 与 **account_points**（2000 积分 A 股链路须填 `2000`）后方可采集；请妥善保管 Token，勿提交到版本库。

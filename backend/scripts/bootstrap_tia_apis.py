@@ -22,9 +22,9 @@ from app.models.platform_job import PlatformJob  # noqa: F401
 from app.models.tia_override import TiaOverride
 from app.models.tia_proposal import TiaProposal  # noqa: F401
 from app.models.user import User  # noqa: F401
-from app.services.workflow.collect_batch import DAILY_BATCH_MODE_OVERRIDES
+from app.services.workflow.collect_batch import TDX_WORKFLOW_APIS, TUSHARE_WORKFLOW_APIS
 
-WORKFLOW_APIS = tuple(DAILY_BATCH_MODE_OVERRIDES.keys())
+WORKFLOW_APIS = TUSHARE_WORKFLOW_APIS
 DEFAULT_MISSING = ("fina_indicator", "stk_limit", "stk_managers")
 
 
@@ -87,7 +87,13 @@ def main() -> int:
             print("All workflow APIs already in tia_overrides.")
             session.close()
             return 0
-        print(f"Missing {len(apis)} workflow API(s): {', '.join(apis)}")
+        print(f"Missing {len(apis)} Tushare workflow API(s): {', '.join(apis)}")
+        skipped = sorted(TDX_WORKFLOW_APIS)
+        if skipped:
+            print(
+                f"Note: TDX APIs ({', '.join(skipped)}) are excluded; "
+                "run python scripts/bootstrap_tdx_bar_1d.py instead"
+            )
         reason = "workflow_bootstrap"
     elif args.apis:
         apis = list(args.apis)

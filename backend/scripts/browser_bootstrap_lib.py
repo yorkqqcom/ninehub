@@ -31,7 +31,7 @@ def ensure_proposal(session: Session, api_name: str, *, reason: str) -> TiaPropo
     ).scalar_one_or_none()
     if row is not None:
         return row
-    meta = resolve_api_meta(api_name)
+    meta = resolve_api_meta(api_name) or {}
     proposal = TiaProposal(
         api_name=api_name,
         status="pending",

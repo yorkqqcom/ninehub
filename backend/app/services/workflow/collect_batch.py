@@ -81,6 +81,14 @@ DAILY_BATCH_MODE_OVERRIDES: dict[str, str] = {
     "concept_member": "tdx_concept_snapshot",
 }
 
+# TDX Sidecar APIs in DAILY_BATCH_MODE_OVERRIDES — use bootstrap_tdx_bar_1d / setup_tdx_workflows.
+TDX_WORKFLOW_APIS: frozenset[str] = frozenset(
+    ("bar_1d", "bar_1m", "bar_5m", "concept_index", "concept_member")
+)
+TUSHARE_WORKFLOW_APIS: tuple[str, ...] = tuple(
+    api for api in DAILY_BATCH_MODE_OVERRIDES if api not in TDX_WORKFLOW_APIS
+)
+
 
 def resolve_run_batch_mode(trigger_type: str) -> str | None:
     """Map workflow run trigger to collect batch_mode for node execution."""
