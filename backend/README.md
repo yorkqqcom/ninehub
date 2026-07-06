@@ -215,7 +215,7 @@ python scripts/import_tdx_vipdoc.py --period 1m --data-type tdx_bar_1m
 
 - **Tushare 日批**：Celery Beat 按工作流 Cron（如 `0 18 * * 1-5`）触发，或 UI 手动运行
 - **质检**：Beat 每日 18:00 `run_quality_check`
-- **Schema 漂移**：TIA 工作台 → Schema 维护；必要时 `alembic upgrade head`
+- **Schema 漂移**：TIA 工作台 → Schema 维护（如 `daily` 补列 `ah_vol` / `ah_amount`）；必要时 `alembic upgrade head`
 
 ### 一键速查（新装环境）
 
@@ -326,7 +326,7 @@ L3 激活成功后：注册 SyncHandler、创建/迁移事实表、写入 Catalo
 | UI | API |
 |----|-----|
 | Schema 对照清单 | `GET /api/v1/catalog/data-standards` |
-| 字段明细 / 漂移 | `GET /api/v1/catalog/data-standards/{api_name}`、`GET .../drift` |
+| 字段明细 / 漂移 | `GET /api/v1/catalog/data-standards/{api_name}`、`GET .../drift`（上游增列时如 `daily` → `ah_vol` / `ah_amount`） |
 | 批量导出契约 | `GET /api/v1/catalog/data-standards/export` |
 
 #### 4c. 官网覆盖
@@ -379,7 +379,7 @@ L3 激活后种子 5 条 published DAG：`python scripts/setup_collect_workflows
 
 ### 7. 数据浏览器（三选一提宽表）
 
-Wind 风格 **证券池 × 多指标截面宽表**：向导三步（选范围 → 选指标 → 选时间），支持系统/用户模板、CSV/XLSX 导出、分享链接与查询审计。路由 `/data-browser`；指标定义来自 `app/catalog/browser_indicators.yaml`，禁止前端硬编码业务字段。
+Wind 风格 **证券池 × 多指标截面宽表**：向导三步（选范围 → 选指标 → 选时间），支持系统/用户模板、CSV/XLSX 导出、分享链接与查询审计。路由 `/data-browser`；指标定义来自 `app/catalog/browser_indicators.yaml`，禁止前端硬编码业务字段。日线常用指标含 OHLC、`vol` / `amount`，以及 2025-07-07 起 Tushare `daily` 新增的 **`ah_vol`（盘后成交量）**、**`ah_amount`（盘后成交额）**（须 L3 表已补列且有采集数据）。
 
 #### 7a. 选范围
 
@@ -551,6 +551,36 @@ backend/
 
 新装环境：`init_db` 已含 `alembic upgrade head`（含 013–015）。若在旧版本上做过 L3 激活，再执行 `setup_collect_workflows.py --migrate` 或 `alembic upgrade head` 即可补丁。`schema_inference` 已将 `holder_name` 推断为 `text` 类型。
 
+### 上游接口字段变更
+
+#### `daily` / `pro_bar` 盘后字段（2025-07-07）
+
+交易所交易规则更新后，Tushare [`pro.daily`](https://tushare.pro/document/2?doc_id=27) 新增两个输出字段（默认不显示，全量返回时有值）：
+
+| API 字段 | 平台列 `column.key` | 说明 |
+|----------|---------------------|------|
+| `ah_vol` | `ah_vol` | 盘后成交量（手） |
+| `ah_amount` | `ah_amount` | 盘后成交额（千元） |
+
+通用复权接口 [`pro_bar`](https://tushare.pro/document/2?doc_id=109) 的股票日线指标引用 `daily` 文档，采集时同样可能返回上述列。**`adj_factor`（复权因子）不受影响**。
+
+| 范围 | 说明 |
+|------|------|
+| 受影响 `data_type` | `tushare_daily`；若已激活 `pro_bar` 则 `tushare_pro_bar` |
+| Catalog 模板 | `api_output_fields_registry.py`、`probe_templates.py`（`daily_ohlcv`）、`legacy_schema_registry.json`、`tushare_api_specs_cache.json` |
+| 数据浏览器 | `browser_indicators.yaml` 已注册 `tushare_daily.ah_vol` / `tushare_daily.ah_amount` |
+
+**新装环境**：`bootstrap_browser_p0.py` 或 L3 激活 `daily` 时，建表 schema 已含 `ah_vol` / `ah_amount`，日批采集自动落库。
+
+**存量环境**（表已存在、缺列时）：
+
+1. TIA 工作台 → 对应 `daily` 提案 → **Schema 维护** → 执行 `columns` 补列；或调用 API：
+   - `GET /api/v1/tia/proposals/{id}/schema-plan`
+   - `POST /api/v1/tia/proposals/{id}/schema-apply`（body：`{"modes":["columns"],"confirm_risk":true}`）
+2. 补列后触发日批工作流，或对 `tushare_daily` 执行定向回填；历史数据需 `--truncate` 重载或 chunk backfill 方有盘后列值（无盘后成交的标的可能为 NULL）。
+
+**Schema 漂移核对**：`GET /api/v1/catalog/data-standards/daily`、`GET .../drift`。
+
 ---
 
 ## 2000 积分 A 股采集部署
@@ -627,7 +657,7 @@ python scripts/seed_tia_workflows.py --replace # 重建
 
 - **日增**：Celery Beat 按工作流 Cron（如 `0 18 * * 1-5`）触发；或 UI 手动运行
 - **质检**：Beat 每日 18:00 `run_quality_check`
-- **Schema 漂移**：TIA 工作台 → Schema 维护；必要时 `alembic upgrade head`
+- **Schema 漂移**：TIA 工作台 → Schema 维护（如 `daily` 补列 `ah_vol` / `ah_amount`）；必要时 `alembic upgrade head`
 
 ---
 

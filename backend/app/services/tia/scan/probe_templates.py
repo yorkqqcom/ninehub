@@ -9,6 +9,8 @@ API_PROBE_OVERRIDES: dict[str, str] = {
     "trade_cal": "trade_cal",
     "top_inst": "top_inst_detail",
     "stock_basic": "list_basic",
+    "daily": "daily_ohlcv",
+    "pro_bar": "daily_ohlcv",
 }
 
 PROBE_TEMPLATES: dict[str, dict[str, Any]] = {
@@ -30,6 +32,28 @@ PROBE_TEMPLATES: dict[str, dict[str, Any]] = {
             "pct_chg",
             "vol",
             "amount",
+        ],
+    },
+    "daily_ohlcv": {
+        "params": {
+            "ts_code": "000001.SZ",
+            "start_date": "20240102",
+            "end_date": "20240105",
+        },
+        "expected_fields": [
+            "ts_code",
+            "trade_date",
+            "open",
+            "high",
+            "low",
+            "close",
+            "pre_close",
+            "change",
+            "pct_chg",
+            "vol",
+            "amount",
+            "ah_vol",
+            "ah_amount",
         ],
     },
     "top_inst_detail": {

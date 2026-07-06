@@ -66,6 +66,18 @@ overrides:
     group: 常用行情
     tags: [常用, 行情]
     pinyin: cje
+  tushare_daily.ah_vol:
+    label: 盘后成交量
+    unit: 手
+    group: 常用行情
+    tags: [行情, 盘后]
+    pinyin: phcjl
+  tushare_daily.ah_amount:
+    label: 盘后成交额
+    unit: 千元
+    group: 常用行情
+    tags: [行情, 盘后]
+    pinyin: phcje
   tushare_daily.pct_chg:
     label: 涨跌幅
     unit: "%"

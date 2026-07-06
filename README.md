@@ -237,6 +237,9 @@ repkit regenerate --project ninehub
 
 ## 注意事项
 
+- 架构与实现细节见本地 `docs/`（clone 后需自行准备，见 `.gitignore`）与 [AGENTS.md](AGENTS.md)
+- **上游接口变更**：2025-07-07 起 Tushare `pro.daily` 新增盘后字段 `ah_vol` / `ah_amount`；存量部署补列与回填见 [backend/README.md — 上游接口字段变更](backend/README.md#上游接口字段变更)
+
 - **Tushare Token**：在「数据源」页配置 Token 与 **account_points**（2000 积分 A 股链路须填 `2000`）后方可采集；请妥善保管 Token，勿提交到版本库。
 - **生产部署**：务必修改 `SECRET_KEY`、数据库密码，并将 `DEBUG=false`、`CELERY_INLINE_FALLBACK=false`。
 - **RBAC**：前端菜单按角色隐藏，但所有写接口后端均独立校验，不可仅依赖前端权限。

@@ -67,6 +67,8 @@ def _field_label(field: str) -> str:
         "close": "收盘",
         "vol": "成交量",
         "amount": "成交额",
+        "ah_vol": "盘后成交量",
+        "ah_amount": "盘后成交额",
     }
     return labels.get(field, field)
 

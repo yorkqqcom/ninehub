@@ -21,8 +21,12 @@ _TS_CODE_DATE_RANGE_OUTPUT: list[str] = [
     "amount",
 ]
 
+# daily / pro_bar — 交易所盘后固定价格交易（2025-07-07 起 pro.daily 新增）
+_DAILY_AFTER_HOURS_OUTPUT: list[str] = ["ah_vol", "ah_amount"]
+
 API_OUTPUT_FIELDS: dict[str, list[str]] = {
-    "daily": list(_TS_CODE_DATE_RANGE_OUTPUT),
+    "daily": list(_TS_CODE_DATE_RANGE_OUTPUT) + list(_DAILY_AFTER_HOURS_OUTPUT),
+    "pro_bar": list(_TS_CODE_DATE_RANGE_OUTPUT) + list(_DAILY_AFTER_HOURS_OUTPUT),
     "weekly": list(_TS_CODE_DATE_RANGE_OUTPUT),
     "monthly": list(_TS_CODE_DATE_RANGE_OUTPUT),
     "adj_factor": ["ts_code", "trade_date", "adj_factor"],

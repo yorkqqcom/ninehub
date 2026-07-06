@@ -28,9 +28,11 @@ def test_daily_schema_includes_registry_output_fields() -> None:
     assert "change" in fields
     schema = build_canonical_schema("daily")
     keys = [c["key"] for c in schema["columns"]]
-    assert len(keys) == 11
+    assert len(keys) == 13
     assert "change_amount" in keys
     assert "stock_code" in keys
+    assert "ah_vol" in keys
+    assert "ah_amount" in keys
 
 
 def test_daily_schema_merges_live_probe_extra_fields() -> None:
@@ -127,6 +129,8 @@ def test_upsert_daily_persists_all_schema_columns() -> None:
                 "pct_chg": 2.94,
                 "vol": 1000,
                 "amount": 10500.0,
+                "ah_vol": 500,
+                "ah_amount": 5200.0,
             }
         ]
     )
@@ -136,8 +140,10 @@ def test_upsert_daily_persists_all_schema_columns() -> None:
 
     inspector = inspect(engine)
     cols = {c["name"] for c in inspector.get_columns("tushare_daily_full")}
-    assert {"stock_code", "pre_close", "change_amount", "pct_chg", "amount"} <= cols
+    assert {"stock_code", "pre_close", "change_amount", "pct_chg", "amount", "ah_vol", "ah_amount"} <= cols
 
     row = session.execute(text("SELECT * FROM tushare_daily_full")).mappings().first()
     assert row["amount"] is not None
     assert row["change_amount"] is not None
+    assert row["ah_vol"] == 500
+    assert row["ah_amount"] == 5200.0

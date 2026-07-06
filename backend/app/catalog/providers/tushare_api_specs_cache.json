@@ -378,6 +378,18 @@
           "type": "float",
           "required": null,
           "description": "成交额 （千元）"
+        },
+        {
+          "name": "ah_vol",
+          "type": "float",
+          "required": null,
+          "description": "盘后成交量 （手）"
+        },
+        {
+          "name": "ah_amount",
+          "type": "float",
+          "required": null,
+          "description": "盘后成交额 （千元）"
         }
       ],
       "output_fields": [
@@ -391,7 +403,9 @@
         "change",
         "pct_chg",
         "vol",
-        "amount"
+        "amount",
+        "ah_vol",
+        "ah_amount"
       ],
       "sample_codes": [
         "pro = ts.pro_api()\n\ndf = pro.daily(ts_code='000001.SZ', start_date='20180701', end_date='20180718')\n\n#多个股票\ndf = pro.daily(ts_code='000001.SZ,600000.SH', start_date='20180701', end_date='20180718')",

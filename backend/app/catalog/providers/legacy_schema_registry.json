@@ -234,6 +234,14 @@
           "type": "number"
         },
         {
+          "key": "ah_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "ah_amount",
+          "type": "number"
+        },
+        {
           "key": "adj_factor",
           "type": "number"
         }
@@ -748,6 +756,14 @@
         },
         {
           "key": "amount",
+          "type": "number"
+        },
+        {
+          "key": "ah_vol",
+          "type": "bigint"
+        },
+        {
+          "key": "ah_amount",
           "type": "number"
         }
       ],
