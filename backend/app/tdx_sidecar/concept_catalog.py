@@ -9,6 +9,7 @@ from typing import Any
 import pandas as pd
 
 BLOCK_MEMBER_CANDIDATES = ("block_gn.dat", "block_fg.dat", "block_zs.dat", "block.dat")
+EXPORT_MEMBER_CANDIDATES = ("概念板块.txt",)
 
 
 def _normalize_stock_code(raw: str) -> str | None:
@@ -53,6 +54,46 @@ def _resolve_block_member_file(hq_cache_root: Path) -> tuple[Path | None, list[s
             return path, missing
         missing.append(name)
     return None, missing
+
+
+def _resolve_export_member_file(export_dir: Path) -> tuple[Path | None, list[str]]:
+    missing: list[str] = []
+    for name in EXPORT_MEMBER_CANDIDATES:
+        path = export_dir / name
+        if path.is_file() and path.stat().st_size > 0:
+            return path, missing
+        missing.append(name)
+    return None, missing
+
+
+def _normalize_index_code(raw: str) -> str | None:
+    code = raw.strip()
+    if len(code) == 6 and code.isdigit():
+        return f"{code}.TDX"
+    if code.endswith(".TDX"):
+        return code
+    return None
+
+
+def _parse_export_members(path: Path, trade_date: date) -> list[dict[str, str]]:
+    """Parse TongDaXin export txt: index_code\\tname\\tstock_code\\tstock_name."""
+    rows: list[dict[str, str]] = []
+    for line in path.read_text(encoding="gbk", errors="ignore").splitlines():
+        parts = line.strip().split("\t")
+        if len(parts) < 3:
+            continue
+        index_code = _normalize_index_code(parts[0])
+        stock_code = _normalize_stock_code(parts[2])
+        if not index_code or not stock_code:
+            continue
+        rows.append(
+            {
+                "index_code": index_code,
+                "stock_code": stock_code,
+                "trade_date": trade_date.isoformat(),
+            }
+        )
+    return rows
 
 
 def _parse_block_members(
@@ -117,13 +158,26 @@ def export_concept_catalog(
             elif index_rows:
                 source = "local:tdxzs"
         else:
-            member_missing_reason = (
-                "未找到板块成分股文件（"
-                + " / ".join(missing_names)
-                + "）。请在通达信客户端执行「系统 → 专业数据 → 板块数据」更新后重试。"
-            )
-            if index_rows:
-                source = "local:tdxzs"
+            export_path: Path | None = None
+            if concept_export_dir:
+                export_path, _export_missing = _resolve_export_member_file(Path(concept_export_dir))
+            if export_path is not None:
+                member_rows = _parse_export_members(export_path, trade_date)
+                member_source = f"export:{export_path.name}"
+                member_missing_reason = None
+                if index_rows and member_rows:
+                    source = f"local:tdxzs+{export_path.name}"
+                elif index_rows:
+                    source = "local:tdxzs"
+            else:
+                member_missing_reason = (
+                    "未找到板块成分股文件（"
+                    + " / ".join(missing_names)
+                    + "）。请在通达信客户端执行「系统 → 专业数据 → 板块数据」更新，"
+                    "或在「自定义板块」导出到 T0002/export（需含 概念板块.txt）后重试。"
+                )
+                if index_rows:
+                    source = "local:tdxzs"
     if index_rows:
         for row in index_rows:
             row["trade_date"] = trade_date.isoformat()
