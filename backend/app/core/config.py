@@ -44,6 +44,28 @@ class Settings(BaseSettings):
     browser_query_cache_ttl: int = 300
     quality_alert_webhook_url: Optional[str] = None
 
+    # Watch / quote_watch (pure TDX)
+    watch_tdx_sidecar_url: Optional[str] = None
+    watch_tdx_sidecar_token: Optional[str] = None
+    watch_alert_retention_days: int = 30
+    watch_max_enabled_profiles: int = 50
+    watch_max_profiles_per_user: int = 5
+    watch_max_targets_per_profile: int = 100
+    watch_require_redis_leader: bool = False
+    watch_tick_interval_seconds: float = 5.0
+    watch_quote_hard_ttl_seconds: float = 2.0
+    watch_session_morning_start: str = "09:15"
+    watch_session_morning_end: str = "11:30"
+    watch_session_afternoon_start: str = "13:00"
+    watch_session_afternoon_end: str = "15:05"
+    # Optional outbound notify (e.g. Hermes webhook deliver_only).
+    # Prefer platform_settings UI/DB; env is fallback when DB pair is unset.
+    watch_alert_webhook_url: Optional[str] = None
+    watch_alert_webhook_secret: Optional[str] = None
+    watch_alert_webhook_timeout_seconds: float = 3.0
+    # Hermes Generic V2 (default) or legacy V1 body-only HMAC.
+    watch_alert_webhook_signature_version: str = "v2"
+
 
 @lru_cache
 def get_settings() -> Settings:

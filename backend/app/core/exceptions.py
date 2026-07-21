@@ -24,3 +24,8 @@ class ForbiddenError(AppException):
 class ValidationError(AppException):
     def __init__(self, message: str = "Validation failed", details: Optional[Any] = None) -> None:
         super().__init__(message, code="validation_error", details=details)
+
+
+class ConflictError(AppException):
+    def __init__(self, message: str = "Conflict", details: Optional[Any] = None) -> None:
+        super().__init__(message, code="conflict", details=details)

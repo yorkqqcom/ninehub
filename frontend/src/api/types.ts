@@ -194,6 +194,12 @@ export interface PlatformSettings {
   sync_start_date: string;
   sync_type_overrides: Record<string, string>;
   env_sync_start_date: string;
+  watch_alert_webhook_url: string | null;
+  watch_alert_webhook_secret_masked: string | null;
+  watch_alert_webhook_secret_configured: boolean;
+  watch_alert_webhook_signature_version: string;
+  watch_alert_webhook_active_source: "db" | "env" | "none";
+  env_watch_alert_webhook_configured: boolean;
 }
 
 export interface UserInfo {

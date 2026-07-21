@@ -5,6 +5,7 @@ from app.tasks.celery_app import celery_app
 EXPECTED_TASKS = {
     "ninehub.cleanup_export_files",
     "ninehub.dispatch_scheduled_tasks",
+    "ninehub.run_backtest",
     "ninehub.run_collect",
     "ninehub.run_platform_job",
     "ninehub.run_quality_check",

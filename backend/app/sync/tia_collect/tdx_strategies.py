@@ -148,7 +148,8 @@ class TdxConceptSnapshotStrategy(CollectStrategy):
                 from app.core.exceptions import ValidationError
 
                 reason = payload.get("concept_member_missing_reason") or (
-                    "成分股为空，请检查 hq_cache 下 block_gn.dat 是否存在"
+                    "成分股为空，请检查 hq_cache/block_gn.dat 或 T0002/export 下"
+                    "概念/地区/行业/风格/指数板块.txt"
                 )
                 raise ValidationError(f"TDX concept_member: {reason}")
         else:

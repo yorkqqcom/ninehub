@@ -28,6 +28,12 @@ const router = createRouter({
           component: () => import("@/pages/browser/DataBrowserPage.vue"),
         },
         {
+          path: "backtest",
+          name: "backtest",
+          component: () => import("@/pages/backtest/BacktestPage.vue"),
+          meta: { adminOnly: true },
+        },
+        {
           path: "tasks",
           name: "tasks",
           component: () => import("@/pages/tasks/TasksPage.vue"),

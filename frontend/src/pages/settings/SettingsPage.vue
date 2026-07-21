@@ -25,7 +25,11 @@ onMounted(async () => {
     health.value = "无法连接";
   }
   if (auth.isAdmin) {
-    await Promise.all([loadSettings(), loadUsers()]);
+    try {
+      await Promise.all([loadSettings(), loadUsers()]);
+    } catch (e) {
+      ui.showMessage(e instanceof Error ? e.message : String(e), "error");
+    }
   }
 });
 
@@ -143,6 +147,12 @@ async function toggleUser(user: UserInfo) {
         <div class="kv-row">
           <span class="kv-row__label">Health</span>
           <span class="kv-row__value"><code>{{ health }}</code></span>
+        </div>
+        <div class="kv-row">
+          <span class="kv-row__label">盯盘 Hermes</span>
+          <span class="kv-row__value">
+            <a href="/watch/notify">前往盯盘「Hermes 外发」配置</a>
+          </span>
         </div>
       </div>
     </div>

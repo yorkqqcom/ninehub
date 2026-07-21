@@ -15,6 +15,12 @@ from app.models.sync_task import SyncTask  # noqa: F401
 from app.models.task_run import TaskRun  # noqa: F401
 from app.models.tia_proposal import TiaProposal  # noqa: F401
 from app.models.user import User  # noqa: F401
+from app.models.watch import (  # noqa: F401
+    WatchAlertEvent,
+    WatchCooldownState,
+    WatchEngineGate,
+    WatchProfile,
+)
 from app.models.workflow import (  # noqa: F401
     NodeRun,
     Workflow,

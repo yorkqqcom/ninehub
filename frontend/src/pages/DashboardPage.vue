@@ -72,6 +72,7 @@ const allModules = [
     desc: "证券池 × 多指标宽表截面（三选一提）",
   },
   { name: "数据查询", path: "/browse", desc: "L3 激活事实表分页查询", browseOnly: true },
+  { name: "策略回测", path: "/backtest", desc: "日线信号 · 证券池异步回测", adminOnly: true },
 
 
 

@@ -41,6 +41,9 @@ dev = [
 doc-sync = [
     "playwright>=1.40",
 ]
+tdx = [
+    "pytdx>=1.72",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]

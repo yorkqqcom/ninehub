@@ -57,6 +57,14 @@ export const NAV_GROUPS: NavGroup[] = [
         desc: "L3 激活事实表分页查询",
         browseOnly: true,
       },
+      {
+        name: "backtest",
+        to: "/backtest",
+        label: "策略回测",
+        icon: "search",
+        desc: "日线信号 · 证券池异步回测",
+        adminOnly: true,
+      },
     ],
   },
   {

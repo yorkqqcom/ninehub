@@ -11,6 +11,7 @@ async def test_get_settings_default(client: AsyncClient) -> None:
     data = response.json()
     assert "sync_start_date" in data
     assert "sync_type_overrides" in data
+    assert "watch_alert_webhook_active_source" in data
 
 
 @pytest.mark.asyncio

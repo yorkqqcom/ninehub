@@ -3,7 +3,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.core.exceptions import AppException, ForbiddenError, NotFoundError, ValidationError
+from app.core.exceptions import AppException, ConflictError, ForbiddenError, NotFoundError, ValidationError
 
 
 def register_exception_handlers(app: FastAPI) -> None:
@@ -18,6 +18,12 @@ def register_exception_handlers(app: FastAPI) -> None:
             content={"detail": exc.message, "code": exc.code, "details": exc.details},
         )
 
+    @app.exception_handler(ConflictError)
+    async def conflict_handler(_request: Request, exc: ConflictError) -> JSONResponse:
+        return JSONResponse(
+            status_code=409,
+            content={"detail": exc.message, "code": exc.code, "details": exc.details},
+        )
     @app.exception_handler(ForbiddenError)
     async def forbidden_handler(_request: Request, exc: ForbiddenError) -> JSONResponse:
         return JSONResponse(status_code=403, content={"detail": exc.message, "code": exc.code})

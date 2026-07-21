@@ -8,9 +8,11 @@ from app.api.v1.endpoints import (
     platform,
     quality,
     query_browser,
+    research,
     sources,
     tasks,
     tia,
+    watch,
     workflows,
 )
 
@@ -26,3 +28,6 @@ api_router.include_router(platform.router, prefix="/platform", tags=["platform"]
 api_router.include_router(
     query_browser.router, prefix="/query/browser", tags=["query-browser"]
 )
+api_router.include_router(research.router, prefix="/research", tags=["research"])
+api_router.include_router(watch.router, prefix="/watch", tags=["watch"])
+

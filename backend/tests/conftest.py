@@ -11,6 +11,7 @@ from app.core.security import create_access_token, get_password_hash
 from app.main import app
 from app.models.base import Base
 from app.models.platform_job import PlatformJob  # noqa: F401
+from app.models.browser import BrowserWatchlist, BrowserTemplate, BrowserQueryAudit  # noqa: F401
 from app.models.user import User
 from app.models.workflow import WorkflowEdge, WorkflowNode  # noqa: F401
 from app.models.data_source import DataSource  # noqa: F401
@@ -35,10 +36,13 @@ def celery_use_delay(monkeypatch):
     """Tests mock .delay(); disable inline fallback so dispatch uses Celery."""
     monkeypatch.setenv("CELERY_INLINE_FALLBACK", "false")
     from app.core.config import get_settings
+    from app.services.watch.watch_webhook_runtime import get_watch_webhook_runtime
 
     get_settings.cache_clear()
+    get_watch_webhook_runtime().reset()
     yield
     get_settings.cache_clear()
+    get_watch_webhook_runtime().reset()
 
 
 @pytest_asyncio.fixture

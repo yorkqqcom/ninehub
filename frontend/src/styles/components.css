@@ -241,6 +241,10 @@
   max-width: 240px;
 }
 
+.input-w-lg {
+  max-width: 420px;
+}
+
 .input-w-full {
   width: 100%;
 }

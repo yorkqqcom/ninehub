@@ -25,6 +25,8 @@ celery_app.conf.update(
         "app.tasks.maintenance_tasks",
         "app.tasks.quality_tasks",
         "app.tasks.platform_jobs",
+        "app.tasks.backtest_tasks",
+        "app.tasks.browser_tasks",
     ],
     beat_schedule={
         "dispatch-scheduled-tasks": {
@@ -38,6 +40,10 @@ celery_app.conf.update(
         "cleanup-export-files": {
             "task": "ninehub.cleanup_export_files",
             "schedule": crontab(hour=3, minute=0),
+        },
+        "cleanup-watch-alerts": {
+            "task": "ninehub.cleanup_watch_alerts",
+            "schedule": crontab(hour=3, minute=15),
         },
     },
 )

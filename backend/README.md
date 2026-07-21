@@ -529,6 +529,13 @@ backend/
 | `BROWSER_QUERY_CACHE_TTL` | 数据浏览器查询结果缓存秒数（默认 300） |
 | `TUSHARE_TOKEN` | 脚本回退用 Token（优先读「数据源」配置） |
 | `TUSHARE_ACCOUNT_POINTS` | 脚本回退用积分档（默认 120；2000 积分 A 股链路须设为 2000） |
+| `WATCH_ALERT_WEBHOOK_URL` | 盯盘 `quote_alert` 外发回退（如 Hermes `http://127.0.0.1:8644/webhooks/ninehub-watch`）；**优先**盯盘 SPA「Hermes 外发」(`/watch/notify`) DB 配置 |
+| `WATCH_ALERT_WEBHOOK_SECRET` | 与 URL 成对；Hermes 路由 HMAC secret（UI 也可配置，GET 掩码） |
+| `WATCH_ALERT_WEBHOOK_SIGNATURE_VERSION` | `v2`（默认，Hermes Generic V2）或 `v1`（旧网关）；UI 可覆盖 |
+| `WATCH_ALERT_WEBHOOK_TIMEOUT_SECONDS` | 外发超时秒数（默认 3；仅 env） |
+| `WATCH_REQUIRE_REDIS_LEADER` | 生产推荐 `true`，避免多 worker 双发告警 |
+
+盯盘外发到 Hermes（可选）：`hermes update` → Gateway 启用 Webhook + 手机通道 → 路由 `ninehub-watch` 设 `deliver_only: true`（勿设 `events`）→ `/sethome` → 在盯盘「Hermes 外发」填写 URL/SECRET（或 `.env` 回退；默认签名 V2）。容器内 API 访问宿主机 Gateway 用 `http://host.docker.internal:8644/webhooks/ninehub-watch`。UI「发送测试」对应 `POST /api/v1/platform/watch-alert-webhook/test`。
 
 ---
 
@@ -536,7 +543,7 @@ backend/
 
 | 层级 | 机制 | 说明 |
 |------|------|------|
-| 平台表 | Alembic `migrations/versions/` | `init_db.py` 执行 `alembic upgrade head`（当前 head：`015_holder_name_text`） |
+| 平台表 | Alembic `migrations/versions/` | `init_db.py` 执行 `alembic upgrade head`（当前 head：`020_watch_alert_webhook`） |
 | 事实表 | TIA L3 `run_migration` | `migration_service.ensure_table` 按 `schema.columns` + `unique_key_registry` 动态建表 |
 | 存量修复 | Alembic 013–015 | 已激活表的约束/列宽补丁（见下表） |
 
