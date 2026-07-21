@@ -1,0 +1,38 @@
+/* NineHub 设计令牌 — 偏机构终端，严谨、低噪、数值可读（对标 xtqmt-user） */
+:root {
+  --font-sans: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --font-size-base: 13px;
+  --font-size-sm: 11px;
+  --font-size-md: 12px;
+  --font-size-lg: 14px;
+  --line-height: 1.45;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-panel: 6px;
+  --radius-input: 4px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+
+  /* 紧凑间距节奏 */
+  --space-xs: 4px;
+  --space-sm: 6px;
+  --space-md: 8px;
+  --space-lg: 12px;
+  --space-xl: 16px;
+
+  --aside-w: 188px;
+  --topbar-h: 40px;
+  --bp-md: 768px;
+
+  /* A 股涨跌色（涨红跌绿）；主题覆盖见 theme-dark.css / theme-light.css */
+  --color-rise: #ef4444;
+  --color-fall: #22c55e;
+  --color-flat: #64748b;
+  /* 主题令牌（--color-on-primary / overlay / info-* / wf-* / shadow-* / topbar-*）定义于 theme-*.css */
+
+  --transition-fast: 120ms ease;
+}
